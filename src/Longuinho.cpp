@@ -39,6 +39,7 @@ void setup()
   pidController.setOutputLimits(-1, 1);
   trekking.setSystemController(&pidController);
 
+  trekking.setMaxTimeInRefinedSearch(10000); // 10s
   trekking.setup();
 }
 

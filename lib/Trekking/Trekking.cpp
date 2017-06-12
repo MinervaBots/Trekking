@@ -80,35 +80,9 @@ void Trekking::rotateToTarget(unsigned long deltaTime)
 void Trekking::search(unsigned long deltaTime)
 {
   auto target = m_Targets.get(m_CurrentTargetId);
-  if(distance(target) > 0.1)
+  auto distanceToTarget = distance(target);
+  if(distanceToTarget > 0.1)
   {
-    /*
-    Se já estamos indo para o ultimo objetivo, temos que ficar atentos a
-    obstaculos
-    */
-    if(m_CurrentTargetId == 2)
-    {
-      auto objectsVector = m_Odometry.getV();
-      // Alguma coisa foi detectada
-      if(objectsVector.getX() != -1)
-      {
-        if(m_Odometry.getT())
-        {
-          /*
-          Objetivo alcançado.
-          Acredito que nunca vai fazer isso, porque na prática vamos encontrar
-          obstaculos antes do objetivo, mas vai que...
-          */
-          m_CurrentMode = &Trekking::finish;
-        }
-        else
-        {
-          m_CurrentMode = &Trekking::avoidObstacles;
-        }
-        return;
-      }
-    }
-
     /*
     auto currentPosition = m_pTrekkingSensoring->getPosition();
     float heading = currentPosition.getHeading();
@@ -125,6 +99,40 @@ void Trekking::search(unsigned long deltaTime)
     float lineError = m_ReferenceLine - m_Odometry.getU();
     float angularVelocity = m_pSystemController->run(lineError);
     m_pMotorController->move(0.5, angularVelocity);
+
+    /*
+    Se estivermos perto o suficiente, já podemos começar a procurar os cones
+    */
+    if(distanceToTarget > 3)
+      return;
+
+    auto objectsVector = m_Odometry.getV();
+    float distance = objectsVector.getY();
+
+    if(distance > 0)
+    {
+      if(m_Odometry.getT())
+      {
+        // Opa! Já chegamos no objetivo
+        m_CurrentMode = &Trekking::buzzer;
+      }
+      else if(m_CurrentTargetId == 2)
+      {
+        /*
+        Se não chegamos no objetivo, e estamos indo na direção do ultimo, isso
+        é um obstaculo.
+        */
+        m_CurrentMode = &Trekking::avoidObstacles;
+      }
+      else
+      {
+        /*
+        É um cone, mas ainda estamos muito longe pra ver a base branca.
+        Muda pra refinedSearch e deixa que ele direcione até o cone.
+        */
+        m_CurrentMode = &Trekking::refinedSearch;
+      }
+    }
     return;
   }
 
@@ -133,6 +141,7 @@ void Trekking::search(unsigned long deltaTime)
   tenham problemas e nunca mude de estado) muda para 'refinedSearch'
   */
   m_CurrentMode = &Trekking::refinedSearch;
+  m_StartTimeInRefinedSearch = millis();
 }
 
 void Trekking::refinedSearch(unsigned long deltaTime)
@@ -150,7 +159,23 @@ void Trekking::refinedSearch(unsigned long deltaTime)
     }
     else
     {
-      m_pMotorController->move(0, -1);
+      if(millis() - m_StartTimeInRefinedSearch < m_MaxTimeInRefinedSearch)
+      {
+        /*
+        Se ainda não ultrapassamos um tempo limite (digamos, que o suficiente
+        pra completar uma volta), gira em torno do próprio eixo e tenta localizar
+        o objetivo.
+        */
+        m_pMotorController->move(0, -1);
+        return;
+      }
+      /*
+      A ideia é que se não localizamos o alvo girando no próprio eixo, devemos
+      ir abrindo cada vez mais a área de busca.
+
+      Então se move fazendo circulos cada vez maiores.
+      */
+      m_pMotorController->move(0.7, -1);
     }
     return;
   }
@@ -217,6 +242,11 @@ void Trekking::standBy(unsigned long deltaTime)
 
 void Trekking::buzzer(unsigned long deltaTime)
 {
+  if(m_CurrentTargetId == 2)
+  {
+    finish(deltaTime);
+    return;
+  }
   turnBuzzerOn();
   delay(5000);
   turnBuzzerOff();
@@ -227,8 +257,9 @@ void Trekking::buzzer(unsigned long deltaTime)
 
 void Trekking::finish(unsigned long deltaTime)
 {
-  // Chama o buzzer pra evitar reescrever o mesmo código
-  buzzer(deltaTime);
+  turnBuzzerOn();
+  delay(5000);
+  turnBuzzerOff();
 
   // Sobrescreve o estado que deve ser executado na próxima iteração
   m_CurrentMode = &Trekking::standBy;

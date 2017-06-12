@@ -38,6 +38,8 @@ public:
 
   void setSystemController(SystemController *controller) { m_pSystemController = controller; }
   void setSensoring(TrekkingSensoring *sensoring) { m_pTrekkingSensoring = sensoring; }
+
+  void setMaxTimeInRefinedSearch(unsigned long maxTime) { m_MaxTimeInRefinedSearch = maxTime; }
   /*--------------------------------------------------------------------------*/
 
 private:
@@ -70,6 +72,8 @@ private:
   TrekkingSensoring *m_pTrekkingSensoring;
   TrekkingOdometry m_Odometry;
   float m_ReferenceLine;
+  unsigned long m_StartTimeInRefinedSearch;
+  unsigned long m_MaxTimeInRefinedSearch;
   /*--------------------------------------------------------------------------*/
 
   /*----|Modos de operação|---------------------------------------------------*/
@@ -90,8 +94,13 @@ private:
 
   /*
   Segue com PID uma linha imaginária que vem do magnetometro até chegar que a
-  posição seja igual a do alvo pela odometria.
+  posição seja igual a do alvo pela odometria. Quando estiver suficientemente
+  próximo (< 3m) do objetivo, utiliza os sensores de ultrassom tentando
+  localizar o alvo com maior rapidez.
+
   [Proximo estado]: refinedSearch
+  [Proximo estado]: buzzer
+  [Proximo estado]: avoidObstacles
   */
   void search(unsigned long deltaTime);
 
