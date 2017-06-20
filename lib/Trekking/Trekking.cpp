@@ -3,12 +3,14 @@
 
 void Trekking::setup()
 {
+  m_CurrentMode = &Trekking::standBy;
 }
 
 void Trekking::start()
 {
   emergency();
   delay(1500);
+  m_CurrentMode = &Trekking::rotateToTarget;
   m_StartTime = millis();
   m_LastIterationTime = m_StartTime;
   m_IsRunning = true;
@@ -18,6 +20,7 @@ void Trekking::stop()
 {
   m_StopTime = millis();
   m_IsRunning = false;
+  m_pMotorController->move(0, 0);
 }
 
 void Trekking::emergency()
@@ -28,11 +31,13 @@ void Trekking::emergency()
 
 void Trekking::update()
 {
-  if(!m_IsRunning)
-    return;
-
   m_Odometry = m_pTrekkingSensoring->getInput();
+  delay(500);
 
+  if(!m_IsRunning)
+  {
+    return;
+  }
 
   unsigned long deltaTime = millis() - m_LastIterationTime;
   (this->*m_CurrentMode)(deltaTime);

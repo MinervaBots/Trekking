@@ -1,6 +1,7 @@
 #ifndef LonguinhoSensoring_hpp
 #define LonguinhoSensoring_hpp
 
+#include "../lib/Filter/SimpleMovingAverageFilter.hpp"
 #include "../lib/Trekking/TrekkingSensoring.hpp"
 #include "../lib/MPU9150Lib/MPU9150Lib.h"
 #include "../lib/InputSource/InputSource.hpp"
@@ -41,6 +42,7 @@ private:
   Position m_pCurrentEncoderPosition;
 
   MPU9150Lib m_MPU;
+  SimpleMovingAverageFilter m_MagFilter;
   float m_InitialHeading;
   Position m_pCurrentMPUPosition;
 

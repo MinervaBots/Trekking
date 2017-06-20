@@ -1,163 +1,22 @@
-#include "Arduino.h"
 #include "RoboClaw.h"
 
 #define MAXRETRY 2
-#define SetDWORDval(arg) (uint8_t)(((uint32_t)arg)>>24),(uint8_t)(((uint32_t)arg)>>16),(uint8_t)(((uint32_t)arg)>>8),(uint8_t)arg
-#define SetWORDval(arg) (uint8_t)(((uint16_t)arg)>>8),(uint8_t)arg
+#define SetDWORDval(arg) (uint8_t)(arg>>24),(uint8_t)(arg>>16),(uint8_t)(arg>>8),(uint8_t)arg
+#define SetWORDval(arg) (uint8_t)(arg>>8),(uint8_t)arg
 
 //
 // Constructor
 //
-RoboClaw::RoboClaw(HardwareSerial *serial, uint32_t tout)
+RoboClaw::RoboClaw(uint8_t receivePin, uint8_t transmitPin, uint32_t tout) : BMSerial::BMSerial(receivePin, transmitPin)
 {
 	timeout = tout;
-	hserial = serial;
-#ifdef __AVR__
-	sserial = 0;
-#endif
 }
-
-#ifdef __AVR__
-RoboClaw::RoboClaw(SoftwareSerial *serial, uint32_t tout)
-{
-	timeout = tout;
-	sserial = serial;
-	hserial = 0;
-}
-#endif
 
 //
 // Destructor
 //
 RoboClaw::~RoboClaw()
 {
-}
-
-void RoboClaw::begin(long speed)
-{
-	if(hserial){
-		hserial->begin(speed);
-	}
-#ifdef __AVR__
-	else{
-		sserial->begin(speed);
-	}
-#endif
-}
-
-bool RoboClaw::listen()
-{
-#ifdef __AVR__
-	if(sserial){
-		return sserial->listen();
-	}
-#endif
-	return false;
-}
-
-bool RoboClaw::isListening()
-{
-#ifdef __AVR__
-	if(sserial)
-		return sserial->isListening();
-#endif
-	return false;
-}
-
-bool RoboClaw::overflow()
-{
-#ifdef __AVR__
-	if(sserial)
-		return sserial->overflow();
-#endif
-	return false;
-}
-
-int RoboClaw::peek()
-{
-	if(hserial)
-		return hserial->peek();
-#ifdef __AVR__
-	else
-		return sserial->peek();
-#endif
-}
-
-size_t RoboClaw::write(uint8_t byte)
-{
-	if(hserial)
-		return hserial->write(byte);
-#ifdef __AVR__
-	else
-		return sserial->write(byte);
-#endif
-}
-
-int RoboClaw::read()
-{
-	if(hserial)
-		return hserial->read();
-#ifdef __AVR__
-	else
-		return sserial->read();
-#endif
-}
-
-int RoboClaw::available()
-{
-	if(hserial)
-		return hserial->available();
-#ifdef __AVR__
-	else
-		return sserial->available();
-#endif
-}
-
-void RoboClaw::flush()
-{
-	if(hserial)
-		hserial->flush();
-}
-
-int RoboClaw::read(uint32_t timeout)
-{
-	if(hserial){
-		uint32_t start = micros();
-		// Empty buffer?
-		while(!hserial->available()){
-		   if((micros()-start)>=timeout)
-		      return -1;
-		}
-		return hserial->read();
-	}
-#ifdef __AVR__
-	else{
-		if(sserial->isListening()){
-			uint32_t start = micros();
-			// Empty buffer?
-			while(!sserial->available()){
-			   if((micros()-start)>=timeout)
-				  return -1;
-			}
-			return sserial->read();
-		}
-	}
-#endif
-	return -1;
-}
-
-void RoboClaw::clear()
-{
-	if(hserial){
-		while(hserial->available())
-			hserial->read();
-	}
-#ifdef __AVR__
-	else{
-		while(sserial->available())
-			sserial->read();
-	}
-#endif
 }
 
 void RoboClaw::crc_clear()
@@ -192,7 +51,7 @@ bool RoboClaw::write_n(uint8_t cnt, ... )
 		va_list marker;
 		va_start( marker, cnt );     /* Initialize variable arguments. */
 		for(uint8_t index=0;index<cnt;index++){
-			uint8_t data = va_arg(marker, int);
+			uint8_t data = va_arg(marker, uint16_t);
 			crc_update(data);
 			write(data);
 		}
@@ -223,9 +82,9 @@ bool RoboClaw::read_n(uint8_t cnt,uint8_t address,uint8_t cmd,...)
 
 		//send data with crc
 		va_list marker;
-		va_start( marker, cmd );     /* Initialize variable arguments. */
+		va_start( marker, cnt );     /* Initialize variable arguments. */
 		for(uint8_t index=0;index<cnt;index++){
-			uint32_t *ptr = va_arg(marker, uint32_t *);
+			uint32_t *ptr = (uint32_t *)va_arg(marker, uint16_t);
 
 			if(data!=-1){
 				data = read(timeout);

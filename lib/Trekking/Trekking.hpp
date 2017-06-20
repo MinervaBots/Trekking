@@ -77,8 +77,7 @@ private:
   /*--------------------------------------------------------------------------*/
 
   /*----|Modos de operação|---------------------------------------------------*/
-  typedef void (Trekking::*OperationMode)(unsigned long deltaTime);
-  OperationMode m_CurrentMode;
+  void (Trekking::*m_CurrentMode)(unsigned long);
 
   /*
   Aguarda pressionar o botão de inicio.

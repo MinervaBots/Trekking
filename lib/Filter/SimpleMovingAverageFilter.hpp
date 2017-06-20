@@ -18,6 +18,7 @@ public:
   SimpleMovingAverageFilter(unsigned int samplesCapacity);
   ~SimpleMovingAverageFilter();
   float getInput();
+  float getInput(float rawInput);
   void clear();
 
 private:
