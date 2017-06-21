@@ -13,7 +13,7 @@ class AverageFilter : public Filter<float>
 {
 public:
   AverageFilter(unsigned int numberOfSamples) { setNumberOfSamples(numberOfSamples); }
-  float getInput();
+  float getInput(float rawInput);
 
   void setNumberOfSamples(unsigned int numberOfSamples) { m_NumberOfSamples = numberOfSamples; }
 

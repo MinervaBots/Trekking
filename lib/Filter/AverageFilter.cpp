@@ -1,7 +1,7 @@
 #include "AverageFilter.hpp"
 
 
-float AverageFilter::getInput()
+float AverageFilter::getInput(float rawInput)
 {
   // Só pra evitar um zero division error
   if(m_NumberOfSamples == 0)
@@ -16,7 +16,7 @@ float AverageFilter::getInput()
   */
   for (unsigned int i = 0; i < m_NumberOfSamples; i++)
   {
-    sum += m_pInputSource->getInput();
+    sum += rawInput;
   }
 
   // Faz a média dividindo pelo número de leituras que ele realizou

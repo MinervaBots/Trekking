@@ -7,7 +7,8 @@ template<typename T>
 class Filter : public InputSource<T>
 {
 public:
-  virtual T getInput() = 0;
+  virtual T getInput(float rawInput) = 0;
+  virtual T getInput() { return getInput(m_pInputSource->getInput()); }
   virtual void setInputSource(InputSource<T>* pInputSource) { m_pInputSource = pInputSource; }
 
 protected:
