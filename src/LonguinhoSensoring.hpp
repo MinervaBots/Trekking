@@ -1,7 +1,7 @@
 #ifndef LonguinhoSensoring_hpp
 #define LonguinhoSensoring_hpp
 
-#include "../lib/Filter/SimpleMovingAverageFilter.hpp"
+#include "../lib/Filter/Filter.hpp"
 #include "../lib/Trekking/TrekkingSensoring.hpp"
 #include "../lib/MPU9150Lib/MPU9150Lib.h"
 #include "../lib/InputSource/InputSource.hpp"
@@ -35,6 +35,8 @@ public:
   Position getMPUPosition() const { return m_pCurrentMPUPosition; }
 
   Position getPosition() const { return getEncoderPosition(); }
+
+  void setMagnetometerFilter(Filter<float> *pFilter) { m_pMagFilter = pFilter; }
 private:
   TrekkingOdometry m_CachedValue;
 
@@ -42,7 +44,7 @@ private:
   Position m_pCurrentEncoderPosition;
 
   MPU9150Lib m_MPU;
-  SimpleMovingAverageFilter<5> m_MagFilter;
+  Filter<float> *m_pMagFilter;
   float m_InitialHeading;
   Position m_pCurrentMPUPosition;
 

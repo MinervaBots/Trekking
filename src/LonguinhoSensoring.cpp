@@ -52,13 +52,16 @@ TrekkingOdometry LonguinhoSensoring::getInput()
 
   if(m_MPU.read())
   {
-    float dir = atan2(m_MPU.m_calMag[VEC3_Y], m_MPU.m_calMag[VEC3_X]);
-    dir = m_MagFilter.getInput(dir);
+    float magDirection = atan2(m_MPU.m_calMag[VEC3_Y], m_MPU.m_calMag[VEC3_X]);
+    if(m_pMagFilter != nullptr)
+    {
+      magDirection = m_pMagFilter->getInput(magDirection);
+    }
 
     Serial.print("Magnetometro: ");
-    Serial.println(dir);
+    Serial.println(magDirection);
 
-    m_CachedValue.setU(dir);
+    m_CachedValue.setU(magDirection);
     m_pCurrentMPUPosition.setHeading(m_MPU.m_dmpEulerPose[VEC3_Z] - m_InitialHeading);
   }
 

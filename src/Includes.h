@@ -14,6 +14,7 @@
 #include "../lib/Trekking/Trekking.hpp"
 #include "../lib/Logger/PrintLogger.hpp"
 #include "../lib/PIDController/PIDController.hpp"
+#include "../lib/Filter/SimpleMovingAverageFilter.hpp"
 
 #include "Pins.h"
 #include "LonguinhoSensoring.hpp"
