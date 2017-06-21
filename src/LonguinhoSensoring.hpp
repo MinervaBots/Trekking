@@ -47,6 +47,7 @@ private:
   Filter<float> *m_pMagFilter;
   float m_InitialHeading;
   Position m_pCurrentMPUPosition;
+  Vector2<float> m_CurrentVelocity;
 
   Ultrasonic m_UltrasonicLeft;
   Ultrasonic m_UltrasonicCenter;

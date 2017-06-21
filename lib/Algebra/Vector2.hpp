@@ -27,18 +27,24 @@ public:
     ret.m_Y = this->m_Y + vector.m_Y;
     return ret;
   }
-  Vector2<T> operator+=(const Vector2<T>& vector)
-  {
-    this->m_X += vector.m_X;
-    this->m_Y += vector.m_Y;
-    return this;
-  }
   Vector2<T> operator-(const Vector2<T>& vector) const
   {
     Vector2<T> ret;
     ret.m_X = this->m_X - vector.m_X;
     ret.m_Y = this->m_Y - vector.m_Y;
     return ret;
+  }
+  Vector2<T>& operator+=(const Vector2<T>& vector)
+  {
+    this->m_X += vector.m_X;
+    this->m_Y += vector.m_Y;
+    return *this;
+  }
+  Vector2<T>& operator-=(const Vector2<T>& vector)
+  {
+    this->m_X -= vector.m_X;
+    this->m_Y -= vector.m_Y;
+    return *this;
   }
   bool operator==(const Vector2<T>& vector) const
   {

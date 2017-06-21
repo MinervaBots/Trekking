@@ -9,7 +9,7 @@ LonguinhoSensoring sensoring;
 LonguinhoMotorController motorController;
 PIDController pidController;
 Logger *Log = new PrintLogger(Serial, LogLevel::Verboses);
-
+SimpleMovingAverageFilter<5> filter;
 void testMotors()
 {
   motorController.setWheelsRadius(0.075);
@@ -43,7 +43,7 @@ void setup()
   // Define a posição inicial
   sensoring.intializePosition(0, 0, 0);
   sensoring.initializeEncoder(&motorController);
-
+  sensoring.setMagnetometerFilter(&filter);
   sensoring.initializeMPU(20, 10, 10, 40);
   trekking.setSensoring(&sensoring);
 

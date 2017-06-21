@@ -1,5 +1,6 @@
 #include "LonguinhoSensoring.hpp"
 #include "Pins.h"
+#include "../lib/Logger/Logger.hpp"
 
 LonguinhoSensoring::LonguinhoSensoring() :
   m_UltrasonicLeft(LEFT_SONAR_RX_PIN, LEFT_SONAR_TX_PIN, 30, 200),
@@ -58,28 +59,26 @@ TrekkingOdometry LonguinhoSensoring::getInput()
       magDirection = m_pMagFilter->getInput(magDirection);
     }
 
-    Serial.print("Magnetometro: ");
-    Serial.println(magDirection);
+    Log->debug("Magnetometro: %f", magDirection);
 
     m_CachedValue.setU(magDirection);
-    m_pCurrentMPUPosition.setHeading(m_MPU.m_dmpEulerPose[VEC3_Z] - m_InitialHeading);
+
+
+    m_CurrentVelocity += Vector2<float>(m_MPU.m_calAccel[VEC3_X], m_MPU.m_calAccel[VEC3_Y]);
+
+    // [TODO] - Verificar isso
+    auto xAlignedVel = m_CurrentVelocity.getX() * sin(m_pCurrentMPUPosition.getHeading());
+    auto yAlignedVel = m_CurrentVelocity.getY() * cos(m_pCurrentMPUPosition.getHeading());
+    
+    m_pCurrentMPUPosition += Vector2<float>(xAlignedVel, yAlignedVel);
+    m_pCurrentMPUPosition.setHeading(m_MPU.m_fusedEulerPose[VEC3_Z] - m_InitialHeading);
   }
 
   auto position = getMPUPosition();
-  Serial.print("MPU: ");
-  Serial.print(position.getX());
-  Serial.print(" ");
-  Serial.print(position.getY());
-  Serial.print(" ");
-  Serial.println(position.getHeading());
+  Log->debug("MPU Position: %f, %f, %f", position.getX(), position.getY(), position.getHeading());
 
   position = getEncoderPosition();
-  Serial.print("Encoder: ");
-  Serial.print(position.getX());
-  Serial.print(" ");
-  Serial.print(position.getY());
-  Serial.print(" ");
-  Serial.println(position.getHeading());
+  Log->debug("Encoder Position: %f, %f, %f", position.getX(), position.getY(), position.getHeading());
 
   /*
   Avaliar os sensores de ultrassom. O vetor resultado disse deve indicar a
