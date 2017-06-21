@@ -25,9 +25,10 @@ void SystemController::setOutputLimits(float min, float max)
 {
 	if (min > max)
 	{
-#ifdef DEBUG
-    CurrentLogger->writeLine("[SystemController::setOutputLimits]: min não pode ser maior que max");
-#endif
+    Log->assertion("[SystemController::setOutputLimits]: min não pode ser maior que max. Os valores foram invertidos automaticamente");
+    float helper = max;
+    max = min;
+    min = helper;
 	}
 	m_MinOutput = min;
 	m_MaxOutput = max;

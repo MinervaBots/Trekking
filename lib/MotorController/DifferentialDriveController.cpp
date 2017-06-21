@@ -11,26 +11,22 @@ DifferentialDriveController::DifferentialDriveController(float wheelsRadius,
 
 void DifferentialDriveController::setWheelsRadius(float wheelsRadius)
 {
-#ifdef DEBUG
   if(wheelsRadius <= 0)
   {
-    CurrentLogger->writeLine("[DifferentialDriveController::setWheelsRadius] O raio das rodas não pode ser menor ou igual a 0");
+    Log->assertion("[DifferentialDriveController::setWheelsRadius] O raio das rodas não pode ser menor ou igual a 0");
     return;
   }
-#endif
   m_WheelsRadius = wheelsRadius;
 }
 
 
 void DifferentialDriveController::setWheelsDistanceFromRotationAxis(float wheelsDistanceFromRotationAxis)
 {
-#ifdef DEBUG
   if(wheelsDistanceFromRotationAxis <= 0)
   {
-    CurrentLogger->writeLine("[DifferentialDriveController::setWheelsDistanceFromRotationAxis] A distância entre as rodas deve ser maior ou igual a 0");
+    Log->assertion("[DifferentialDriveController::setWheelsDistanceFromRotationAxis] A distância entre as rodas deve ser maior ou igual a 0");
     return;
   }
-#endif
   m_WheelsDistanceFromRotationAxis = wheelsDistanceFromRotationAxis;
 }
 

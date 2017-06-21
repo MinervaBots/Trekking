@@ -34,9 +34,8 @@ void PIDController::setTunings(float proportionalConstant, float integralConstan
 {
 	if (proportionalConstant < 0 || integralConstant < 0 || derivativeConstant < 0)
 	{
-#ifdef DEBUG
-    CurrentLogger->writeLine("[PIDController::setTunings]: As constantes devem ser valores apenas positivos. Use o modo de operação inverso");
-#endif
+    Log->assertion("[PIDController::setTunings]: As constantes devem ser valores apenas positivos. Use o modo de operação inverso");
+		return;
 	}
 
 	m_ProportionalConstant = proportionalConstant;

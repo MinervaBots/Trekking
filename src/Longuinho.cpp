@@ -4,12 +4,11 @@
 //#include "Pins.h"
 #include "Includes.h"
 
-PrintLogger logger;
 Trekking trekking;
 LonguinhoSensoring sensoring;
 LonguinhoMotorController motorController;
 PIDController pidController;
-
+Logger *Log = new PrintLogger(Serial, LogLevel::Verboses);
 
 void testMotors()
 {
