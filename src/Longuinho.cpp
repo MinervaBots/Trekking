@@ -1,30 +1,55 @@
 #ifndef Longuinho_cpp
 #define Longuinho_cpp
 
+//#include "Pins.h"
 #include "Includes.h"
 
 PrintLogger logger;
-
 Trekking trekking;
 LonguinhoSensoring sensoring;
 LonguinhoMotorController motorController;
 PIDController pidController;
 
+
+void testMotors()
+{
+  motorController.setWheelsRadius(0.075);
+  motorController.setWheelsDistanceFromRotationAxis(0.150);
+
+  motorController.move(1, 0);
+  delay(2000);
+  motorController.move(-1, 0);
+  delay(2000);
+  motorController.move(0, 1);
+  delay(2000);
+  motorController.move(0, -1);
+  delay(2000);
+  motorController.move(0, 0);
+  delay(2000);
+}
+
 void setup()
 {
   // Inicializa a comunicação Serial e define como saída do logger
   Serial.begin(9600);
-  logger.setPrinter(Serial);
+  Serial1.begin(9600);
+  Serial2.begin(57600);
+  Wire.begin();
 
+  //logger.setPrinter(Serial);
+
+  motorController.setWheelsRadius(0.075);
+  motorController.setWheelsDistanceFromRotationAxis(0.150);
 
   // Define a posição inicial
-  sensoring.intializePosition(3, 3, 0);
+  sensoring.intializePosition(0, 0, 0);
   sensoring.initializeEncoder(&motorController);
+
   sensoring.initializeMPU(20, 10, 10, 40);
   trekking.setSensoring(&sensoring);
 
   // Adiciona os objetivos
-  trekking.addTarget(40, 20);
+  trekking.addTarget(10, 0);
   trekking.addTarget(30, 2);
   trekking.addTarget(6, 18);
 
@@ -43,15 +68,16 @@ void setup()
   trekking.setup();
 }
 
+bool emergencyButton;
 void readButtons()
 {
 	bool initButton = digitalRead(INIT_BUTTON_PIN);
-  if(initButton && trekking.isRunning())
+  emergencyButton = digitalRead(EMERGENCY_BUTTON_PIN);
+
+  if(initButton && !trekking.isRunning())
   {
     trekking.start();
   }
-
-	bool emergencyButton = digitalRead(EMERGENCY_BUTTON_PIN);
   if(emergencyButton)
   {
     trekking.emergency();

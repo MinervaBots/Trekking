@@ -6,8 +6,7 @@
 class DifferentialDriveController : public MotorController
 {
 public:
-  DifferentialDriveController()
-      : DifferentialDriveController(0, 0) {}
+  DifferentialDriveController() { }
   DifferentialDriveController(float wheelsRadius, float distanceFromRotationAxis);
   virtual void move(float linearVelocity, float angularVelocity);
 

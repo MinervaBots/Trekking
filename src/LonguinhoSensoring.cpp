@@ -19,14 +19,18 @@ void LonguinhoSensoring::initializeEncoder(LonguinhoMotorController *pMotorContr
 void LonguinhoSensoring::initializeMPU(int mpuRate, int magMix, int magUpdateRate, int lpfRate)
 {
   m_MPU.useAccelCal(true);
-  m_MPU.useAccelCal(true);
+  m_MPU.useMagCal(true);
+
   m_MPU.init(mpuRate, magMix,	magUpdateRate, lpfRate);
-
-
+  delay(2000);
   //*
-  if(m_MPU.read())
+
+  bool inited = false;
+  while(!inited)
   {
+    inited = m_MPU.read();
     m_InitialHeading = m_MPU.m_dmpEulerPose[2];
+    Serial.println(m_InitialHeading);
   }
   //*/
 }
@@ -34,7 +38,7 @@ void LonguinhoSensoring::initializeMPU(int mpuRate, int magMix, int magUpdateRat
 TrekkingOdometry LonguinhoSensoring::getInput()
 {
   m_Encoder.update(&m_pCurrentEncoderPosition);
-
+  /*
   if(m_ColorSensorLeft.getInput().getAlpha() >= m_White &&
     m_ColorSensorRight.getInput().getAlpha() >= m_White)
   {
@@ -44,19 +48,41 @@ TrekkingOdometry LonguinhoSensoring::getInput()
   {
     m_CachedValue.setT(false);
   }
+  */
 
-/*
   if(m_MPU.read())
   {
-    m_CachedValue.setU(m_MPU.m_calMag[2]);
-    m_pCurrentMPUPosition.setHeading(m_MPU.m_dmpEulerPose[2] - m_InitialHeading);
+    float dir = atan2(m_MPU.m_calMag[VEC3_Y], m_MPU.m_calMag[VEC3_X]);
+    dir = m_MagFilter.getInput(dir);
+
+    Serial.print("Magnetometro: ");
+    Serial.println(dir);
+
+    m_CachedValue.setU(dir);
+    m_pCurrentMPUPosition.setHeading(m_MPU.m_dmpEulerPose[VEC3_Z] - m_InitialHeading);
   }
-*/
+
+  auto position = getMPUPosition();
+  Serial.print("MPU: ");
+  Serial.print(position.getX());
+  Serial.print(" ");
+  Serial.print(position.getY());
+  Serial.print(" ");
+  Serial.println(position.getHeading());
+
+  position = getEncoderPosition();
+  Serial.print("Encoder: ");
+  Serial.print(position.getX());
+  Serial.print(" ");
+  Serial.print(position.getY());
+  Serial.print(" ");
+  Serial.println(position.getHeading());
 
   /*
   Avaliar os sensores de ultrassom. O vetor resultado disse deve indicar a
   direção e distância até o que for detectado
   */
+  /*
   auto leftDistance = m_UltrasonicLeft.getInput();
   auto centerDistance = m_UltrasonicCenter.getInput();
   auto rightDistance = m_UltrasonicRight.getInput();
@@ -97,5 +123,6 @@ TrekkingOdometry LonguinhoSensoring::getInput()
 
   Vector2<float> result(x, y);
   m_CachedValue.setV(result);
+  */
   return m_CachedValue;
 }

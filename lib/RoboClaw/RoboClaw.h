@@ -2,13 +2,7 @@
 #define RoboClaw_h
 
 #include <stdarg.h>
-
-#include <inttypes.h>
-#include <Stream.h>
-#include <HardwareSerial.h>
-#ifdef __AVR__
-	#include <SoftwareSerial.h>
-#endif
+#include "../BMSerial/BMSerial.h"
 
 /******************************************************************************
 * Definitions
@@ -19,17 +13,10 @@
 #define GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
 #endif
 
-#define _SS_VERSION 16
-
-class RoboClaw : public Stream
+class RoboClaw : public BMSerial
 {
 	uint16_t crc;
 	uint32_t timeout;
-
-	HardwareSerial *hserial;
-#ifdef __AVR__
-	SoftwareSerial *sserial;
-#endif
 
 	enum {M1FORWARD = 0,
 			M1BACKWARD = 1,
@@ -125,10 +112,7 @@ class RoboClaw : public Stream
 			FLAGBOOTLOADER = 255};	//Only available via USB communications
 public:
 	// public methods
-	RoboClaw(HardwareSerial *hserial,uint32_t tout);
-#ifdef __AVR__
-	RoboClaw(SoftwareSerial *sserial,uint32_t tout);
-#endif
+	RoboClaw(uint8_t receivePin, uint8_t transmitPin,uint32_t tout);	//ack option only available on 3.1.8 and newer firmware
 
 	~RoboClaw();
 
@@ -223,20 +207,6 @@ public:
 	bool ReadM2MaxCurrent(uint8_t address,uint32_t &max);
 	bool SetPWMMode(uint8_t address, uint8_t mode);
 	bool GetPWMMode(uint8_t address, uint8_t &mode);
-
-	static int16_t library_version() { return _SS_VERSION; }
-
-	virtual int available();
-	void begin(long speed);
-	bool isListening();
-	bool overflow();
-	int peek();
-	virtual int read();
-	int read(uint32_t timeout);
-	bool listen();
-	virtual size_t write(uint8_t byte);
-	virtual void flush();
-	void clear();
 
 private:
 	void crc_clear();

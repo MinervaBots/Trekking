@@ -4,11 +4,11 @@
 #include "Pins.h"
 
 LonguinhoMotorController::LonguinhoMotorController() :
-    DifferentialDriveController(),
+    //DifferentialDriveController(),
     m_Address(ROBOCLAW_ADDRESS),
-    m_SoftwareSerial(RX_MOTOR_PIN, TX_MOTOR_PIN),
-    m_RoboClaw(&m_SoftwareSerial, ROBOCLAW_TIMEOUT)
+    m_RoboClaw(RX_MOTOR_PIN, TX_MOTOR_PIN, ROBOCLAW_TIMEOUT)
 {
+  m_RoboClaw.begin(38400);
 }
 
 float LonguinhoMotorController::getLeftVelocity()
@@ -34,6 +34,7 @@ void LonguinhoMotorController::move(float linearVelocity, float angularVelocity)
                                     (2 * PI * m_WheelsRadius);
 	float rightRotation = (linearVelocity - angularVelocity * m_WheelsDistanceFromRotationAxis) /
                                     (2 * PI * m_WheelsRadius);
+
   /*--------------------------------------------------------------------------*/
 
 
@@ -93,9 +94,6 @@ void LonguinhoMotorController::move(float linearVelocity, float angularVelocity)
 		rightRotationLimited = rightRotation;
 		leftRotationLimited = leftRotation;
 	}
-
-  rightRotation = rightRotationLimited;
-  leftRotation = leftRotationLimited;
   /*--------------------------------------------------------------------------*/
 
   /*
