@@ -195,7 +195,7 @@ void Trekking::avoidObstacles(unsigned long deltaTime)
   Outra "dificuldade" é converter o posicionamento "real" para as posições na
   matriz. Além das posições dela
   */
-  m_Map = Matrix<float>(10, 10, 0);
+  //m_Map = BitMatrix<8, 8>(false);
 
   /*
   Aqui lemos o ultrassom e calculamos a posição que devemos colocar o obstaculo

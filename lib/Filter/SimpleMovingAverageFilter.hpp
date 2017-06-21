@@ -12,19 +12,19 @@ Pode também propagar rúido das ultimas avaliações.
 
 Um novo filtro de média ponderada pode amenizar isso.
 */
+template<unsigned char SamplesCapacity>
 class SimpleMovingAverageFilter : public Filter<float>
 {
 public:
-  SimpleMovingAverageFilter(unsigned int samplesCapacity);
+  SimpleMovingAverageFilter();
   ~SimpleMovingAverageFilter();
   float getInput();
   void clear();
 
 private:
   unsigned int m_SamplesCount;
-  unsigned int m_SamplesCapacity;
   unsigned int m_Position;
-  float *m_pSamples;
+  float m_pSamples[SamplesCapacity];
   float m_Sum;
 };
 

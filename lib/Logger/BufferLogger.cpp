@@ -3,35 +3,36 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-BufferLogger::BufferLogger(unsigned int bufferSize)
+template<unsigned short BufferSize>
+BufferLogger<BufferSize>::BufferLogger()
 {
   m_BufferPosition = 0;
-  m_BufferSize = bufferSize;
-  m_LogsBuffer = new char[bufferSize];//(char*)malloc(bufferSize);
-
   // Chama aqui pra garantir que o buffer está "limpo"
   flush();
 }
 
-BufferLogger::~BufferLogger()
+template<unsigned short BufferSize>
+BufferLogger<BufferSize>::~BufferLogger()
 {
   delete [] m_LogsBuffer;
   //free(m_LogsBuffer);
 }
 
-void BufferLogger::flush()
+template<unsigned short BufferSize>
+void BufferLogger<BufferSize>::flush()
 {
   m_BufferPosition = 0;
-  memset(m_LogsBuffer, '\0', m_BufferSize);
+  memset(m_LogsBuffer, '\0', BufferSize);
 }
 
-void BufferLogger::write(const char* format, ...)
+template<unsigned short BufferSize>
+void BufferLogger<BufferSize>::write(const char* format, ...)
 {
   /*
   O tamanho disponível é o total do buffer menos o que já tá ocupado.
   Subtrai 1 aqui pra garantir que vai ter espaço pro marcador de fim de string.
   */
-  unsigned int availabeSize = m_BufferSize - m_BufferPosition - 1;
+  unsigned int availabeSize = BufferSize - m_BufferPosition - 1;
 
   va_list args;
   va_start (args, format);
@@ -57,7 +58,8 @@ void BufferLogger::write(const char* format, ...)
   //m_LogsBuffer[m_BufferPosition] = '\0';
 }
 
-void BufferLogger::writeLine(const char* format, ...)
+template<unsigned short BufferSize>
+void BufferLogger<BufferSize>::writeLine(const char* format, ...)
 {
   // TODO - Verificar se a formatação vai funcionar
   // Se não preciso fazer aqui o mesmo que fiz em 'Write'

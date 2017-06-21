@@ -10,7 +10,7 @@
 class AStar
 {
 public:
-  void compute(Matrix<float> map, Matrix<Vector2<unsigned char>> cameFrom, Vector2<unsigned char> start, Vector2<unsigned char> goal);
+  void compute(Matrix<float>* pMap, Matrix<Vector2<unsigned char>>* pCameFrom, Vector2<unsigned char> start, Vector2<unsigned char> goal);
 
 private:
   static inline float heuristicCost(Vector2<unsigned char> pos1, Vector2<unsigned char> pos2)

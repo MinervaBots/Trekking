@@ -13,7 +13,7 @@ Vector2<unsigned char> neighbors[] =
   Vector2<unsigned char>(0, 1)
 };
 
-void AStar::compute(Matrix<float> map, Matrix<Vector2<unsigned char>> cameFrom, Vector2<unsigned char> start, Vector2<unsigned char> goal)
+void AStar::compute(Matrix<float>* pMap, Matrix<Vector2<unsigned char>>* pCameFrom, Vector2<unsigned char> start, Vector2<unsigned char> goal)
 {
   PriorityQueue<Vector2<unsigned char>> frontier;
   frontier.push(start, 0);
@@ -22,8 +22,8 @@ void AStar::compute(Matrix<float> map, Matrix<Vector2<unsigned char>> cameFrom, 
   Se o valor na matriz for diferente de -1, a posição é considerada como visitada.
   Fiz isso pra evitar que fosse necessário alocar mais uma matriz/array.
   */
-  map.set(start.getY(), start.getX(), 0);
-  cameFrom.set(start.getY(), start.getX(), start);
+  pMap->set(start.getY(), start.getX(), 0);
+  pCameFrom->set(start.getY(), start.getX(), start);
 
   while (!frontier.isEmpty())
   {
@@ -39,8 +39,8 @@ void AStar::compute(Matrix<float> map, Matrix<Vector2<unsigned char>> cameFrom, 
     {
       auto next = neighbors[i] + current;
 
-      Checked<float> newCost = map.get(current.getY(), current.getX());
-      Checked<float> nextCost = map.get(next.getY(), next.getX());
+      Checked<float> newCost = pMap->get(current.getY(), current.getX());
+      Checked<float> nextCost = pMap->get(next.getY(), next.getX());
 
       /*
       Por algum motivo saímos dos limites da matrix.
@@ -56,9 +56,9 @@ void AStar::compute(Matrix<float> map, Matrix<Vector2<unsigned char>> cameFrom, 
 
       if (nextCost > -1 || newCost < nextCost)
       {
-        map.set(next.getY(), next.getX(), newCost);
+        pMap->set(next.getY(), next.getX(), newCost);
         frontier.push(next, newCost + heuristicCost(goal, next));
-        cameFrom.set(next.getY(), next.getX(), current);
+        pCameFrom->set(next.getY(), next.getX(), current);
       }
     }
   }

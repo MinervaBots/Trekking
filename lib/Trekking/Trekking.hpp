@@ -66,7 +66,7 @@ private:
 
   /*----|Variáveis de navegação|----------------------------------------------*/
   AStar m_Pathfinder;
-  Matrix<float> m_Map;
+  Matrix<float>* m_pMap;
   unsigned char m_CurrentTargetId;
   LinkedList<Vector2<unsigned char>> m_Targets;
   TrekkingSensoring *m_pTrekkingSensoring;
