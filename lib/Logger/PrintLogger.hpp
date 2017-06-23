@@ -1,106 +1,112 @@
 #ifndef PrintLogger_hpp
 #define PrintLogger_hpp
 
-#include "Logger.hpp"
 #include <stdio.h>
 #include <stdarg.h>
 #include <Arduino.h>
 
-class PrintLogger : public Logger
+
+enum LogLevel
 {
+  Nothing,
+  Store,
+  Errors,
+  Assertions,
+  Warnings,
+  Infos,
+  Debugs,
+  Verboses
+};
+
+class PrintLogger : public Print
+{
+	using Print::print;
+	using Print::println;
+
 private:
   Stream *m_pStream;
+  LogLevel m_LogLevel;
 
 public:
-  PrintLogger(Stream &pStream, LogLevel logLevel) : Logger(logLevel), m_pStream(&pStream) {}
+  PrintLogger(Stream &pStream, LogLevel logLevel) : m_pStream(&pStream), m_LogLevel(logLevel) {}
+	void setLogLevel(LogLevel logLevel) { m_LogLevel = logLevel; }
   void setStream(Stream &pStream) { m_pStream = &pStream; }
 
-protected:
-  void print(const char *format, va_list args = 0)
+  template<typename T>
+  void debug(const char* tag, T* msg)
   {
-    for (; *format != 0; ++format)
-    {
-      if (*format == '%')
-      {
-        ++format;
-        if (*format == '\0') break;
-        if (*format == '%')
-        {
-          m_pStream->print(*format);
-          continue;
-        }
-        if(*format == 's')
-        {
-  				register char *s = (char *)va_arg(args, int);
-  				m_pStream->print(s);
-  				continue;
-  			}
-        if(*format == 'd' || *format == 'i')
-        {
-  				m_pStream->print(va_arg(args, int), DEC);
-  				continue;
-  			}
-        if( *format == 'x' )
-        {
-  				m_pStream->print(va_arg(args, int), HEX);
-  				continue;
-			  }
-        if(*format == 'X')
-        {
-    			m_pStream->print("0x");
-    			m_pStream->print(va_arg(args, int),HEX);
-    			continue;
-			  }
-        if(*format == 'b')
-        {
-  				m_pStream->print(va_arg(args, int),BIN);
-  				continue;
-        }
-        if(*format == 'B')
-        {
-        	m_pStream->print("0b");
-        	m_pStream->print(va_arg(args, int), BIN);
-        	continue;
-        }
-        if(*format == 'l')
-        {
-  				m_pStream->print(va_arg(args, long), DEC);
-  				continue;
-  			}
+    println(LogLevel::Debugs, tag, msg);
 
-        if(*format == 'c')
-        {
-  				m_pStream->print(va_arg(args, int));
-  				continue;
-  			}
-        if(*format == 't')
-        {
-  				if (va_arg(args, int) == 1)
-          {
-  					m_pStream->print("T");
-  				}
-  				else
-          {
-  					m_pStream->print("F");
-  				}
-  				continue;
-  			}
-        if(*format == 'T')
-        {
-  				if (va_arg(args, int) == 1)
-          {
-  					m_pStream->print("true");
-  				}
-  				else
-          {
-  					m_pStream->print("false");
-  				}
-          continue;
-        }
-      }
-      m_pStream->print(*format);
-    }
   }
+
+protected:
+  /*
+  		Calls the write method from the current stream
+  	*/
+  	size_t write(uint8_t b) {
+  		size_t bytes_written = 0;
+  		bytes_written = m_pStream->write(b);
+  		return bytes_written;
+  	}
+
+  	/*
+  		Calls the write method from the current stream
+  	*/
+  	size_t write(const uint8_t *buffer, size_t size) {
+  		size_t bytes_written = 0;
+  		bytes_written = m_pStream->write(buffer, size);
+  		return bytes_written;
+  	}
+
+  	/*
+  		Prints the priority, the tag and the message in the following pattern:
+
+  		priority/tag: message
+
+  		and returns the number of bytes written. The message will be printed if:
+  		- The log object is enabled and
+  		- The message's priority is the same as the current priority or
+  		- The current priority is setted to verbose
+  	*/
+  	template <typename T>
+
+  	size_t print(LogLevel priority, char const * tag, T msg, bool print_header=true) {
+
+  		size_t bytes_written = 0;
+
+  		if(priority < m_LogLevel) {
+  			if(print_header) {
+  				String full_message = "";
+  				full_message += (char)priority;
+  				full_message += "/";
+  				full_message += tag;
+  				full_message += ": ";
+  				bytes_written += print(full_message);
+  			}
+  			bytes_written += print(msg);
+  		}
+
+  		return bytes_written;
+  	}
+
+  	/*
+  		Calls the print method, prints the new line character "\n"
+  		and returns the number of bytes written
+  	*/
+  	template <typename T>
+
+  	size_t println(LogLevel priority, char const * tag, T msg) {
+
+  		size_t bytes_written = print(priority, tag, msg);
+
+  		if(bytes_written) {
+  			bytes_written += print("\n");
+  		}
+
+  		return bytes_written;
+  	}
 };
+
+extern PrintLogger Log;
 
 #endif //PrintLogger_hpp

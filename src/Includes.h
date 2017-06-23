@@ -15,6 +15,7 @@
 #include "../lib/Logger/PrintLogger.hpp"
 #include "../lib/PIDController/PIDController.hpp"
 #include "../lib/Filter/SimpleMovingAverageFilter.hpp"
+//#include "../lib/Log/log.h"
 
 #include "Pins.h"
 #include "LonguinhoSensoring.hpp"

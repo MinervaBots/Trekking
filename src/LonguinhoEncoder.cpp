@@ -8,11 +8,10 @@ void LonguinhoEncoder::update(Position *pPosition)
   float leftVelocity = m_pMotorController->getLeftVelocity();
   float rightVelocity = m_pMotorController->getRightVelocity();
 
-
   float deltaTime = (millis() - m_LastUpdateTime) / 1000;
 
-  m_DeltaDistanceLeft = 2 * PI * radius * m_pMotorController->getEncoderLeft() / m_pMotorController->getPulsesPerRotation();
-  m_DeltaDistanceRight = 2 * PI * radius *  m_pMotorController->getEncoderRight() / m_pMotorController->getPulsesPerRotation();
+  m_DeltaDistanceLeft = 2 * PI * radius * leftVelocity * deltaTime;
+  m_DeltaDistanceRight = 2 * PI * radius *  rightVelocity * deltaTime;
 
   float deltaEncoder = getDeltaDistance();
   float deltaEncoderLeft = getDeltaDistanceLeft();

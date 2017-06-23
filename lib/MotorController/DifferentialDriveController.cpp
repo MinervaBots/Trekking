@@ -13,7 +13,7 @@ void DifferentialDriveController::setWheelsRadius(float wheelsRadius)
 {
   if(wheelsRadius <= 0)
   {
-    Log->assertion("[DifferentialDriveController::setWheelsRadius] O raio das rodas não pode ser menor ou igual a 0");
+    Log.assertion("[DifferentialDriveController::setWheelsRadius] O raio das rodas não pode ser menor ou igual a 0");
     return;
   }
   m_WheelsRadius = wheelsRadius;
@@ -24,7 +24,7 @@ void DifferentialDriveController::setWheelsDistanceFromRotationAxis(float wheels
 {
   if(wheelsDistanceFromRotationAxis <= 0)
   {
-    Log->assertion("[DifferentialDriveController::setWheelsDistanceFromRotationAxis] A distância entre as rodas deve ser maior ou igual a 0");
+    Log.assertion("[DifferentialDriveController::setWheelsDistanceFromRotationAxis] A distância entre as rodas deve ser maior ou igual a 0");
     return;
   }
   m_WheelsDistanceFromRotationAxis = wheelsDistanceFromRotationAxis;

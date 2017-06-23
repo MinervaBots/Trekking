@@ -1,6 +1,6 @@
 #include "LonguinhoSensoring.hpp"
 #include "Pins.h"
-#include "../lib/Logger/Logger.hpp"
+#include "../lib/Logger/PrintLogger.hpp"
 
 LonguinhoSensoring::LonguinhoSensoring() :
   m_UltrasonicLeft(LEFT_SONAR_RX_PIN, LEFT_SONAR_TX_PIN, 30, 200),
@@ -19,19 +19,21 @@ void LonguinhoSensoring::initializeEncoder(LonguinhoMotorController *pMotorContr
 
 void LonguinhoSensoring::initializeMPU(int mpuRate, int magMix, int magUpdateRate, int lpfRate)
 {
-  m_MPU.useAccelCal(true);
-  m_MPU.useMagCal(true);
+  //m_MPU.useAccelCal(true);
+  //m_MPU.useMagCal(true);
 
   m_MPU.init(mpuRate, magMix,	magUpdateRate, lpfRate);
   delay(2000);
   //*
 
-  bool inited = false;
-  while(!inited)
+  //while(true)
   {
-    inited = m_MPU.read();
-    m_InitialHeading = m_MPU.m_dmpEulerPose[2];
-    Serial.println(m_InitialHeading);
+    if(m_MPU.read())
+    {
+      m_InitialHeading = m_MPU.m_dmpEulerPose[2];
+      Log.debug("Initial Heading: %f", m_InitialHeading);
+      return;
+    }
   }
   //*/
 }
@@ -59,7 +61,7 @@ TrekkingOdometry LonguinhoSensoring::getInput()
       magDirection = m_pMagFilter->getInput(magDirection);
     }
 
-    Log->debug("Magnetometro: %f", magDirection);
+    Log.debug("Magnetometro: %f", magDirection);
 
     m_CachedValue.setU(magDirection);
 
@@ -69,16 +71,21 @@ TrekkingOdometry LonguinhoSensoring::getInput()
     // [TODO] - Verificar isso
     auto xAlignedVel = m_CurrentVelocity.getX() * sin(m_pCurrentMPUPosition.getHeading());
     auto yAlignedVel = m_CurrentVelocity.getY() * cos(m_pCurrentMPUPosition.getHeading());
-    
+
     m_pCurrentMPUPosition += Vector2<float>(xAlignedVel, yAlignedVel);
     m_pCurrentMPUPosition.setHeading(m_MPU.m_fusedEulerPose[VEC3_Z] - m_InitialHeading);
   }
 
   auto position = getMPUPosition();
-  Log->debug("MPU Position: %f, %f, %f", position.getX(), position.getY(), position.getHeading());
+  Log.debug("MPU Position X", &position.getX());
+  Log.debug("MPU Position Y", &position.getY());
+  Log.debug("MPU Position Heading", &position.getHeading());
 
   position = getEncoderPosition();
-  Log->debug("Encoder Position: %f, %f, %f", position.getX(), position.getY(), position.getHeading());
+
+  Log.debug("Encoder Position X", &position.getX());
+  Log.debug("Encoder Position Y", &position.getY());
+  Log.debug("Encoder Position Heading", &position.getHeading());
 
   /*
   Avaliar os sensores de ultrassom. O vetor resultado disse deve indicar a

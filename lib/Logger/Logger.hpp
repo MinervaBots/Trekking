@@ -4,17 +4,6 @@
 #include <string.h>
 #include <stdarg.h>
 
-enum LogLevel
-{
-  Nothing,
-  Store,
-  Errors,
-  Assertions,
-  Warnings,
-  Infos,
-  Debugs,
-  Verboses
-};
 
 class Logger
 {
@@ -108,6 +97,6 @@ public:
   }
 };
 
-extern Logger* Log;
+//extern Logger* Log;
 
 #endif // Logger_hpp

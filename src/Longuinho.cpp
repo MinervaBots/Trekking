@@ -10,6 +10,7 @@ LonguinhoMotorController motorController;
 PIDController pidController;
 Logger *Log = new PrintLogger(Serial, LogLevel::Verboses);
 SimpleMovingAverageFilter<5> filter;
+
 void testMotors()
 {
   motorController.setWheelsRadius(0.075);
@@ -34,7 +35,6 @@ void setup()
   Serial1.begin(9600);
   Serial2.begin(57600);
   Wire.begin();
-
   //logger.setPrinter(Serial);
 
   motorController.setWheelsRadius(0.075);
