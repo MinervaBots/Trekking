@@ -8,7 +8,6 @@ Trekking trekking;
 LonguinhoSensoring sensoring;
 LonguinhoMotorController motorController;
 PIDController pidController;
-Logger *Log = new PrintLogger(Serial, LogLevel::Verboses);
 SimpleMovingAverageFilter<5> filter;
 
 void testMotors()
@@ -40,15 +39,15 @@ void setup()
   motorController.setWheelsRadius(0.075);
   motorController.setWheelsDistanceFromRotationAxis(0.150);
 
+  trekking.setSensoring(&sensoring);
   // Define a posição inicial
   sensoring.intializePosition(0, 0, 0);
   sensoring.initializeEncoder(&motorController);
-  sensoring.setMagnetometerFilter(&filter);
+  //sensoring.setMagnetometerFilter(&filter);
   sensoring.initializeMPU(20, 10, 10, 40);
-  trekking.setSensoring(&sensoring);
 
   // Adiciona os objetivos
-  trekking.addTarget(10, 0);
+  trekking.addTarget(1, 1);
   trekking.addTarget(30, 2);
   trekking.addTarget(6, 18);
 
@@ -58,12 +57,13 @@ void setup()
   trekking.setBuzzerPin(BUZZER_PIN);
 
   // [TODO]
-  pidController.setTunings(10, 1, 3);
+  pidController.setTunings(.5, .2, .3);
   pidController.setSetPoint(0);
   pidController.setOutputLimits(-1, 1);
   trekking.setSystemController(&pidController);
 
   trekking.setMaxTimeInRefinedSearch(10000); // 10s
+  //motorController.resetEncoders();
   trekking.setup();
 }
 

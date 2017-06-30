@@ -3,20 +3,16 @@
 
 void LonguinhoEncoder::update(Position *pPosition)
 {
-  float radius = m_pMotorController->getWheelsRadius();
+  float wheelRadius = m_pMotorController->getWheelsRadius();
   float distanceFromAxis = m_pMotorController->getWheelsDistanceFromRotationAxis();
-  float leftVelocity = m_pMotorController->getLeftVelocity();
-  float rightVelocity = m_pMotorController->getRightVelocity();
 
-  float deltaTime = (millis() - m_LastUpdateTime) / 1000;
-
-  m_DeltaDistanceLeft = 2 * PI * radius * leftVelocity * deltaTime;
-  m_DeltaDistanceRight = 2 * PI * radius *  rightVelocity * deltaTime;
+  float correctionFactor = m_pMotorController->getPulsesPerRotation() * m_pMotorController->getGearRate();
+  m_DeltaDistanceLeft = 2 * PI * wheelRadius * m_pMotorController->getEncoderLeft() / correctionFactor;
+  m_DeltaDistanceRight = 2 * PI * wheelRadius * m_pMotorController->getEncoderRight() / correctionFactor;
 
   float deltaEncoder = getDeltaDistance();
   float deltaEncoderLeft = getDeltaDistanceLeft();
   float deltaEncoderRight = getDeltaDistanceRight();
-
 
   float heading = pPosition->getHeading();
   float xPrime = deltaEncoder * cos(heading);
@@ -31,11 +27,11 @@ void LonguinhoEncoder::update(Position *pPosition)
   Serial.print(xPrime);
   Serial.print(", ");
   Serial.print(yPrime);
+  Serial.print(", ");
+  Serial.print(headingPrime);
   Serial.println();
-
+  //delay(250);
   pPosition->setX(pPosition->getX() + xPrime);
   pPosition->setY(pPosition->getY() + yPrime);
-  pPosition->setHeading(pPosition->getHeading() + headingPrime);
-
-  m_LastUpdateTime = millis();
+  //pPosition->setHeading(pPosition->getHeading() + headingPrime);
 }

@@ -3,7 +3,9 @@
 
 #include "../lib/Filter/Filter.hpp"
 #include "../lib/Trekking/TrekkingSensoring.hpp"
-#include "../lib/MPU9150Lib/MPU9150Lib.h"
+#include "../RTIMULib/RTIMU.h"
+#include "../RTIMULib/RTIMUMPU9150.h"
+#include "../RTIMULib/RTIMUSettings.h"
 #include "../lib/InputSource/InputSource.hpp"
 #include "../lib/TCS230/TCS230.h"
 #include "../lib/Ultrasonic/Ultrasonic.hpp"
@@ -37,13 +39,17 @@ public:
   Position getPosition() const { return getEncoderPosition(); }
 
   void setMagnetometerFilter(Filter<float> *pFilter) { m_pMagFilter = pFilter; }
-private:
+
+private:                     // the fusion object
+  RTIMUSettings settings;                               // the settings object
+  RTIMUMPU9150 imu;              // the IMU object
+
+
   TrekkingOdometry m_CachedValue;
 
   LonguinhoEncoder m_Encoder;
   Position m_pCurrentEncoderPosition;
 
-  MPU9150Lib m_MPU;
   Filter<float> *m_pMagFilter;
   float m_InitialHeading;
   Position m_pCurrentMPUPosition;

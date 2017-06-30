@@ -13,9 +13,12 @@ public:
   float getLeftVelocity();
   float getRightVelocity();
   float getPulsesPerRotation() { return m_PulsesPerRotation; }
+  float getGearRate() { return m_GearRate; }
 
-  unsigned int getEncoderLeft() { return m_RoboClaw.ReadEncM2(m_Address, &m_StatusLeft, &m_ValidLeft); }
-  unsigned int getEncoderRight() { return m_RoboClaw.ReadEncM1(m_Address, &m_StatusRight, &m_ValidRight); }
+  int getEncoderLeft();
+  int getEncoderRight();
+
+  void resetEncoders(){ m_RoboClaw.ResetEncoders(m_Address); }
 
 private:
   /*----|RoboClaw|------------------------------------------------------------*/

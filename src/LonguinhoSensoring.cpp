@@ -1,8 +1,8 @@
 #include "LonguinhoSensoring.hpp"
 #include "Pins.h"
-#include "../lib/Logger/PrintLogger.hpp"
 
 LonguinhoSensoring::LonguinhoSensoring() :
+  imu(&settings),
   m_UltrasonicLeft(LEFT_SONAR_RX_PIN, LEFT_SONAR_TX_PIN, 30, 200),
   m_UltrasonicCenter(CENTER_SONAR_RX_PIN, RIGHT_SONAR_TX_PIN, 30, 200),
   m_UltrasonicRight(RIGHT_SONAR_RX_PIN, RIGHT_SONAR_TX_PIN, 30, 200),
@@ -19,23 +19,34 @@ void LonguinhoSensoring::initializeEncoder(LonguinhoMotorController *pMotorContr
 
 void LonguinhoSensoring::initializeMPU(int mpuRate, int magMix, int magUpdateRate, int lpfRate)
 {
-  //m_MPU.useAccelCal(true);
-  //m_MPU.useMagCal(true);
+  Serial.print("ArduinoIMU starting using device ");
 
-  m_MPU.init(mpuRate, magMix,	magUpdateRate, lpfRate);
-  delay(2000);
-  //*
-
-  //while(true)
+  int errcode;
+  Serial.println(imu.IMUName());
+  if ((errcode = imu.IMUInit()) < 0)
   {
-    if(m_MPU.read())
+    Serial.print("Failed to init IMU: ");
+    Serial.println(errcode);
+  }
+
+  if (imu.getCalibrationValid())
+    Serial.println("Using compass calibration");
+  else
+    Serial.println("No valid compass calibration data");
+
+  while (true)
+  {
+    if(imu.IMURead())
     {
-      m_InitialHeading = m_MPU.m_dmpEulerPose[2];
-      Log.debug("Initial Heading: %f", m_InitialHeading);
-      return;
+      RTVector3 mag = imu.getCompass();
+      float theta = atan2(mag.y(), mag.x());
+
+      m_InitialHeading = theta;
+      Serial.print("Initial Heading: ");
+      Serial.println(m_InitialHeading);
+      break;
     }
   }
-  //*/
 }
 
 TrekkingOdometry LonguinhoSensoring::getInput()
@@ -52,20 +63,24 @@ TrekkingOdometry LonguinhoSensoring::getInput()
     m_CachedValue.setT(false);
   }
   */
-
-  if(m_MPU.read())
+  if (imu.IMURead())
   {
-    float magDirection = atan2(m_MPU.m_calMag[VEC3_Y], m_MPU.m_calMag[VEC3_X]);
+    RTVector3 mag = imu.getCompass();
+    float theta = atan2(mag.y(), mag.x());
+
+    float magDirection = theta - m_InitialHeading;
     if(m_pMagFilter != nullptr)
     {
       magDirection = m_pMagFilter->getInput(magDirection);
     }
 
-    Log.debug("Magnetometro: %f", magDirection);
+    Serial.print("Magnetometro: ");
+    Serial.println(magDirection);
 
     m_CachedValue.setU(magDirection);
+    m_pCurrentEncoderPosition.setHeading(magDirection);
 
-
+/*
     m_CurrentVelocity += Vector2<float>(m_MPU.m_calAccel[VEC3_X], m_MPU.m_calAccel[VEC3_Y]);
 
     // [TODO] - Verificar isso
@@ -74,18 +89,24 @@ TrekkingOdometry LonguinhoSensoring::getInput()
 
     m_pCurrentMPUPosition += Vector2<float>(xAlignedVel, yAlignedVel);
     m_pCurrentMPUPosition.setHeading(m_MPU.m_fusedEulerPose[VEC3_Z] - m_InitialHeading);
+*/
   }
 
+/*
   auto position = getMPUPosition();
-  Log.debug("MPU Position X", &position.getX());
-  Log.debug("MPU Position Y", &position.getY());
-  Log.debug("MPU Position Heading", &position.getHeading());
-
-  position = getEncoderPosition();
-
-  Log.debug("Encoder Position X", &position.getX());
-  Log.debug("Encoder Position Y", &position.getY());
-  Log.debug("Encoder Position Heading", &position.getHeading());
+  Log.debug("MPU Position X", position.getX());
+  Log.debug("MPU Position Y", position.getY());
+  Log.debug("MPU Position Heading", position.getHeading());
+*/
+  auto position = m_pCurrentEncoderPosition;
+  Serial.print("X: ");
+  Serial.print(position.getX());
+  Serial.print(", ");
+  Serial.print("Y: ");
+  Serial.print(position.getY());
+  Serial.print(", ");
+  Serial.print("Heading: ");
+  Serial.println(position.getHeading());
 
   /*
   Avaliar os sensores de ultrassom. O vetor resultado disse deve indicar a

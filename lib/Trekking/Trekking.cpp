@@ -31,13 +31,13 @@ void Trekking::emergency()
 
 void Trekking::update()
 {
-  m_Odometry = m_pTrekkingSensoring->getInput();
-  delay(500);
 
   if(!m_IsRunning)
   {
     return;
   }
+  m_Odometry = m_pTrekkingSensoring->getInput();
+  //delay(500);
 
   unsigned long deltaTime = millis() - m_LastIterationTime;
   (this->*m_CurrentMode)(deltaTime);
@@ -57,9 +57,16 @@ void Trekking::rotateToTarget(unsigned long deltaTime)
   float headingError = desiredHeading - heading;
   headingError = atan2(sin(headingError), cos(headingError));
 
-  if(abs(headingError) > 0.5)
+  Serial.print(heading);
+  Serial.print(" - ");
+  Serial.print(desiredHeading);
+  Serial.print(" = ");
+  Serial.println(headingError);
+  delay(250);
+  
+  if(abs(headingError) > 0.08)
   {
-    float angularVelocity = m_pSystemController->run(headingError);
+    float angularVelocity = headingError * 0.5/abs(headingError);
     m_pMotorController->move(0, angularVelocity);
     return;
   }
@@ -210,6 +217,7 @@ void Trekking::avoidObstacles(unsigned long deltaTime)
 
 void Trekking::standBy(unsigned long deltaTime)
 {
+  stop();
   if(m_OperationMode)
   {
 

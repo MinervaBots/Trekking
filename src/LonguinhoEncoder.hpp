@@ -18,7 +18,6 @@ public:
 
 private:
   LonguinhoMotorController *m_pMotorController;
-  unsigned long m_LastUpdateTime;
 };
 
 #endif //LonguinhoEncoder_hpp

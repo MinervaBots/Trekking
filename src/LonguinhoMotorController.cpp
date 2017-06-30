@@ -4,24 +4,28 @@
 #include "Pins.h"
 
 LonguinhoMotorController::LonguinhoMotorController() :
-    //DifferentialDriveController(),
     m_Address(ROBOCLAW_ADDRESS),
     m_RoboClaw(RX_MOTOR_PIN, TX_MOTOR_PIN, ROBOCLAW_TIMEOUT)
 {
   m_RoboClaw.begin(38400);
+  //m_RoboClaw.ResetEncoders(m_Address);
+  /*
+  m_RoboClaw.SetEncM1(m_Address, 0);
+  m_RoboClaw.SetEncM2(m_Address, 0);
+  */
 }
 
 float LonguinhoMotorController::getLeftVelocity()
 {
-  m_LeftVelocity = m_RoboClaw.ReadSpeedM2(m_Address, &m_StatusLeft, &m_ValidLeft);
-  m_LeftVelocity /= (m_PulsesPerRotation * m_GearRate);
+  int32_t pps = m_RoboClaw.ReadSpeedM2(m_Address, &m_StatusLeft, &m_ValidLeft);
+  m_LeftVelocity = pps / (m_PulsesPerRotation * m_GearRate);
   return m_LeftVelocity;
 }
 
 float LonguinhoMotorController::getRightVelocity()
 {
-  m_RightVelocity = m_RoboClaw.ReadSpeedM1(m_Address, &m_StatusRight, &m_ValidRight);
-  m_RightVelocity /= (m_PulsesPerRotation * m_GearRate);
+  int32_t pps = m_RoboClaw.ReadSpeedM1(m_Address, &m_StatusRight, &m_ValidRight);
+  m_RightVelocity = pps / (m_PulsesPerRotation * m_GearRate);
   return m_RightVelocity;
 }
 
@@ -121,4 +125,19 @@ unsigned char LonguinhoMotorController::mapPWM(float pps)
   pwm = 64 * (1 + speed);
   pwm = max(min(128, pwm), 0);
   return pwm;
+}
+
+
+int LonguinhoMotorController::getEncoderLeft()
+{
+  int enc = m_RoboClaw.ReadEncM2(m_Address, &m_StatusLeft, &m_ValidLeft);
+  m_RoboClaw.SetEncM2(m_Address, 0);
+  return enc;
+}
+
+int LonguinhoMotorController::getEncoderRight()
+{
+  int enc = m_RoboClaw.ReadEncM1(m_Address, &m_StatusRight, &m_ValidRight);
+  m_RoboClaw.SetEncM1(m_Address, 0);
+  return enc;
 }

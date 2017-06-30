@@ -1,5 +1,5 @@
 #include "AStar.hpp"
-#include "../Logger/Logger.hpp"
+//#include "../Logger/Logger.hpp"
 
 Vector2<unsigned char> neighbors[] =
 {
@@ -47,12 +47,12 @@ void AStar::compute(Matrix<float>* pMap, Matrix<Vector2<unsigned char>>* pCameFr
       */
       if(!newCost.IsValid())
       {
-        Log.verbose("Buscando fora do mapa, x=%d, y=%d", current.getX(), current.getY());
+        //Log.verbose("Buscando fora do mapa, x=%d, y=%d", current.getX(), current.getY());
         continue;
       }
       else if(!nextCost.IsValid() == -255)
       {
-        Log.verbose("Buscando fora do mapa, x=%d, y=%d", next.getX(), next.getY());
+        //Log.verbose("Buscando fora do mapa, x=%d, y=%d", next.getX(), next.getY());
         continue;
       }
 

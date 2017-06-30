@@ -7,7 +7,7 @@ class Position : public Vector2<float>
 {
 public:
   Position() : Vector2<float>(0, 0), m_Heading(0) { }
-  
+
   float getHeading() const
   {
     return m_Heading;
@@ -16,6 +16,7 @@ public:
   void setHeading(float heading)
   {
     m_Heading = heading;
+    //m_Heading = atan2(sin(heading), cos(heading));
   }
 
 
