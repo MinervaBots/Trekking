@@ -15,14 +15,15 @@ LonguinhoMotorController::LonguinhoMotorController() :
   */
 }
 
-float LonguinhoMotorController::getLeftVelocity()
+//Returns the number of rotations that the wheel does on a second
+float LonguinhoMotorController::getLeftVelocityRPS()
 {
   int32_t pps = m_RoboClaw.ReadSpeedM2(m_Address, &m_StatusLeft, &m_ValidLeft);
   m_LeftVelocity = pps / (m_PulsesPerRotation * m_GearRate);
   return m_LeftVelocity;
 }
-
-float LonguinhoMotorController::getRightVelocity()
+// Returns the number of rotations that the wheel does on a segond
+float LonguinhoMotorController::getRightVelocityRPS()
 {
   int32_t pps = m_RoboClaw.ReadSpeedM1(m_Address, &m_StatusRight, &m_ValidRight);
   m_RightVelocity = pps / (m_PulsesPerRotation * m_GearRate);
@@ -31,72 +32,74 @@ float LonguinhoMotorController::getRightVelocity()
 
 void LonguinhoMotorController::move(float linearVelocity, float angularVelocity)
 {
+  //DifferentialDriveController::move(linearVelocity, angularVelocity);
   /*----[Cálculo de Rotações por Segundo (RPS)]---------------------------------
   Equações descritas na página 54~55 da tese do Fraga
   */
-	float leftRotation = (linearVelocity + angularVelocity * m_WheelsDistanceFromRotationAxis) /
+	float leftWheelRotation = (linearVelocity + angularVelocity * m_WheelsDistanceFromRotationAxis) /
                                     (2 * PI * m_WheelsRadius);
-	float rightRotation = (linearVelocity - angularVelocity * m_WheelsDistanceFromRotationAxis) /
+	float rightWheelRotation = (linearVelocity - angularVelocity * m_WheelsDistanceFromRotationAxis) /
                                     (2 * PI * m_WheelsRadius);
-
   /*--------------------------------------------------------------------------*/
 
 
   /*----[Saturação Diferencial]-------------------------------------------------
   Algoritmo descrito na página 60 da tese do Fraga.
+  I don't know for sure what it does, but works just fine.
   */
-	float rightRotationLimited, leftRotationLimited = 0;
+	float rightWheelRotationLimited = 0;
+  float leftWheelRotationLimited = 0;
 
-	if (leftRotation < 0 && rightRotation > 0)
+	if (leftWheelRotation < 0 && rightWheelRotation > 0)
   {
-		leftRotationLimited = max(leftRotation, -m_SafeRPS); // L negativo
-		rightRotationLimited = min(rightRotation, m_SafeRPS); // R positivo
+		leftWheelRotationLimited = max(leftWheelRotation, -m_SafeRPS); // L negativo
+		rightWheelRotationLimited = min(rightWheelRotation, m_SafeRPS); // R positivo
 	}
-	else if (leftRotation > 0 && rightRotation < 0)
+	else if (leftWheelRotation > 0 && rightWheelRotation < 0)
   {
-		rightRotationLimited = max(rightRotation, -m_SafeRPS); // R negativo
-		leftRotationLimited = min(leftRotation, m_SafeRPS);   // L positivo
+		rightWheelRotationLimited = max(rightWheelRotation, -m_SafeRPS); // R negativo
+		leftWheelRotationLimited = min(leftWheelRotation, m_SafeRPS);   // L positivo
 	}
-	else if (leftRotation > m_SafeRPS || rightRotation > m_SafeRPS)
+	else if (leftWheelRotation > m_SafeRPS || rightWheelRotation > m_SafeRPS)
   {
-		if (leftRotation > rightRotation)
+		if (leftWheelRotation > rightWheelRotation)
     {
-			rightRotationLimited = m_SafeRPS * (1 - rightRotation/leftRotation);
-			leftRotationLimited = m_SafeRPS;
+			rightWheelRotationLimited = m_SafeRPS * (1 - rightWheelRotation/leftWheelRotation);
+			leftWheelRotationLimited = m_SafeRPS;
 		}
-		else if (leftRotation < rightRotation)
+		else if (leftWheelRotation < rightWheelRotation)
     {
-			leftRotationLimited = m_SafeRPS * (1 - leftRotation/rightRotation);
-			rightRotationLimited = m_SafeRPS;
+			leftWheelRotationLimited = m_SafeRPS * (1 - leftWheelRotation/rightWheelRotation);
+			rightWheelRotationLimited = m_SafeRPS;
 		}
-		else if (leftRotation == rightRotation)
+		else if (leftWheelRotation == rightWheelRotation)
     {
-			rightRotationLimited = m_SafeRPS;
-			leftRotationLimited = m_SafeRPS;
+			rightWheelRotationLimited = m_SafeRPS;
+			leftWheelRotationLimited = m_SafeRPS;
 		}
 	}
-	else if (leftRotation < -m_SafeRPS || rightRotation < -m_SafeRPS)
+	else if (leftWheelRotation < -m_SafeRPS || rightWheelRotation < -m_SafeRPS)
   {
-  	if (leftRotation < rightRotation)
+  	if (leftWheelRotation < rightWheelRotation)
     {
-    	rightRotationLimited = -m_SafeRPS * (1 - rightRotation/leftRotation);
-      leftRotationLimited = -m_SafeRPS;
+    	rightWheelRotationLimited = -m_SafeRPS * (1 - rightWheelRotation/leftWheelRotation);
+      leftWheelRotationLimited = -m_SafeRPS;
     }
-    else if (leftRotation > rightRotation)
+    else if (leftWheelRotation > rightWheelRotation)
     {
-        leftRotationLimited = -m_SafeRPS * (1 - leftRotation/rightRotation);
-        rightRotationLimited = -m_SafeRPS;
+        leftWheelRotationLimited = -m_SafeRPS * (1 - leftWheelRotation/rightWheelRotation);
+        rightWheelRotationLimited = -m_SafeRPS;
     }
-    else if (leftRotation == rightRotation)
+    else if (leftWheelRotation == rightWheelRotation)
     {
-        rightRotationLimited = -m_SafeRPS;
-        leftRotationLimited = -m_SafeRPS;
+        rightWheelRotationLimited = -m_SafeRPS;
+        leftWheelRotationLimited = -m_SafeRPS;
     }
 	}
 	else
   {
-		rightRotationLimited = rightRotation;
-		leftRotationLimited = leftRotation;
+		rightWheelRotationLimited = rightWheelRotation;
+		leftWheelRotationLimited = leftWheelRotation;
 	}
   /*--------------------------------------------------------------------------*/
 
@@ -111,11 +114,26 @@ void LonguinhoMotorController::move(float linearVelocity, float angularVelocity)
 		log << DELIMITER << rightRotationLimited;
 	}
   */
-	float rightQpps = rightRotationLimited * m_GearRate * m_PulsesPerRotation;
-	float leftQpps = leftRotationLimited * m_GearRate * m_PulsesPerRotation;
+	float rightQpps = rightWheelRotationLimited * m_GearRate * m_PulsesPerRotation;
+	float leftQpps = leftWheelRotationLimited * m_GearRate * m_PulsesPerRotation;
 
   m_RoboClaw.ForwardBackwardM1(m_Address, mapPWM(rightQpps));
   m_RoboClaw.ForwardBackwardM2(m_Address, mapPWM(leftQpps));
+}
+
+
+//Faz com que os dois motores se movam com uma mesma velocidade constante
+void LonguinhoMotorController::moveToConstantVelocity(float linearVelocity)
+{
+  float qPulsesPerSecond = (linearVelocity * m_GearRate * m_PulsesPerRotation)/m_WheelsRadius;
+  m_RoboClaw.SetM1VelocityPID(m_Address,1,0.01,0.1,qPulsesPerSecond);
+  m_RoboClaw.SetM2VelocityPID(m_Address,1,0.01,0.1,qPulsesPerSecond);
+}
+
+float LonguinhoMotorController::movingTime(float initialX, float initialY, float finalX, float finalY, float linearVelocity)
+{
+  float distance = sqrt(pow(finalX - initialX, 2) + pow(finalY - initialY, 2));
+  return linearVelocity/distance;
 }
 
 unsigned char LonguinhoMotorController::mapPWM(float pps)

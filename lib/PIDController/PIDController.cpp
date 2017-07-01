@@ -62,8 +62,8 @@ void PIDController::setTunings(float proportionalConstant, float integralConstan
 	Essa converção não é necessária, mas permite que a gente entre com
 	valores de KI e KD em termos de Hz (1/s)
 	*/
-	integralConstant /= 1000;
-	derivativeConstant /= 1000;
+	//integralConstant /= 1000;
+	//derivativeConstant /= 1000;
 
 	m_IntegralConstant = integralConstant;
 	m_DerivativeConstant = derivativeConstant;

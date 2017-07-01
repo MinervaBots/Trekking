@@ -17,8 +17,8 @@ void LonguinhoEncoder::update(Position *pPosition)
   float heading = pPosition->getHeading();
   float xPrime = deltaEncoder * cos(heading);
   float yPrime = deltaEncoder * sin(heading);
-  float headingPrime = (deltaEncoderRight - deltaEncoderLeft) / distanceFromAxis;
-
+  float headingPrime = (deltaEncoderRight - deltaEncoderLeft) / (2 * distanceFromAxis);
+  /*
   Serial.print("Encoder: ");
   Serial.print(deltaEncoderLeft);
   Serial.print(", ");
@@ -31,7 +31,10 @@ void LonguinhoEncoder::update(Position *pPosition)
   Serial.print(headingPrime);
   Serial.println();
   //delay(250);
+  //*/
+  float newHeading = pPosition->getHeading() + headingPrime;
+  newHeading = atan2(sin(newHeading), cos(newHeading));
   pPosition->setX(pPosition->getX() + xPrime);
   pPosition->setY(pPosition->getY() + yPrime);
-  //pPosition->setHeading(pPosition->getHeading() + headingPrime);
+  pPosition->setHeading(newHeading);
 }

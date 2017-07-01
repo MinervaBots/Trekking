@@ -31,11 +31,11 @@ void Trekking::emergency()
 
 void Trekking::update()
 {
-
   if(!m_IsRunning)
   {
     return;
   }
+  Serial.println("update");
   m_Odometry = m_pTrekkingSensoring->getInput();
   //delay(500);
 
@@ -48,26 +48,29 @@ void Trekking::update()
 /*----|Modos de operação|-----------------------------------------------------*/
 void Trekking::rotateToTarget(unsigned long deltaTime)
 {
+  Serial.print("rotateToTarget: ");
+  Serial.println(m_CurrentTargetId);
   auto target = m_Targets.get(m_CurrentTargetId);
   auto currentPosition = m_pTrekkingSensoring->getPosition();
 
   float heading = currentPosition.getHeading();
   float desiredHeading = atan((target.getY() - currentPosition.getY()) / (target.getX() - currentPosition.getX()));
-
   float headingError = desiredHeading - heading;
   headingError = atan2(sin(headingError), cos(headingError));
 
-  Serial.print(heading);
-  Serial.print(" - ");
   Serial.print(desiredHeading);
+  Serial.print(" - ");
+  Serial.print(heading);
   Serial.print(" = ");
   Serial.println(headingError);
-  delay(250);
-  
-  if(abs(headingError) > 0.08)
+
+
+  if(abs(headingError) < 0.03)
   {
-    float angularVelocity = headingError * 0.5/abs(headingError);
-    m_pMotorController->move(0, angularVelocity);
+    float angularVelocity = headingError;
+    Serial.print("angularVelocity: ");
+    Serial.println(angularVelocity);
+    m_pMotorController->move(0, angularVelocity);//m_pSystemController->run(headingError));
     return;
   }
 
@@ -76,7 +79,8 @@ void Trekking::rotateToTarget(unsigned long deltaTime)
   valor na linha de referência que vai ser usada para o PID no estado 'search'.
   */
   m_ReferenceLine = m_Odometry.getU();
-
+  Serial.print("m_ReferenceLine: ");
+  Serial.println(m_ReferenceLine);
   /*
   Se estamos indo parao ultimo objetivo, devemos ativar os sensores de ultrassom
   e os sensores de cor.
@@ -91,9 +95,10 @@ void Trekking::rotateToTarget(unsigned long deltaTime)
 
 void Trekking::search(unsigned long deltaTime)
 {
+  Serial.println("search");
   auto target = m_Targets.get(m_CurrentTargetId);
   auto distanceToTarget = distance(target);
-  if(distanceToTarget > 0.1)
+  if(distanceToTarget > 0.75)
   {
     /*
     auto currentPosition = m_pTrekkingSensoring->getPosition();
@@ -109,12 +114,20 @@ void Trekking::search(unsigned long deltaTime)
     */
 
     float lineError = m_ReferenceLine - m_Odometry.getU();
-    float angularVelocity = m_pSystemController->run(lineError);
+    float angularVelocity = lineError; //m_pSystemController->run(lineError);
     m_pMotorController->move(0.5, angularVelocity);
+
+    Serial.print("lineError: ");
+    Serial.print(lineError);
+    Serial.print("\tangularVelocity: ");
+    Serial.print(angularVelocity);
+    Serial.print("\tm_CurrentTargetId: ");
+    Serial.println(m_CurrentTargetId);
 
     /*
     Se estivermos perto o suficiente, já podemos começar a procurar os cones
     */
+    /*
     if(distanceToTarget > 3)
       return;
 
@@ -133,7 +146,7 @@ void Trekking::search(unsigned long deltaTime)
         /*
         Se não chegamos no objetivo, e estamos indo na direção do ultimo, isso
         é um obstaculo.
-        */
+        *
         m_CurrentMode = &Trekking::avoidObstacles;
       }
       else
@@ -141,23 +154,29 @@ void Trekking::search(unsigned long deltaTime)
         /*
         É um cone, mas ainda estamos muito longe pra ver a base branca.
         Muda pra refinedSearch e deixa que ele direcione até o cone.
-        */
+        *
         m_CurrentMode = &Trekking::refinedSearch;
+        m_StartTimeInRefinedSearch = millis();
       }
     }
+    */
     return;
+
   }
 
   /*
   Se já estamos a uma distância mínima do nosso objetivo (garante que não
   tenham problemas e nunca mude de estado) muda para 'refinedSearch'
   */
-  m_CurrentMode = &Trekking::refinedSearch;
+  m_CurrentMode = &Trekking::buzzer;
+  this->stop();
+  Serial.println("POSIÇÃO DESEJADA ALCANÇADA!");
   m_StartTimeInRefinedSearch = millis();
 }
 
 void Trekking::refinedSearch(unsigned long deltaTime)
 {
+  Serial.println("refinedSearch");
   if(!m_Odometry.getT())
   {
     auto targetVector = m_Odometry.getV();
@@ -255,6 +274,7 @@ void Trekking::standBy(unsigned long deltaTime)
 
 void Trekking::buzzer(unsigned long deltaTime)
 {
+  m_pMotorController->stop();
   if(m_CurrentTargetId == 2)
   {
     finish(deltaTime);

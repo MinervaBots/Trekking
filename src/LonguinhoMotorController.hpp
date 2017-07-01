@@ -9,16 +9,19 @@ class LonguinhoMotorController : public DifferentialDriveController
 public:
   LonguinhoMotorController();
   void move(float linearVelocity, float angularVelocity);
+  void moveToConstantVelocity(float linearVelocity);
+  float movingTime(float initialX, float initialY, float finalX, float finalY, float linearVelocity);
+  float getLeftVelocityRPS();
+  float getRightVelocityRPS();
 
-  float getLeftVelocity();
-  float getRightVelocity();
   float getPulsesPerRotation() { return m_PulsesPerRotation; }
   float getGearRate() { return m_GearRate; }
 
   int getEncoderLeft();
   int getEncoderRight();
 
-  void resetEncoders(){ m_RoboClaw.ResetEncoders(m_Address); }
+  void resetEncoders(){ m_RoboClaw.ResetEncoders(m_Address);
+  }
 
 private:
   /*----|RoboClaw|------------------------------------------------------------*/
@@ -32,8 +35,11 @@ private:
   /*----|Variáveis de controle|-----------------------------------------------*/
   float m_PulsesPerRotation = 64;
   float m_GearRate = 70;
-  float m_MaxPPS = m_GearRate*m_PulsesPerRotation*150/60;
-  float m_SafeRPS = m_MaxPPS*0.9;
+  float m_MaxRPM = 150;         //Rotations per minute
+  float m_MaxRPS = m_MaxRPM/60; //Rotations per second
+  float m_SafetyFactor = 0.9;
+  float m_MaxPPS = m_GearRate*m_PulsesPerRotation*m_MaxRPS; //Pulses per second
+  float m_SafeRPS = m_MaxRPS*m_SafetyFactor; //Safe RPS to be used on calculations
   /*--------------------------------------------------------------------------*/
 
   /*----|Pinos|---------------------------------------------------------------*/

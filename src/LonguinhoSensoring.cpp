@@ -33,17 +33,15 @@ void LonguinhoSensoring::initializeMPU(int mpuRate, int magMix, int magUpdateRat
     Serial.println("Using compass calibration");
   else
     Serial.println("No valid compass calibration data");
+  delay(1000);
 
   while (true)
   {
     if(imu.IMURead())
     {
-      RTVector3 mag = imu.getCompass();
-      float theta = atan2(mag.y(), mag.x());
-
-      m_InitialHeading = theta;
-      Serial.print("Initial Heading: ");
-      Serial.println(m_InitialHeading);
+      //m_InitialHeading = hdm;
+      //Serial.print("Initial Heading: ");
+      //Serial.println(m_InitialHeading);
       break;
     }
   }
@@ -63,35 +61,24 @@ TrekkingOdometry LonguinhoSensoring::getInput()
     m_CachedValue.setT(false);
   }
   */
-  if (imu.IMURead())
+  while (true)
   {
-    RTVector3 mag = imu.getCompass();
-    float theta = atan2(mag.y(), mag.x());
-
-    float magDirection = theta - m_InitialHeading;
-    if(m_pMagFilter != nullptr)
+    if(imu.IMURead())
     {
-      magDirection = m_pMagFilter->getInput(magDirection);
+      RTVector3 mag = imu.getCompass();
+      float magDirection = atan2(mag.y(), mag.x()); //- m_InitialHeading;
+      if(m_pMagFilter != nullptr)
+      {
+        magDirection = m_pMagFilter->getInput(magDirection);
+      }
+      //Serial.print("Magnetometro: ");
+      //Serial.println(magDirection);
+
+      m_CachedValue.setU(magDirection);
+      //m_pCurrentEncoderPosition.setHeading(magDirection);
+      break;
     }
-
-    Serial.print("Magnetometro: ");
-    Serial.println(magDirection);
-
-    m_CachedValue.setU(magDirection);
-    m_pCurrentEncoderPosition.setHeading(magDirection);
-
-/*
-    m_CurrentVelocity += Vector2<float>(m_MPU.m_calAccel[VEC3_X], m_MPU.m_calAccel[VEC3_Y]);
-
-    // [TODO] - Verificar isso
-    auto xAlignedVel = m_CurrentVelocity.getX() * sin(m_pCurrentMPUPosition.getHeading());
-    auto yAlignedVel = m_CurrentVelocity.getY() * cos(m_pCurrentMPUPosition.getHeading());
-
-    m_pCurrentMPUPosition += Vector2<float>(xAlignedVel, yAlignedVel);
-    m_pCurrentMPUPosition.setHeading(m_MPU.m_fusedEulerPose[VEC3_Z] - m_InitialHeading);
-*/
   }
-
 /*
   auto position = getMPUPosition();
   Log.debug("MPU Position X", position.getX());

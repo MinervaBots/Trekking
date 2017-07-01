@@ -6,6 +6,7 @@
 #include "../RTIMULib/RTIMU.h"
 #include "../RTIMULib/RTIMUMPU9150.h"
 #include "../RTIMULib/RTIMUSettings.h"
+#include "../RTIMULib/RTFusionRTQF.h"
 #include "../lib/InputSource/InputSource.hpp"
 #include "../lib/TCS230/TCS230.h"
 #include "../lib/Ultrasonic/Ultrasonic.hpp"
@@ -43,7 +44,7 @@ public:
 private:                     // the fusion object
   RTIMUSettings settings;                               // the settings object
   RTIMUMPU9150 imu;              // the IMU object
-
+  RTFusionRTQF fusion;
 
   TrekkingOdometry m_CachedValue;
 
