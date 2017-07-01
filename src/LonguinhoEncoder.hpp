@@ -18,6 +18,9 @@ public:
 
 private:
   LonguinhoMotorController *m_pMotorController;
+  
+  long m_LastEncoderLeft;
+  long m_LastEncoderRight;
 };
 
 #endif //LonguinhoEncoder_hpp

@@ -123,13 +123,6 @@ void LonguinhoMotorController::move(float linearVelocity, float angularVelocity)
 
 
 //Faz com que os dois motores se movam com uma mesma velocidade constante
-void LonguinhoMotorController::moveToConstantVelocity(float linearVelocity)
-{
-  float qPulsesPerSecond = (linearVelocity * m_GearRate * m_PulsesPerRotation)/m_WheelsRadius;
-  m_RoboClaw.SetM1VelocityPID(m_Address,1,0.01,0.1,qPulsesPerSecond);
-  m_RoboClaw.SetM2VelocityPID(m_Address,1,0.01,0.1,qPulsesPerSecond);
-}
-
 float LonguinhoMotorController::movingTime(float initialX, float initialY, float finalX, float finalY, float linearVelocity)
 {
   float distance = sqrt(pow(finalX - initialX, 2) + pow(finalY - initialY, 2));
@@ -149,13 +142,13 @@ unsigned char LonguinhoMotorController::mapPWM(float pps)
 int LonguinhoMotorController::getEncoderLeft()
 {
   int enc = m_RoboClaw.ReadEncM2(m_Address, &m_StatusLeft, &m_ValidLeft);
-  m_RoboClaw.SetEncM2(m_Address, 0);
+  //m_RoboClaw.SetEncM2(m_Address, 0);
   return enc;
 }
 
 int LonguinhoMotorController::getEncoderRight()
 {
   int enc = m_RoboClaw.ReadEncM1(m_Address, &m_StatusRight, &m_ValidRight);
-  m_RoboClaw.SetEncM1(m_Address, 0);
+  //m_RoboClaw.SetEncM1(m_Address, 0);
   return enc;
 }

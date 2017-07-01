@@ -65,9 +65,9 @@ void Trekking::rotateToTarget(unsigned long deltaTime)
   Serial.println(headingError);
 
 
-  if(abs(headingError) < 0.03)
+  if(abs(headingError) > 0.03)
   {
-    float angularVelocity = headingError;
+    float angularVelocity = headingError/abs(headingError);
     Serial.print("angularVelocity: ");
     Serial.println(angularVelocity);
     m_pMotorController->move(0, angularVelocity);//m_pSystemController->run(headingError));
@@ -98,7 +98,7 @@ void Trekking::search(unsigned long deltaTime)
   Serial.println("search");
   auto target = m_Targets.get(m_CurrentTargetId);
   auto distanceToTarget = distance(target);
-  if(distanceToTarget > 0.75)
+  if(distanceToTarget > 0.5)
   {
     /*
     auto currentPosition = m_pTrekkingSensoring->getPosition();
@@ -114,7 +114,7 @@ void Trekking::search(unsigned long deltaTime)
     */
 
     float lineError = m_ReferenceLine - m_Odometry.getU();
-    float angularVelocity = lineError; //m_pSystemController->run(lineError);
+    float angularVelocity = -lineError * 5; //m_pSystemController->run(lineError);
     m_pMotorController->move(0.5, angularVelocity);
 
     Serial.print("lineError: ");
@@ -143,7 +143,7 @@ void Trekking::search(unsigned long deltaTime)
       }
       else if(m_CurrentTargetId == 2)
       {
-        /*
+/*
         Se não chegamos no objetivo, e estamos indo na direção do ultimo, isso
         é um obstaculo.
         *

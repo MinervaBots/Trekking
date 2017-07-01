@@ -9,7 +9,6 @@ LonguinhoSensoring sensoring;
 LonguinhoMotorController motorController;
 PIDController pidController;
 SimpleMovingAverageFilter<5> filter;
-float desiredAngle = 0;
 bool emergencyButton, initButton, operationModeSwitch;
 
 void setup()
@@ -33,7 +32,7 @@ void setup()
   sensoring.initializeMPU(20, 10, 10, 40);
 
   // Adiciona os objetivos
-  trekking.addTarget(5, 0);
+  trekking.addTarget(6, 0);
   trekking.addTarget(16, 15);
   trekking.addTarget(6, 18);
 
@@ -50,9 +49,7 @@ void setup()
   trekking.setSystemController(&pidController);
 
   trekking.setMaxTimeInRefinedSearch(10000); // 10s
-  //motorController.resetEncoders();
-  motorController.getEncoderLeft();
-  motorController.getEncoderRight();
+  motorController.resetEncoders();
   trekking.setup();
 }
 
@@ -67,7 +64,7 @@ void readButtons()
 void loop()
 {
   readButtons();
-    trekking.setOperationMode(operationModeSwitch);
+  trekking.setOperationMode(operationModeSwitch);
   if(initButton && !trekking.isRunning())
   {
     trekking.start();
@@ -77,21 +74,8 @@ void loop()
   {
     trekking.emergency();
   }
-  //trekking.update();
+  trekking.update();
   float tempo = motorController.movingTime(0,0,10,0,0.5);
-  float start = millis();
-  while(millis() - start < tempo)
-  {
-      motorController.moveToConstantVelocity(0.5);
-      Serial.print("x = ");
-      Serial.println(sensoring.getEncoderPosition().getX());
-      Serial.print("y = ");
-      Serial.println(sensoring.getEncoderPosition().getY());
-      Serial.println(motorController.getLeftVelocityRPS()*2*PI*motorController.getWheelsRadius());
-      Serial.println(motorController.getRightVelocityRPS()*2*PI*motorController.getWheelsRadius());
-  }
-  motorController.stop();
-  return;
 }
 
 #endif //Longuinho_cpp

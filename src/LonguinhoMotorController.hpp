@@ -8,8 +8,8 @@ class LonguinhoMotorController : public DifferentialDriveController
 {
 public:
   LonguinhoMotorController();
+
   void move(float linearVelocity, float angularVelocity);
-  void moveToConstantVelocity(float linearVelocity);
   float movingTime(float initialX, float initialY, float finalX, float finalY, float linearVelocity);
   float getLeftVelocityRPS();
   float getRightVelocityRPS();
@@ -20,8 +20,7 @@ public:
   int getEncoderLeft();
   int getEncoderRight();
 
-  void resetEncoders(){ m_RoboClaw.ResetEncoders(m_Address);
-  }
+  void resetEncoders(){ m_RoboClaw.ResetEncoders(m_Address); }
 
 private:
   /*----|RoboClaw|------------------------------------------------------------*/
