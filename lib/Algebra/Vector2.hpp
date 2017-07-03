@@ -14,12 +14,12 @@ public:
   T getY() const { return m_Y; }
   void setX(T x) { m_X = x; }
   void setY(T y) { m_Y = y; }
-
+/*
   static float euclideanDistance(Vector2<T> vector1, Vector2<T> vector2)
   {
     return sqrt(pow(vector1.m_X - vector2.m_X, 2) + pow(vector1.m_Y - vector2.m_Y, 2));
   }
-
+*/
   Vector2<T> operator+(const Vector2<T>& vector) const
   {
     Vector2<T> ret;
@@ -44,6 +44,18 @@ public:
   {
     this->m_X -= vector.m_X;
     this->m_Y -= vector.m_Y;
+    return *this;
+  }
+  Vector2<T>& operator/=(const T& scalar)
+  {
+    this->m_X /= scalar;
+    this->m_Y /= scalar;
+    return *this;
+  }
+  Vector2<T>& operator*=(const T& scalar)
+  {
+    this->m_X *= scalar;
+    this->m_Y *= scalar;
     return *this;
   }
   bool operator==(const Vector2<T>& vector) const

@@ -71,28 +71,41 @@ TrekkingOdometry LonguinhoSensoring::getInput()
       {
         magDirection = m_pMagFilter->getInput(magDirection);
       }
-      //Serial.print("Magnetometro: ");
-      //Serial.println(magDirection);
-
       m_CachedValue.setU(magDirection);
-      //m_pCurrentEncoderPosition.setHeading(magDirection);
+
+      RTVector3 acceleration = imu.getAccel();
+      if(abs(acceleration.x()) < 0.05 * m_GForce)
+      {
+        acceleration.setX(0);
+      }
+      if(abs(acceleration.y()) < 0.05 * m_GForce)
+      {
+        acceleration.setY(0);
+      }
+      float xVelocityPrime = (acceleration.x() / m_GForce) * sin(m_pCurrentEncoderPosition.getHeading());
+      float yVelocityPrime = (acceleration.y() / m_GForce) * cos(m_pCurrentEncoderPosition.getHeading());
+
+      m_Velocity += Vector2<float>(xVelocityPrime, yVelocityPrime);
+
+      m_pCurrentMPUPosition += m_Velocity;
       break;
     }
   }
-/*
+
   auto position = getMPUPosition();
-  Log.debug("MPU Position X", position.getX());
-  Log.debug("MPU Position Y", position.getY());
-  Log.debug("MPU Position Heading", position.getHeading());
-*/
-  auto position = m_pCurrentEncoderPosition;
-  Serial.print("X: ");
+  Serial.print("MPU Position   -   X: ");
   Serial.print(position.getX());
-  Serial.print(", ");
-  Serial.print("Y: ");
+  Serial.print("\tY: ");
   Serial.print(position.getY());
-  Serial.print(", ");
-  Serial.print("Heading: ");
+  Serial.print("\tHeading: ");
+  Serial.println(position.getHeading());
+
+  position = m_pCurrentEncoderPosition;
+  Serial.print("Encoder Position - X: ");
+  Serial.print(position.getX());
+  Serial.print("\tY: ");
+  Serial.print(position.getY());
+  Serial.print("\tHeading: ");
   Serial.println(position.getHeading());
 
   /*

@@ -41,10 +41,12 @@ public:
 
   void setMagnetometerFilter(Filter<float> *pFilter) { m_pMagFilter = pFilter; }
 
-private:                     // the fusion object
-  RTIMUSettings settings;                               // the settings object
-  RTIMUMPU9150 imu;              // the IMU object
-  RTFusionRTQF fusion;
+private:
+  RTIMUMPU9150 imu;
+  RTIMUSettings settings;
+
+  const float m_GForce = 9.8;
+  Vector2<float> m_Velocity;
 
   TrekkingOdometry m_CachedValue;
 

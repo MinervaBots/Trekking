@@ -100,7 +100,7 @@ void Trekking::search(unsigned long deltaTime)
   auto target = m_Targets.get(m_CurrentTargetId);
   auto distanceToTarget = distance(target);
 
-  if(distanceToTarget > 0.2)
+  if(distanceToTarget > 0.15)
   {
     auto currentPosition = m_pTrekkingSensoring->getPosition();
     float heading = currentPosition.getHeading();
@@ -172,7 +172,7 @@ void Trekking::search(unsigned long deltaTime)
   tenham problemas e nunca mude de estado) muda para 'refinedSearch'
   */
   m_CurrentMode = &Trekking::buzzer;
-  //this->stop();
+  this->stop();
   Serial.println("POSIÇÃO DESEJADA ALCANÇADA!");
   m_StartTimeInRefinedSearch = millis();
 }

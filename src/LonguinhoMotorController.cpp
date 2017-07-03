@@ -22,6 +22,7 @@ float LonguinhoMotorController::getLeftVelocityRPS()
   m_LeftVelocity = pps / (m_PulsesPerRotation * m_GearRate);
   return m_LeftVelocity;
 }
+
 // Returns the number of rotations that the wheel does on a segond
 float LonguinhoMotorController::getRightVelocityRPS()
 {
