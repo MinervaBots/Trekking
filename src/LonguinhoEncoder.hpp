@@ -18,10 +18,11 @@ public:
 
 private:
   LonguinhoMotorController *m_pMotorController;
+/*
   unsigned long m_LastRun;
 
   int m_LastEncoderLeft;
-  int m_LastEncoderRight;
+*/
 };
 
 #endif //LonguinhoEncoder_hpp

@@ -1,6 +1,8 @@
 #include "LonguinhoEncoder.hpp"
 #include <Arduino.h>
+#include <stdint.h>
 
+/*
 void LonguinhoEncoder::update(Position *pPosition)
 {
   float deltaTimeInSeconds = (millis() - m_LastRun) / 1000.0;
@@ -34,40 +36,22 @@ void LonguinhoEncoder::update(Position *pPosition)
 
   m_LastRun = millis();
 }
+*/
 
-/*
 void LonguinhoEncoder::update(Position *pPosition)
 {
-  float deltaTimeInSeconds = (millis() - m_LastRun) / 1000.0;
   float wheelRadius = m_pMotorController->getWheelsRadius();
   float distanceFromAxis = m_pMotorController->getWheelsDistanceFromRotationAxis();
-
+/*
   int encoderLeft = m_pMotorController->getEncoderLeft();
   int encoderRight = m_pMotorController->getEncoderRight();
-
-  int deltaEncoderLeft = encoderLeft - m_LastEncoderLeft;
-  int deltaEncoderRight = encoderRight - m_LastEncoderRight;
+*/
+  int deltaEncoderLeft = m_pMotorController->getEncoderLeft(true); //encoderLeft - m_LastEncoderLeft; // % INT32_MAX;
+  int deltaEncoderRight = m_pMotorController->getEncoderRight(true); //encoderRight - m_LastEncoderRight; // % INT32_MAX;
 
   float correctionFactor = m_pMotorController->getPulsesPerRotation() * m_pMotorController->getGearRate();
-  if(deltaEncoderLeft > -30000)
-  {
-    m_DeltaDistanceLeft = 2 * PI * wheelRadius * deltaEncoderLeft / correctionFactor;
-  }
-  else
-  {
-    m_DeltaDistanceLeft = 2 * PI * wheelRadius * m_pMotorController->getLeftVelocityRPS() * deltaTimeInSeconds;
-    m_DeltaDistanceLeft *= 0.98;
-  }
-
-  if(deltaEncoderRight > -30000)
-  {
-    m_DeltaDistanceRight = 2 * PI * wheelRadius * deltaEncoderRight / correctionFactor;
-  }
-  else
-  {
-    m_DeltaDistanceRight = 2 * PI * wheelRadius * m_pMotorController->getRightVelocityRPS() * deltaTimeInSeconds;
-  }
-
+  m_DeltaDistanceLeft = 2 * PI * wheelRadius * deltaEncoderLeft / correctionFactor;
+  m_DeltaDistanceRight = 2 * PI * wheelRadius * deltaEncoderRight / correctionFactor;
 
   float deltaEncoderDistance = getDeltaDistance();
   float deltaEncoderLeftDistance = getDeltaDistanceLeft();
@@ -83,9 +67,9 @@ void LonguinhoEncoder::update(Position *pPosition)
   pPosition->setX(pPosition->getX() + xPrime);
   pPosition->setY(pPosition->getY() + yPrime);
   pPosition->setHeading(newHeading);
-
+/*
   m_LastEncoderLeft = encoderLeft;
   m_LastEncoderRight = encoderRight;
   m_LastRun = millis();
-}
 */
+}

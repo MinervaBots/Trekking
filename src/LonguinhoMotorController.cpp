@@ -154,17 +154,23 @@ unsigned char LonguinhoMotorController::mapPWM(float pps)
 }
 
 
-int LonguinhoMotorController::getEncoderLeft()
+int LonguinhoMotorController::getEncoderLeft(bool reset)
 {
   int enc = m_RoboClaw.ReadEncM1(m_Address, &m_StatusLeft, &m_ValidLeft);
   enc *= 0.98;
-  //m_RoboClaw.SetEncM1(m_Address, enc);
+  if(reset)
+  {
+    m_RoboClaw.SetEncM1(m_Address, 0);
+  }
   return enc;
 }
 
-int LonguinhoMotorController::getEncoderRight()
+int LonguinhoMotorController::getEncoderRight(bool reset)
 {
   int enc = m_RoboClaw.ReadEncM2(m_Address, &m_StatusRight, &m_ValidRight);
-  //m_RoboClaw.SetEncM2(m_Address, 0);
+  if(reset)
+  {
+    m_RoboClaw.SetEncM2(m_Address, 0);
+  }
   return enc;
 }
