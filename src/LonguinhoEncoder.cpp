@@ -70,6 +70,7 @@ void LonguinhoEncoder::update(Position *pPosition)
 /*
   m_LastEncoderLeft = encoderLeft;
   m_LastEncoderRight = encoderRight;
-  m_LastRun = millis();
+  m_LastRun =
+   millis();
 */
 }
