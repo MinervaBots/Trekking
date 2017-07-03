@@ -19,8 +19,8 @@ public:
   float getPulsesPerRotation() { return m_PulsesPerRotation; }
   float getGearRate() { return m_GearRate; }
 
-  int getEncoderLeft();
-  int getEncoderRight();
+  int getEncoderLeft(bool reset);
+  int getEncoderRight(bool reset);
 
   void resetEncoders(){ m_RoboClaw.ResetEncoders(m_Address); }
 
