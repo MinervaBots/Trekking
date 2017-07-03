@@ -31,12 +31,12 @@ void Trekking::emergency()
 
 void Trekking::update()
 {
-  m_Odometry = m_pTrekkingSensoring->getInput();
   if(!m_IsRunning)
   {
     return;
   }
   Serial.println("update");
+  m_Odometry = m_pTrekkingSensoring->getInput();
   //delay(500);
 
   unsigned long deltaTime = millis() - m_LastIterationTime;
