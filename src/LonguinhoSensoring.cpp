@@ -73,7 +73,11 @@ TrekkingOdometry LonguinhoSensoring::getInput()
       }
       m_CachedValue.setU(magDirection);
 
-      RTVector3 acceleration = imu.getAccel();
+      float deltaTimeInSeconds = (millis() / 1000.0) - m_LastRunInSeconds;
+      m_LastRunInSeconds = millis() / 1000.0;
+      auto acceleration = Vector2<float>(-imu.getAccel().x(), imu.getAccel().y()) / m_GForce;
+
+      /*
       if(abs(acceleration.x()) < 0.05 * m_GForce)
       {
         acceleration.setX(0);
@@ -82,12 +86,14 @@ TrekkingOdometry LonguinhoSensoring::getInput()
       {
         acceleration.setY(0);
       }
-      float xVelocityPrime = (acceleration.x() / m_GForce) * sin(m_pCurrentEncoderPosition.getHeading());
-      float yVelocityPrime = (acceleration.y() / m_GForce) * cos(m_pCurrentEncoderPosition.getHeading());
+      */
 
+      float xVelocityPrime = (acceleration.getX() * deltaTimeInSeconds) * cos(m_pCurrentEncoderPosition.getHeading());
+      float yVelocityPrime = (acceleration.getY() * deltaTimeInSeconds) * sin(m_pCurrentEncoderPosition.getHeading());
       m_Velocity += Vector2<float>(xVelocityPrime, yVelocityPrime);
 
-      m_pCurrentMPUPosition += m_Velocity;
+      m_pCurrentMPUPosition += m_Velocity * deltaTimeInSeconds + (acceleration * pow(deltaTimeInSeconds, 2)) / 2;
+
       break;
     }
   }

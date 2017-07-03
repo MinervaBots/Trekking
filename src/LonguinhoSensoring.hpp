@@ -42,10 +42,11 @@ public:
   void setMagnetometerFilter(Filter<float> *pFilter) { m_pMagFilter = pFilter; }
 
 private:
+  float m_LastRunInSeconds;
   RTIMUMPU9150 imu;
   RTIMUSettings settings;
 
-  const float m_GForce = 9.8;
+  const float m_GForce = 9.80665f;
   Vector2<float> m_Velocity;
 
   TrekkingOdometry m_CachedValue;
