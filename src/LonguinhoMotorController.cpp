@@ -18,14 +18,14 @@ LonguinhoMotorController::LonguinhoMotorController() :
 //Returns the number of rotations that the wheel does on a second
 float LonguinhoMotorController::getLeftVelocityRPS()
 {
-  int32_t pps = m_RoboClaw.ReadSpeedM2(m_Address, &m_StatusLeft, &m_ValidLeft);
+  int32_t pps = m_RoboClaw.ReadSpeedM1(m_Address, &m_StatusLeft, &m_ValidLeft);
   m_LeftVelocity = pps / (m_PulsesPerRotation * m_GearRate);
   return m_LeftVelocity;
 }
 // Returns the number of rotations that the wheel does on a segond
 float LonguinhoMotorController::getRightVelocityRPS()
 {
-  int32_t pps = m_RoboClaw.ReadSpeedM1(m_Address, &m_StatusRight, &m_ValidRight);
+  int32_t pps = m_RoboClaw.ReadSpeedM2(m_Address, &m_StatusRight, &m_ValidRight);
   m_RightVelocity = pps / (m_PulsesPerRotation * m_GearRate);
   return m_RightVelocity;
 }
@@ -117,10 +117,24 @@ void LonguinhoMotorController::move(float linearVelocity, float angularVelocity)
 	float rightQpps = rightWheelRotationLimited * m_GearRate * m_PulsesPerRotation;
 	float leftQpps = leftWheelRotationLimited * m_GearRate * m_PulsesPerRotation;
 
-  m_RoboClaw.ForwardBackwardM1(m_Address, mapPWM(rightQpps));
-  m_RoboClaw.ForwardBackwardM2(m_Address, mapPWM(leftQpps));
+  unsigned char leftPwm = mapPWM(leftQpps);
+  unsigned char rightPwm = mapPWM(rightQpps);
+
+  Serial.print("Left PWM: ");
+  Serial.print(leftPwm);
+
+  Serial.print("\tRight PWM: ");
+  Serial.println(rightPwm);
+
+  m_RoboClaw.ForwardBackwardM1(m_Address, leftPwm);
+  m_RoboClaw.ForwardBackwardM2(m_Address, rightPwm);
 }
 
+void LonguinhoMotorController::stop()
+{
+  m_RoboClaw.ForwardBackwardM1(m_Address, 64);
+  m_RoboClaw.ForwardBackwardM2(m_Address, 64);
+}
 
 //Faz com que os dois motores se movam com uma mesma velocidade constante
 float LonguinhoMotorController::movingTime(float initialX, float initialY, float finalX, float finalY, float linearVelocity)
@@ -141,14 +155,15 @@ unsigned char LonguinhoMotorController::mapPWM(float pps)
 
 int LonguinhoMotorController::getEncoderLeft()
 {
-  int enc = m_RoboClaw.ReadEncM2(m_Address, &m_StatusLeft, &m_ValidLeft);
-  //m_RoboClaw.SetEncM2(m_Address, 0);
+  int enc = m_RoboClaw.ReadEncM1(m_Address, &m_StatusLeft, &m_ValidLeft);
+  enc *= 0.98;
+  //m_RoboClaw.SetEncM1(m_Address, enc);
   return enc;
 }
 
 int LonguinhoMotorController::getEncoderRight()
 {
-  int enc = m_RoboClaw.ReadEncM1(m_Address, &m_StatusRight, &m_ValidRight);
-  //m_RoboClaw.SetEncM1(m_Address, 0);
+  int enc = m_RoboClaw.ReadEncM2(m_Address, &m_StatusRight, &m_ValidRight);
+  //m_RoboClaw.SetEncM2(m_Address, 0);
   return enc;
 }

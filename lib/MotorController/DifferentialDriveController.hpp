@@ -1,14 +1,13 @@
 #ifndef DifferentialDriveController_hpp
 #define DifferentialDriveController_hpp
 
-#include "MotorController.hpp"
-
-class DifferentialDriveController : public MotorController
+class DifferentialDriveController
 {
 public:
   DifferentialDriveController() { }
   DifferentialDriveController(float wheelsRadius, float distanceFromRotationAxis);
   virtual void move(float linearVelocity, float angularVelocity);
+  virtual void stop() = 0;
 
   float getWheelsRadius() { return m_WheelsRadius; }
   float getWheelsDistanceFromRotationAxis() { return m_WheelsDistanceFromRotationAxis; }

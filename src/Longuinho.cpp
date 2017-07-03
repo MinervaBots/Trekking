@@ -32,9 +32,9 @@ void setup()
   sensoring.initializeMPU(20, 10, 10, 40);
 
   // Adiciona os objetivos
-  trekking.addTarget(6, 0);
-  trekking.addTarget(16, 15);
-  trekking.addTarget(6, 18);
+  trekking.addTarget(2, 0);
+  trekking.addTarget(2, 2);
+  trekking.addTarget(0, 0);
 
   // Define o ponteiro para a classe de controle dos motores
   trekking.setMotorController(&motorController, 0.2);
@@ -42,7 +42,7 @@ void setup()
   trekking.setBuzzerPin(BUZZER_PIN);
 
   // [TODO]
-  pidController.setTunings(2, 0.2, 2);
+  pidController.setTunings(2, 0, 0);
   pidController.setSetPoint(0);
   pidController.setOutputLimits(-1, 1);
   pidController.setControllerDirection(SystemControllerDirection::Inverse);

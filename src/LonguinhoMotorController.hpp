@@ -10,6 +10,8 @@ public:
   LonguinhoMotorController();
 
   void move(float linearVelocity, float angularVelocity);
+  void stop();
+
   float movingTime(float initialX, float initialY, float finalX, float finalY, float linearVelocity);
   float getLeftVelocityRPS();
   float getRightVelocityRPS();

@@ -20,7 +20,7 @@ void Trekking::stop()
 {
   m_StopTime = millis();
   m_IsRunning = false;
-  m_pMotorController->move(0, 0);
+  m_pMotorController->stop();
 }
 
 void Trekking::emergency()
@@ -31,17 +31,18 @@ void Trekking::emergency()
 
 void Trekking::update()
 {
+  m_Odometry = m_pTrekkingSensoring->getInput();
   if(!m_IsRunning)
   {
     return;
   }
   Serial.println("update");
-  m_Odometry = m_pTrekkingSensoring->getInput();
   //delay(500);
 
   unsigned long deltaTime = millis() - m_LastIterationTime;
   (this->*m_CurrentMode)(deltaTime);
   m_LastIterationTime = millis();
+  //delay(250);
 }
 
 
@@ -54,9 +55,9 @@ void Trekking::rotateToTarget(unsigned long deltaTime)
   auto currentPosition = m_pTrekkingSensoring->getPosition();
 
   float heading = currentPosition.getHeading();
-  float desiredHeading = atan((target.getY() - currentPosition.getY()) / (target.getX() - currentPosition.getX()));
+  float desiredHeading = atan2((target.getY() - currentPosition.getY()),(target.getX() - currentPosition.getX()));
   float headingError = desiredHeading - heading;
-  headingError = atan2(sin(headingError), cos(headingError));
+  //headingError = atan2(sin(headingError), cos(headingError));
 
   Serial.print(desiredHeading);
   Serial.print(" - ");
@@ -65,9 +66,9 @@ void Trekking::rotateToTarget(unsigned long deltaTime)
   Serial.println(headingError);
 
 
-  if(abs(headingError) > 0.03)
+  if(abs(headingError) > 0.02)
   {
-    float angularVelocity = headingError/abs(headingError);
+    float angularVelocity = 0.7 * headingError/abs(headingError);
     Serial.print("angularVelocity: ");
     Serial.println(angularVelocity);
     m_pMotorController->move(0, angularVelocity);//m_pSystemController->run(headingError));
@@ -78,7 +79,7 @@ void Trekking::rotateToTarget(unsigned long deltaTime)
   Depois que atingirmos a rotação que queriamos, lê o magnetometro e salva o
   valor na linha de referência que vai ser usada para o PID no estado 'search'.
   */
-  m_ReferenceLine = m_Odometry.getU();
+  m_ReferenceLine = desiredHeading;// m_Odometry.getU();
   Serial.print("m_ReferenceLine: ");
   Serial.println(m_ReferenceLine);
   /*
@@ -98,11 +99,12 @@ void Trekking::search(unsigned long deltaTime)
   Serial.println("search");
   auto target = m_Targets.get(m_CurrentTargetId);
   auto distanceToTarget = distance(target);
-  if(distanceToTarget > 0.5)
+
+  if(distanceToTarget > 0.2)
   {
-    /*
     auto currentPosition = m_pTrekkingSensoring->getPosition();
     float heading = currentPosition.getHeading();
+    /*
 
     auto plan = Vector2<float>();
     plan.setX(currentPosition.getX() - target.getX());
@@ -113,8 +115,9 @@ void Trekking::search(unsigned long deltaTime)
     m_pMotorController->move(linearVelocity, angularVelocity);
     */
 
-    float lineError = m_ReferenceLine - m_Odometry.getU();
-    float angularVelocity = -lineError * 5; //m_pSystemController->run(lineError);
+
+    float lineError = (m_ReferenceLine - heading); //m_Odometry.getU()) / PI;
+    float angularVelocity = lineError; //m_pSystemController->run(lineError);
     m_pMotorController->move(0.5, angularVelocity);
 
     Serial.print("lineError: ");
@@ -169,7 +172,7 @@ void Trekking::search(unsigned long deltaTime)
   tenham problemas e nunca mude de estado) muda para 'refinedSearch'
   */
   m_CurrentMode = &Trekking::buzzer;
-  this->stop();
+  //this->stop();
   Serial.println("POSIÇÃO DESEJADA ALCANÇADA!");
   m_StartTimeInRefinedSearch = millis();
 }
