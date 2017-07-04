@@ -41,16 +41,27 @@ public:
 
   void setMaxTimeInRefinedSearch(unsigned long maxTime) { m_MaxTimeInRefinedSearch = maxTime; }
   /*--------------------------------------------------------------------------*/
-
+  void pause() { m_IsPaused = true; m_pMotorController->stop(); }
+  void resume() { m_IsPaused = false; }
 private:
   /*----|Variáveis gerais|----------------------------------------------------*/
   bool m_IsRunning;
+  bool m_IsPaused;
   bool m_OperationMode;
   unsigned long m_StartTime;
   unsigned long m_StopTime;
   unsigned long m_LastIterationTime;
+  float m_LastDistance;
+  float m_LastLastDistance;
+  float m_CurrentLinearVelocity;
+  unsigned long m_StartTimeOnSearch;
   /*--------------------------------------------------------------------------*/
 
+
+  /*----|Controle PI|---------------------------------------------------------*/
+  float Kp, Ki;
+  float I;
+  /*--------------------------------------------------------------------------*/
 
   /*----|Pinos|---------------------------------------------------------------*/
   unsigned char m_BuzzerPin;

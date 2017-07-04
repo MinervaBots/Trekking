@@ -40,24 +40,6 @@ void PIDController::setTunings(float proportionalConstant, float integralConstan
 
 	m_ProportionalConstant = proportionalConstant;
 
-	if(m_SampleTime != 0)
-	{
-		integralConstant *= m_SampleTime;
-		derivativeConstant /= m_SampleTime;
-		/*
-		A aplicação direta dos valores aqui nas constantes só é possivel
-		porque o tempo de avalição do PID é fixado*. Isso evita também que a
-		multiplicação e principalmente a divisão tenham que ser feitas
-		cada vez que o PID é calculado.
-
-		TL;DR: deixa o código mais rápido e mais eficiente.
-
-		*Se não for possivel manter o sistema com um tempo de amostragem fixo
-		essa otimização não pode ser aplicada.
-		Para isso o tempo de amostragem deve ser definido como 0.
-		*/
-	}
-
 	/*
 	Essa converção não é necessária, mas permite que a gente entre com
 	valores de KI e KD em termos de Hz (1/s)
@@ -89,7 +71,7 @@ float PIDController::compute(float input, unsigned long deltaTime, float proport
 	float error = m_SetPoint - input;
 
 	// Se o tempo de amostragem for fixo, faz deltaTime = 1 pra não afetar os valores das constantes
-	deltaTime = m_SampleTime != 0 ? 1 : deltaTime;
+	deltaTime = m_SampleTime != 0 ? m_SampleTime : deltaTime;
 
 	/*
 	Faz a derivada das entradas para evitar o "derivative kick", que ocorre mudando
@@ -106,8 +88,9 @@ float PIDController::compute(float input, unsigned long deltaTime, float proport
 
 	Então a derivada do erro é igual a menos a derivada do sinal de entrada:
 	*/
-	float dInput = (input - m_LastInput) / deltaTime;
-	float dError = -dInput;
+	//float dInput = (input - m_LastInput) / deltaTime;
+	//float dError = -dInput;
+	float dError = (error - m_LastError) / deltaTime;
 	/*
 	Não acontece em nenhum dos nossos projetos, mas é uma implementação
 	melhor e o custo computacional é identico ao do PID clássico

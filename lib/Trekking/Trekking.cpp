@@ -1,4 +1,5 @@
 #include "Trekking.hpp"
+#include "MathHelper.h"
 #include <Arduino.h>
 
 void Trekking::setup()
@@ -14,6 +15,12 @@ void Trekking::start()
   m_StartTime = millis();
   m_LastIterationTime = m_StartTime;
   m_IsRunning = true;
+  m_LastDistance = 100;
+  m_LastLastDistance = 110;
+  m_pMotorController->reset();
+  I = 0;
+  Kp = 3;
+  Ki = 0.004; //0.01;
 }
 
 void Trekking::stop()
@@ -31,11 +38,11 @@ void Trekking::emergency()
 
 void Trekking::update()
 {
-  if(!m_IsRunning)
+  if(!m_IsRunning || m_IsPaused)
   {
     return;
   }
-  Serial.println("update");
+  //Serial.println("update");
   m_Odometry = m_pTrekkingSensoring->getInput();
   //delay(500);
 
@@ -91,43 +98,54 @@ void Trekking::rotateToTarget(unsigned long deltaTime)
 
   }
 
+  m_StartTimeOnSearch = millis();
   m_CurrentMode = &Trekking::search;
 }
 
 void Trekking::search(unsigned long deltaTime)
 {
-  Serial.println("search");
+  //Serial.println("search");
   auto target = m_Targets.get(m_CurrentTargetId);
   auto distanceToTarget = distance(target);
 
-  if(distanceToTarget > 0.15)
+  Serial.println(distanceToTarget);
+
+  //if(distanceToTarget > 3)
+  if(m_LastDistance >= distanceToTarget)
   {
+    m_LastLastDistance = m_LastDistance;
+    m_LastDistance = distanceToTarget;
+
     auto currentPosition = m_pTrekkingSensoring->getPosition();
     float heading = currentPosition.getHeading();
     /*
-
-    auto plan = Vector2<float>();
-    plan.setX(currentPosition.getX() - target.getX());
-    plan.setY(currentPosition.getY() - target.getY());
-
-    float linearVelocity = cos(-heading) * plan.getX() + sin(-heading) * plan.getY();
-    float angularVelocity = (sin(-heading) * plan.getX() - cos(-heading) * plan.getY()) / m_ControlPointDistance;
-    m_pMotorController->move(linearVelocity, angularVelocity);
+    Serial.print("lastlast: ");
+    Serial.println(m_LastLastDistance);
+    Serial.print("last: ");
+    Serial.println(m_LastDistance);
+    Serial.print("distance: ");
+    Serial.println(distanceToTarget);
     */
 
-
     float lineError = (m_ReferenceLine - heading); //m_Odometry.getU()) / PI;
-    float angularVelocity = lineError; //m_pSystemController->run(lineError);
-    m_pMotorController->move(0.5, angularVelocity);
+    I += lineError * Ki * deltaTime;
+    float angularVelocity = lineError * Kp + I;
+    angularVelocity = constrain(angularVelocity, -1, 1);
 
+    m_CurrentLinearVelocity = constrain(lerp(0, 1, (millis() - m_StartTimeOnSearch) / 2000.0), 0, 1);
+    m_pMotorController->move(m_CurrentLinearVelocity, angularVelocity);
+    /*
+    Serial.print("m_CurrentLinearVelocity: ");
+    Serial.print(m_CurrentLinearVelocity);
     Serial.print("lineError: ");
     Serial.print(lineError);
+    */
     Serial.print("\tangularVelocity: ");
-    Serial.print(angularVelocity);
+    Serial.println(angularVelocity);
+    /*
     Serial.print("\tm_CurrentTargetId: ");
     Serial.println(m_CurrentTargetId);
 
-    /*
     Se estivermos perto o suficiente, já podemos começar a procurar os cones
     */
     /*

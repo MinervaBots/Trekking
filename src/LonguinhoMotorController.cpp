@@ -48,6 +48,7 @@ void LonguinhoMotorController::move(float linearVelocity, float angularVelocity)
   Algoritmo descrito na página 60 da tese do Fraga.
   I don't know for sure what it does, but works just fine.
   */
+  /*
 	float rightWheelRotationLimited = 0;
   float leftWheelRotationLimited = 0;
 
@@ -115,18 +116,18 @@ void LonguinhoMotorController::move(float linearVelocity, float angularVelocity)
 		log << DELIMITER << rightRotationLimited;
 	}
   */
-	float rightQpps = rightWheelRotationLimited * m_GearRate * m_PulsesPerRotation;
-	float leftQpps = leftWheelRotationLimited * m_GearRate * m_PulsesPerRotation;
+	float rightQpps = rightWheelRotation * m_GearRate * m_PulsesPerRotation;
+	float leftQpps = leftWheelRotation * m_GearRate * m_PulsesPerRotation;
 
   unsigned char leftPwm = mapPWM(leftQpps);
   unsigned char rightPwm = mapPWM(rightQpps);
-
   Serial.print("Left PWM: ");
   Serial.print(leftPwm);
 
   Serial.print("\tRight PWM: ");
   Serial.println(rightPwm);
-
+  /*
+*/
   m_RoboClaw.ForwardBackwardM1(m_Address, leftPwm);
   m_RoboClaw.ForwardBackwardM2(m_Address, rightPwm);
 }
@@ -157,12 +158,12 @@ unsigned char LonguinhoMotorController::mapPWM(float pps)
 int LonguinhoMotorController::getEncoderLeft(bool reset)
 {
   int enc = m_RoboClaw.ReadEncM1(m_Address, &m_StatusLeft, &m_ValidLeft);
-  enc *= 0.98;
+  enc *= 0.9822;
   if(reset)
   {
     m_RoboClaw.SetEncM1(m_Address, 0);
   }
-  return enc;
+  return enc / 0.9;
 }
 
 int LonguinhoMotorController::getEncoderRight(bool reset)
@@ -172,5 +173,5 @@ int LonguinhoMotorController::getEncoderRight(bool reset)
   {
     m_RoboClaw.SetEncM2(m_Address, 0);
   }
-  return enc;
+  return enc / 0.9;
 }

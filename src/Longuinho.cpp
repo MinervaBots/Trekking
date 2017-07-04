@@ -9,7 +9,7 @@ LonguinhoSensoring sensoring;
 LonguinhoMotorController motorController;
 PIDController pidController;
 SimpleMovingAverageFilter<5> filter;
-bool emergencyButton, initButton, operationModeSwitch;
+bool emergencyButton, initButton, pauseSwitch;
 
 void setup()
 {
@@ -32,7 +32,7 @@ void setup()
   sensoring.initializeMPU(20, 10, 10, 40);
 
   // Adiciona os objetivos
-  trekking.addTarget(5, 0);
+  trekking.addTarget(8, 0);
   trekking.addTarget(2, 2);
   trekking.addTarget(0, 0);
 
@@ -42,14 +42,14 @@ void setup()
   trekking.setBuzzerPin(BUZZER_PIN);
 
   // [TODO]
-  pidController.setTunings(2, 0, 0);
+  pidController.setTunings(1, 0, 0);
   pidController.setSetPoint(0);
+  pidController.setSampleTime(5);
   pidController.setOutputLimits(-1, 1);
   pidController.setControllerDirection(SystemControllerDirection::Inverse);
   trekking.setSystemController(&pidController);
 
   trekking.setMaxTimeInRefinedSearch(10000); // 10s
-  motorController.resetEncoders();
   trekking.setup();
 }
 
@@ -58,24 +58,31 @@ void readButtons()
 {
 	initButton = digitalRead(INIT_BUTTON_PIN);
   emergencyButton = digitalRead(EMERGENCY_BUTTON_PIN);
-  operationModeSwitch = digitalRead(OPERATION_MODE_SWITCH_PIN);
+  pauseSwitch = digitalRead(PAUSE_SWITCH_PIN);
 }
 
 void loop()
 {
   readButtons();
-  trekking.setOperationMode(operationModeSwitch);
+  if(pauseSwitch)
+  {
+    trekking.pause();
+  }
+  else
+  {
+    trekking.resume();
+  }
+
   if(initButton && !trekking.isRunning())
   {
     trekking.start();
-
   }
   if(emergencyButton)
   {
     trekking.emergency();
   }
   trekking.update();
-  float tempo = motorController.movingTime(0,0,10,0,0.5);
+  //float tempo = motorController.movingTime(0,0,10,0,0.5);
 }
 
 #endif //Longuinho_cpp

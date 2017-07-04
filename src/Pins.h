@@ -11,7 +11,7 @@ const byte WHITE_VALUE = 30;
 */
 const byte INIT_BUTTON_PIN = 3;
 const byte EMERGENCY_BUTTON_PIN  = 4;
-const byte OPERATION_MODE_SWITCH_PIN = 2;
+const byte PAUSE_SWITCH_PIN = 2;
 
 const bool MANUAL_MODE = 0;
 const bool AUTO_MODE = 1;

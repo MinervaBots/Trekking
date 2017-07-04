@@ -60,7 +60,6 @@ TrekkingOdometry LonguinhoSensoring::getInput()
   {
     m_CachedValue.setT(false);
   }
-  */
   while (true)
   {
     if(imu.IMURead())
@@ -77,16 +76,6 @@ TrekkingOdometry LonguinhoSensoring::getInput()
       m_LastRunInSeconds = millis() / 1000.0;
       auto acceleration = Vector2<float>(-imu.getAccel().x(), imu.getAccel().y()) / m_GForce;
 
-      /*
-      if(abs(acceleration.x()) < 0.05 * m_GForce)
-      {
-        acceleration.setX(0);
-      }
-      if(abs(acceleration.y()) < 0.05 * m_GForce)
-      {
-        acceleration.setY(0);
-      }
-      */
 
       float xVelocityPrime = (acceleration.getX() * deltaTimeInSeconds) * cos(m_pCurrentEncoderPosition.getHeading());
       float yVelocityPrime = (acceleration.getY() * deltaTimeInSeconds) * sin(m_pCurrentEncoderPosition.getHeading());
@@ -106,7 +95,8 @@ TrekkingOdometry LonguinhoSensoring::getInput()
   Serial.print("\tHeading: ");
   Serial.println(position.getHeading());
 
-  position = m_pCurrentEncoderPosition;
+  */
+  auto position = m_pCurrentEncoderPosition;
   Serial.print("Encoder Position - X: ");
   Serial.print(position.getX());
   Serial.print("\tY: ");

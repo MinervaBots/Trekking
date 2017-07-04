@@ -8,7 +8,8 @@ public:
   DifferentialDriveController(float wheelsRadius, float distanceFromRotationAxis);
   virtual void move(float linearVelocity, float angularVelocity);
   virtual void stop() = 0;
-
+  virtual void reset() = 0;
+  
   float getWheelsRadius() { return m_WheelsRadius; }
   float getWheelsDistanceFromRotationAxis() { return m_WheelsDistanceFromRotationAxis; }
 

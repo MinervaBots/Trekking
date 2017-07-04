@@ -22,7 +22,7 @@ public:
   int getEncoderLeft(bool reset);
   int getEncoderRight(bool reset);
 
-  void resetEncoders(){ m_RoboClaw.ResetEncoders(m_Address); }
+  void reset(){ m_RoboClaw.ResetEncoders(m_Address); }
 
 private:
   /*----|RoboClaw|------------------------------------------------------------*/
