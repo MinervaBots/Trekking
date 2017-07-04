@@ -19,8 +19,9 @@ void Trekking::start()
   m_LastLastDistance = 110;
   m_pMotorController->reset();
   I = 0;
-  Kp = 3;
+  Kp = 0.5;
   Ki = 0.004; //0.01;
+  Kd = 5;
 }
 
 void Trekking::stop()
@@ -38,46 +39,48 @@ void Trekking::emergency()
 
 void Trekking::update()
 {
-  if(!m_IsRunning || m_IsPaused)
+  if(m_IsRunning && !m_IsPaused)
   {
-    return;
+    m_Odometry = m_pTrekkingSensoring->getInput();
+    (this->*m_CurrentMode)(millis() - m_LastIterationTime);
   }
-  //Serial.println("update");
-  m_Odometry = m_pTrekkingSensoring->getInput();
-  //delay(500);
-
-  unsigned long deltaTime = millis() - m_LastIterationTime;
-  (this->*m_CurrentMode)(deltaTime);
   m_LastIterationTime = millis();
-  //delay(250);
 }
 
+float anglesDif(float angle1, float angle2)
+{
+  float dif = angle2 - angle1;
+  while(dif < -PI)
+  {
+    dif += 2 * PI;
+  }
+  while(dif > PI)
+  {
+    dif -= 2 * PI;
+  }
+  return dif;
+}
 
 /*----|Modos de operação|-----------------------------------------------------*/
 void Trekking::rotateToTarget(unsigned long deltaTime)
 {
+  /*
   Serial.print("rotateToTarget: ");
   Serial.println(m_CurrentTargetId);
+  */
   auto target = m_Targets.get(m_CurrentTargetId);
   auto currentPosition = m_pTrekkingSensoring->getPosition();
 
-  float heading = currentPosition.getHeading();
-  float desiredHeading = atan2((target.getY() - currentPosition.getY()),(target.getX() - currentPosition.getX()));
-  float headingError = desiredHeading - heading;
-  //headingError = atan2(sin(headingError), cos(headingError));
+  float desiredHeading = atan2(target.getY() - currentPosition.getY(), target.getX() - currentPosition.getX());
+  float headingError = desiredHeading - currentPosition.getHeading();
+  headingError = atan2(sin(headingError), cos(headingError));
 
-  Serial.print(desiredHeading);
-  Serial.print(" - ");
-  Serial.print(heading);
-  Serial.print(" = ");
-  Serial.println(headingError);
-
-
-  if(abs(headingError) > 0.02)
+  if(abs(headingError) > 0.01)
   {
-    float angularVelocity = 0.7 * headingError/abs(headingError);
-    Serial.print("angularVelocity: ");
-    Serial.println(angularVelocity);
+    I += headingError * Ki * deltaTime;
+    float angularVelocity = headingError * Kp + I + Kd * (headingError - lastError)/ deltaTime;
+    lastError = headingError;
+    angularVelocity = constrain(angularVelocity, -1, 1);
     m_pMotorController->move(0, angularVelocity);//m_pSystemController->run(headingError));
     return;
   }
@@ -86,9 +89,11 @@ void Trekking::rotateToTarget(unsigned long deltaTime)
   Depois que atingirmos a rotação que queriamos, lê o magnetometro e salva o
   valor na linha de referência que vai ser usada para o PID no estado 'search'.
   */
-  m_ReferenceLine = desiredHeading;// m_Odometry.getU();
+  m_ReferenceLine = currentPosition.getHeading();
+  /*
   Serial.print("m_ReferenceLine: ");
   Serial.println(m_ReferenceLine);
+  */
   /*
   Se estamos indo parao ultimo objetivo, devemos ativar os sensores de ultrassom
   e os sensores de cor.
@@ -98,54 +103,53 @@ void Trekking::rotateToTarget(unsigned long deltaTime)
 
   }
 
+  I = 0;
+  m_LastDistance = 99999;
   m_StartTimeOnSearch = millis();
   m_CurrentMode = &Trekking::search;
 }
 
 void Trekking::search(unsigned long deltaTime)
 {
-  //Serial.println("search");
+  Serial.println("search");
   auto target = m_Targets.get(m_CurrentTargetId);
   auto distanceToTarget = distance(target);
 
-  Serial.println(distanceToTarget);
+  //Serial.println(distanceToTarget);
 
-  //if(distanceToTarget > 3)
-  if(m_LastDistance >= distanceToTarget)
+  if(distanceToTarget > 0.1)
+  //if(m_LastDistance >= distanceToTarget)
   {
-    m_LastLastDistance = m_LastDistance;
     m_LastDistance = distanceToTarget;
 
     auto currentPosition = m_pTrekkingSensoring->getPosition();
     float heading = currentPosition.getHeading();
-    /*
-    Serial.print("lastlast: ");
-    Serial.println(m_LastLastDistance);
-    Serial.print("last: ");
-    Serial.println(m_LastDistance);
-    Serial.print("distance: ");
-    Serial.println(distanceToTarget);
-    */
 
-    float lineError = (m_ReferenceLine - heading); //m_Odometry.getU()) / PI;
+    float lineError = (m_ReferenceLine - heading);
+    lineError = atan2(sin(lineError), cos(lineError));
+
+    /*if(lineError < 0)
+    {
+      lineError += 2 * PI;
+    }*/
     I += lineError * Ki * deltaTime;
     float angularVelocity = lineError * Kp + I;
     angularVelocity = constrain(angularVelocity, -1, 1);
 
-    m_CurrentLinearVelocity = constrain(lerp(0, 1, (millis() - m_StartTimeOnSearch) / 2000.0), 0, 1);
+    if(distanceToTarget < 1)
+    {
+      // Rampa de desaceleração
+      m_CurrentLinearVelocity = distanceToTarget + 0.1;
+      //m_CurrentLinearVelocity = lerp(0, 1, distanceToTarget + 0.1);
+    }
+    else
+    {
+      // Rampa de aceleração
+      m_CurrentLinearVelocity = constrain(lerp(0, 1, (millis() - m_StartTimeOnSearch) / 2000.0), 0, 1);
+    }
     m_pMotorController->move(m_CurrentLinearVelocity, angularVelocity);
-    /*
-    Serial.print("m_CurrentLinearVelocity: ");
-    Serial.print(m_CurrentLinearVelocity);
-    Serial.print("lineError: ");
-    Serial.print(lineError);
-    */
-    Serial.print("\tangularVelocity: ");
-    Serial.println(angularVelocity);
-    /*
-    Serial.print("\tm_CurrentTargetId: ");
-    Serial.println(m_CurrentTargetId);
 
+    /*
     Se estivermos perto o suficiente, já podemos começar a procurar os cones
     */
     /*
@@ -164,7 +168,7 @@ void Trekking::search(unsigned long deltaTime)
       }
       else if(m_CurrentTargetId == 2)
       {
-/*
+        /*
         Se não chegamos no objetivo, e estamos indo na direção do ultimo, isso
         é um obstaculo.
         *
@@ -182,7 +186,6 @@ void Trekking::search(unsigned long deltaTime)
     }
     */
     return;
-
   }
 
   /*
@@ -190,14 +193,17 @@ void Trekking::search(unsigned long deltaTime)
   tenham problemas e nunca mude de estado) muda para 'refinedSearch'
   */
   m_CurrentMode = &Trekking::buzzer;
+  m_LastDistance = 9999;
+  /*
   this->stop();
   Serial.println("POSIÇÃO DESEJADA ALCANÇADA!");
+  */
   m_StartTimeInRefinedSearch = millis();
 }
 
 void Trekking::refinedSearch(unsigned long deltaTime)
 {
-  Serial.println("refinedSearch");
+  //Serial.println("refinedSearch");
   if(!m_Odometry.getT())
   {
     auto targetVector = m_Odometry.getV();
@@ -236,77 +242,31 @@ void Trekking::refinedSearch(unsigned long deltaTime)
 
 void Trekking::avoidObstacles(unsigned long deltaTime)
 {
-  /*
-  Temos que inicializar uam matriz com tamanho um suficientemente grande para
-  incluir todos os obstáculos, o objetivo e o robô.
-
-  [TODO]: Estudar a melhor maneira de fazer isso. Devido as limitações de
-  memória do Arduino, não é ideal criar uma matriz do tamanho do campo. Devido
-  a isso a matemática fica um pouco mais complicada já que as posições vão ter
-  um offset.
-  Outra "dificuldade" é converter o posicionamento "real" para as posições na
-  matriz. Além das posições dela
-  */
-  //m_Map = BitMatrix<8, 8>(false);
-
-  /*
-  Aqui lemos o ultrassom e calculamos a posição que devemos colocar o obstaculo
-  no mapa
-  */
 }
 
 void Trekking::standBy(unsigned long deltaTime)
 {
   stop();
-  if(m_OperationMode)
-  {
-
-  }
-  /*
-  if(operation_mode_switch == AUTO_MODE) {
-		is_manual_message_sent = false;
-		if(!is_auto_message_sent){
-			log.debug("mode switch", "auto ");
-			is_auto_message_sent = true;
-		}
-		if(init_button) {
-			log.debug("init button", init_button);
-			reset();
-			if(checkSensors()) {
-				operation_mode = &Trekking::search;
-				startTimers();
-			} else {
-				log.error("sensors", "sensors not working as expected");
-			}
-		}
-	}	else{
-		is_auto_message_sent = false;
-		if(!is_manual_message_sent){
-			log.debug("mode switch", "manual ");
-			is_manual_message_sent = true;
-		}
-		if(current_command != ' ') {
-			Robot::useCommand(current_command);
-			log.debug("using command", current_command);
-		}
-	}
-  */
 }
 
 void Trekking::buzzer(unsigned long deltaTime)
 {
   m_pMotorController->stop();
+  auto target = m_Targets.get(m_CurrentTargetId);
+  m_pTrekkingSensoring->setPosition(target.getX(), target.getY(), m_pTrekkingSensoring->getPosition().getHeading());
+
   if(m_CurrentTargetId == 2)
   {
     finish(deltaTime);
     return;
   }
   turnBuzzerOn();
-  delay(5000);
+  delay(2000);
   turnBuzzerOff();
 
   m_CurrentTargetId++;
   m_CurrentMode = &Trekking::rotateToTarget;
+  I = 0;
 }
 
 void Trekking::finish(unsigned long deltaTime)
@@ -315,6 +275,7 @@ void Trekking::finish(unsigned long deltaTime)
   delay(5000);
   turnBuzzerOff();
 
+  m_CurrentTargetId = 0;
   // Sobrescreve o estado que deve ser executado na próxima iteração
   m_CurrentMode = &Trekking::standBy;
 }

@@ -12,9 +12,9 @@
 class Trekking
 {
 public:
-  void addTarget(unsigned char x, unsigned char y)
+  void addTarget(float x, float y)
   {
-    m_Targets.add(Vector2<unsigned char>(x, y));
+    m_Targets.add(Vector2<float>(x, y));
   }
   void setup();
   void start();
@@ -58,9 +58,9 @@ private:
   /*--------------------------------------------------------------------------*/
 
 
-  /*----|Controle PI|---------------------------------------------------------*/
-  float Kp, Ki;
-  float I;
+  /*----|Controle PID|---------------------------------------------------------*/
+  float Kp, Ki, Kd;
+  float I, lastError;
   /*--------------------------------------------------------------------------*/
 
   /*----|Pinos|---------------------------------------------------------------*/
@@ -79,7 +79,7 @@ private:
   AStar m_Pathfinder;
   Matrix<float>* m_pMap;
   unsigned char m_CurrentTargetId;
-  LinkedList<Vector2<unsigned char>> m_Targets;
+  LinkedList<Vector2<float>> m_Targets;
   TrekkingSensoring *m_pTrekkingSensoring;
   TrekkingOdometry m_Odometry;
   float m_ReferenceLine;
@@ -153,7 +153,7 @@ private:
   void turnBuzzerOn();
 	void turnBuzzerOff();
 
-  float distance(Vector2<unsigned char> vector)
+  float distance(Vector2<float> vector)
   {
     auto currentPosition = m_pTrekkingSensoring->getPosition();
     return sqrt(

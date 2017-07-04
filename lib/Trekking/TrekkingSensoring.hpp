@@ -26,6 +26,7 @@ public:
   virtual TrekkingOdometry getInput() = 0;
 
   virtual Position getPosition() const = 0;
+  virtual void setPosition(float x, float y, float heading) = 0;
 };
 
 #endif //TrekkingSensoring_hpp

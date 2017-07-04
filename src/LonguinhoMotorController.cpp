@@ -121,13 +121,13 @@ void LonguinhoMotorController::move(float linearVelocity, float angularVelocity)
 
   unsigned char leftPwm = mapPWM(leftQpps);
   unsigned char rightPwm = mapPWM(rightQpps);
+  /*
   Serial.print("Left PWM: ");
   Serial.print(leftPwm);
 
   Serial.print("\tRight PWM: ");
   Serial.println(rightPwm);
-  /*
-*/
+  */
   m_RoboClaw.ForwardBackwardM1(m_Address, leftPwm);
   m_RoboClaw.ForwardBackwardM2(m_Address, rightPwm);
 }

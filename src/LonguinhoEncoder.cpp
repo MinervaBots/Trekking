@@ -6,12 +6,9 @@ void LonguinhoEncoder::update(Position *pPosition)
 {
   float wheelRadius = m_pMotorController->getWheelsRadius();
   float distanceFromAxis = m_pMotorController->getWheelsDistanceFromRotationAxis();
-/*
-  int encoderLeft = m_pMotorController->getEncoderLeft();
-  int encoderRight = m_pMotorController->getEncoderRight();
-*/
-  int deltaEncoderLeft = m_pMotorController->getEncoderLeft(true); //encoderLeft - m_LastEncoderLeft; // % INT32_MAX;
-  int deltaEncoderRight = m_pMotorController->getEncoderRight(true); //encoderRight - m_LastEncoderRight; // % INT32_MAX;
+
+  int deltaEncoderLeft = m_pMotorController->getEncoderLeft(true);
+  int deltaEncoderRight = m_pMotorController->getEncoderRight(true);
 
   float correctionFactor = m_pMotorController->getPulsesPerRotation() * m_pMotorController->getGearRate();
   m_DeltaDistanceLeft = 2 * PI * wheelRadius * deltaEncoderLeft / correctionFactor;

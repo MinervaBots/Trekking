@@ -20,7 +20,7 @@ public:
   LonguinhoSensoring();
   TrekkingOdometry getInput();
 
-  void intializePosition(float x, float y, float heading)
+  void setPosition(float x, float y, float heading)
   {
     m_pCurrentEncoderPosition.setX(x);
     m_pCurrentEncoderPosition.setY(y);

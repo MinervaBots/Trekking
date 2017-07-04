@@ -94,8 +94,8 @@ TrekkingOdometry LonguinhoSensoring::getInput()
   Serial.print(position.getY());
   Serial.print("\tHeading: ");
   Serial.println(position.getHeading());
-
   */
+
   auto position = m_pCurrentEncoderPosition;
   Serial.print("Encoder Position - X: ");
   Serial.print(position.getX());
