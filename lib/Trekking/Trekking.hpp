@@ -59,8 +59,11 @@ private:
 
 
   /*----|Controle PID|---------------------------------------------------------*/
-  float Kp, Ki, Kd;
-  float I, lastError;
+  float KpRotation, KiRotation, KdRotation;
+  float IRotation, lastErrorRotation;
+
+  float KpSearch, KiSearch, KdSearch;
+  float ISearch, lastErrorSearch;
   /*--------------------------------------------------------------------------*/
 
   /*----|Pinos|---------------------------------------------------------------*/

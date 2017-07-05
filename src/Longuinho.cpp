@@ -32,9 +32,9 @@ void setup()
   sensoring.initializeMPU(20, 10, 10, 40);
 
   // Adiciona os objetivos
-  trekking.addTarget(10, 0);
-  trekking.addTarget(10, 1);
-  trekking.addTarget(0, 1);
+  trekking.addTarget(2, 2);
+  trekking.addTarget(2, 0);
+  trekking.addTarget(0, 0);
 
   // Define o ponteiro para a classe de controle dos motores
   trekking.setMotorController(&motorController, 0.2);

@@ -158,7 +158,7 @@ unsigned char LonguinhoMotorController::mapPWM(float pps)
 int LonguinhoMotorController::getEncoderLeft(bool reset)
 {
   int enc = m_RoboClaw.ReadEncM1(m_Address, &m_StatusLeft, &m_ValidLeft);
-  enc *= 0.9822;
+  enc *= 0.98155; //0.9822
   if(reset)
   {
     m_RoboClaw.SetEncM1(m_Address, 0);

@@ -18,10 +18,16 @@ void Trekking::start()
   m_LastDistance = 100;
   m_LastLastDistance = 110;
   m_pMotorController->reset();
-  I = 0;
-  Kp = 0.5;
-  Ki = 0.004; //0.01;
-  Kd = 5;
+
+  IRotation = 0;
+  KpRotation = 0.1;
+  KiRotation = 0.005; //0.01;
+  KdRotation = 0;
+
+  ISearch = 0;
+  KpSearch = 2;
+  KiSearch = 0.01; //0.01;
+  KdSearch = 0;
 }
 
 void Trekking::stop()
@@ -47,20 +53,6 @@ void Trekking::update()
   m_LastIterationTime = millis();
 }
 
-float anglesDif(float angle1, float angle2)
-{
-  float dif = angle2 - angle1;
-  while(dif < -PI)
-  {
-    dif += 2 * PI;
-  }
-  while(dif > PI)
-  {
-    dif -= 2 * PI;
-  }
-  return dif;
-}
-
 /*----|Modos de operação|-----------------------------------------------------*/
 void Trekking::rotateToTarget(unsigned long deltaTime)
 {
@@ -77,14 +69,16 @@ void Trekking::rotateToTarget(unsigned long deltaTime)
 
   if(abs(headingError) > 0.01)
   {
-    I += headingError * Ki * deltaTime;
-    float angularVelocity = headingError * Kp + I + Kd * (headingError - lastError)/ deltaTime;
-    lastError = headingError;
+    IRotation += headingError * KiRotation * deltaTime;
+    float angularVelocity = headingError * KpRotation + IRotation + KdRotation * (headingError - lastErrorRotation)/ deltaTime;
+    lastErrorRotation = headingError;
     angularVelocity = constrain(angularVelocity, -1, 1);
     m_pMotorController->move(0, angularVelocity);//m_pSystemController->run(headingError));
     return;
   }
 
+  m_pMotorController->stop();
+  delay(250);
   /*
   Depois que atingirmos a rotação que queriamos, lê o magnetometro e salva o
   valor na linha de referência que vai ser usada para o PID no estado 'search'.
@@ -98,12 +92,12 @@ void Trekking::rotateToTarget(unsigned long deltaTime)
   Se estamos indo parao ultimo objetivo, devemos ativar os sensores de ultrassom
   e os sensores de cor.
   */
-  if(m_CurrentTargetId == 2)
+  if(m_CurrentTargetId == m_Targets.size() - 1)
   {
 
   }
 
-  I = 0;
+  IRotation = 0;
   m_LastDistance = 99999;
   m_StartTimeOnSearch = millis();
   m_CurrentMode = &Trekking::search;
@@ -111,13 +105,13 @@ void Trekking::rotateToTarget(unsigned long deltaTime)
 
 void Trekking::search(unsigned long deltaTime)
 {
-  Serial.println("search");
+  //Serial.println("search");
   auto target = m_Targets.get(m_CurrentTargetId);
   auto distanceToTarget = distance(target);
 
   //Serial.println(distanceToTarget);
 
-  if(distanceToTarget > 0.1)
+  if(distanceToTarget > 0.08)
   //if(m_LastDistance >= distanceToTarget)
   {
     m_LastDistance = distanceToTarget;
@@ -132,14 +126,14 @@ void Trekking::search(unsigned long deltaTime)
     {
       lineError += 2 * PI;
     }*/
-    I += lineError * Ki * deltaTime;
-    float angularVelocity = lineError * Kp + I;
+    ISearch += lineError * KiSearch * deltaTime;
+    float angularVelocity = lineError * KpSearch + ISearch;
     angularVelocity = constrain(angularVelocity, -1, 1);
 
     if(distanceToTarget < 1)
     {
       // Rampa de desaceleração
-      m_CurrentLinearVelocity = distanceToTarget + 0.1;
+      m_CurrentLinearVelocity = (distanceToTarget/2.0) + 0.1;
       //m_CurrentLinearVelocity = lerp(0, 1, distanceToTarget + 0.1);
     }
     else
@@ -166,7 +160,7 @@ void Trekking::search(unsigned long deltaTime)
         // Opa! Já chegamos no objetivo
         m_CurrentMode = &Trekking::buzzer;
       }
-      else if(m_CurrentTargetId == 2)
+      else if(m_CurrentTargetId == m_Targets.size() - 1)
       {
         /*
         Se não chegamos no objetivo, e estamos indo na direção do ultimo, isso
@@ -252,10 +246,10 @@ void Trekking::standBy(unsigned long deltaTime)
 void Trekking::buzzer(unsigned long deltaTime)
 {
   m_pMotorController->stop();
-  auto target = m_Targets.get(m_CurrentTargetId);
-  m_pTrekkingSensoring->setPosition(target.getX(), target.getY(), m_pTrekkingSensoring->getPosition().getHeading());
+  //auto target = m_Targets.get(m_CurrentTargetId);
+  //m_pTrekkingSensoring->setPosition(target.getX(), target.getY(), m_pTrekkingSensoring->getPosition().getHeading());
 
-  if(m_CurrentTargetId == 2)
+  if(m_CurrentTargetId == m_Targets.size() - 1)
   {
     finish(deltaTime);
     return;
@@ -266,7 +260,7 @@ void Trekking::buzzer(unsigned long deltaTime)
 
   m_CurrentTargetId++;
   m_CurrentMode = &Trekking::rotateToTarget;
-  I = 0;
+  ISearch = 0;
 }
 
 void Trekking::finish(unsigned long deltaTime)
@@ -275,6 +269,7 @@ void Trekking::finish(unsigned long deltaTime)
   delay(5000);
   turnBuzzerOff();
 
+  stop();
   m_CurrentTargetId = 0;
   // Sobrescreve o estado que deve ser executado na próxima iteração
   m_CurrentMode = &Trekking::standBy;
