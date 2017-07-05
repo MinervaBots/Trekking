@@ -21,7 +21,7 @@ void LonguinhoEncoder::update(Position *pPosition)
   float heading = pPosition->getHeading();
   float xPrime = deltaEncoderDistance * cos(heading);
   float yPrime = deltaEncoderDistance * sin(heading);
-  float headingPrime = (deltaEncoderRightDistance - deltaEncoderLeftDistance) / (2 * distanceFromAxis);
+  float headingPrime = 1.1 * (deltaEncoderRightDistance - deltaEncoderLeftDistance) / (2 * distanceFromAxis);
 
   float newHeading = pPosition->getHeading() + headingPrime;
   newHeading = atan2(sin(newHeading), cos(newHeading));

@@ -20,14 +20,14 @@ void Trekking::start()
   m_pMotorController->reset();
 
   IRotation = 0;
-  KpRotation = 0.1;
-  KiRotation = 0.005; //0.01;
-  KdRotation = 0;
+  KpRotation = 1;
+  KiRotation = 0.01; //0.01;
+  KdRotation = 5;
 
   ISearch = 0;
-  KpSearch = 2;
-  KiSearch = 0.01; //0.01;
-  KdSearch = 0;
+  KpSearch = 3;
+  KiSearch = 0.004; //0.01;
+  KdSearch = 1;
 }
 
 void Trekking::stop()
@@ -111,7 +111,7 @@ void Trekking::search(unsigned long deltaTime)
 
   //Serial.println(distanceToTarget);
 
-  if(distanceToTarget > 0.08)
+  if(distanceToTarget > 0.1)
   //if(m_LastDistance >= distanceToTarget)
   {
     m_LastDistance = distanceToTarget;
