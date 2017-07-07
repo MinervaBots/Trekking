@@ -158,8 +158,7 @@ unsigned char LonguinhoMotorController::mapPWM(float pps)
 int LonguinhoMotorController::getEncoderLeft(bool reset)
 {
   int enc = m_RoboClaw.ReadEncM1(m_Address, &m_StatusLeft, &m_ValidLeft);
-  //ele está fazendo uma exponencial ou log. temos que subtrair a função(função de deslocamento)
-  enc *= 0.985;
+  //ele está fazendo uma exponencial ou log. temos que subtrair a função(função de deslocamento);
   if(reset)
   {
     m_RoboClaw.SetEncM1(m_Address, 0);
@@ -174,5 +173,6 @@ int LonguinhoMotorController::getEncoderRight(bool reset)
   {
     m_RoboClaw.SetEncM2(m_Address, 0);
   }
+  enc *= 0.975;
   return enc / 0.9;
 }

@@ -22,9 +22,9 @@ void Trekking::start()
   m_pMotorController->reset();
 
   IRotation = 0;
-  KpRotation = 4;
-  KiRotation = 0.01; //0.01;
-  KdRotation = 5;
+  KpRotation = 2;
+  KiRotation = 0.002; //0.01;
+  KdRotation = 10;
 
   ISearch = 0;
   KpSearch = 5;
@@ -69,13 +69,17 @@ void Trekking::rotateToTarget(unsigned long deltaTime)
   float headingError = desiredHeading - currentPosition.getHeading();
   headingError = atan2(sin(headingError), cos(headingError));
 
-  if(abs(headingError) > 0.01)
+  if(abs(headingError) > 0.02)
   {
     IRotation += headingError * KiRotation * deltaTime;
-    float angularVelocity = 2 * headingError/abs(headingError);//headingError * KpRotation + IRotation + KdRotation * (headingError - lastErrorRotation)/ deltaTime;
+    float angularVelocity = KpRotation * (-headingError/abs(headingError));//headingError * KpRotation + IRotation + KdRotation * (headingError - lastErrorRotation)/ deltaTime;
     lastErrorRotation = headingError;
     //angularVelocity = constrain(angularVelocity, -4, 4);
     m_pMotorController->move(0, angularVelocity);//m_pSystemController->run(headingError));
+    Serial.print("heading: ");
+    Serial.println(currentPosition.getHeading());
+    Serial.print("headingError: ");
+    Serial.println(headingError);
     return;
   }
 
@@ -129,6 +133,7 @@ void Trekking::search(unsigned long deltaTime)
   Serial.println(m_LastDistanceTimeCheck);
 */
   if(m_LastDistance >= distanceToTarget && distanceToTarget > 0.1)
+  //if (distanceToTarget > 0.1)
   {
     auto currentPosition = m_pTrekkingSensoring->getPosition();
     float heading = currentPosition.getHeading();
@@ -151,7 +156,7 @@ void Trekking::search(unsigned long deltaTime)
       // Rampa de aceleração
       m_CurrentLinearVelocity = constrain(lerp(0, 1, (millis() - m_StartTimeOnSearch) / 2000.0), 0, 1);
     }
-    m_pMotorController->move(m_CurrentLinearVelocity, angularVelocity);
+    m_pMotorController->move(- m_CurrentLinearVelocity, - angularVelocity);
 
     /*
     Se estivermos perto o suficiente, já podemos começar a procurar os cones

@@ -59,7 +59,7 @@ const byte RIGHT_COLOR_S3 = 32;
 /*
 	Sirene
 */
-const byte BUZZER_PIN = 7;
+const byte BUZZER_PIN = A0;
 
 /*
 	Alert led
