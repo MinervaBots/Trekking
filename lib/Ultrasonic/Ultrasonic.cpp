@@ -1,6 +1,8 @@
 #include "Ultrasonic.hpp"
 #include <Arduino.h>
 
+const float SONAR_TO_CM = 100.0 / 95.0;
+
 Ultrasonic::Ultrasonic(int triggerPin, int echoPin) :
 	m_TriggerPin(triggerPin),
 	m_EchoPin(echoPin)
@@ -16,28 +18,30 @@ Ultrasonic::Ultrasonic(int triggerPin, int echoPin, unsigned short minRange, uns
 		setRange(minRange, maxRange);
 }
 
-unsigned long Ultrasonic::getTimming()
+void Ultrasonic::trigger()
 {
-	digitalWrite(m_TriggerPin, LOW);
-	delayMicroseconds(2);
-
 	digitalWrite(m_TriggerPin, HIGH);
-	delayMicroseconds(10);
-
+	delayMicroseconds(20);
 	digitalWrite(m_TriggerPin, LOW);
-
-	return pulseIn(m_EchoPin, HIGH, m_Timeout);
 }
 
-unsigned short Ultrasonic::getInput()
+float Ultrasonic::getInput()
 {
-	unsigned short distance = getTimming() / 58.2;
-
-	if(distance <= m_MinRange || distance >= m_MaxRange)
+	//m_Distance = analogRead(m_EchoPin) * SONAR_TO_CM; //;* 5 / 1024;// / 58.2;
+	m_Distance = (analogRead(m_EchoPin) / 2) * 2.54;// / 58.2;
+	//Serial.println(m_Distance);
+	/*
+	if(m_Distance <= m_MinRange || m_Distance >= m_MaxRange)
 	{
-		return -1; //OutOfRange
+		m_Distance = -1;
 	}
-	return distance;
+	*/
+	/*
+	Serial.println(m_MinRange);
+	Serial.println(m_MaxRange);
+	Serial.println(m_Timeout);
+	*/
+	return m_Distance;
 }
 
 void Ultrasonic::setRange(unsigned short minimum, unsigned short maximum)

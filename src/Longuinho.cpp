@@ -8,7 +8,6 @@ Trekking trekking;
 LonguinhoSensoring sensoring;
 LonguinhoMotorController motorController;
 PIDController pidController;
-SimpleMovingAverageFilter<5> filter;
 bool emergencyButton, initButton, pauseSwitch;
 
 void setup()
@@ -29,18 +28,18 @@ void setup()
   sensoring.setPosition(0, 0, 0);
   sensoring.initializeEncoder(&motorController);
   //sensoring.setMagnetometerFilter(&filter);
-  sensoring.initializeMPU(20, 10, 10, 40);
+  //sensoring.initializeMPU(20, 10, 10, 40);
 
   // Adiciona os objetivos
-  trekking.addTarget(4, 0);
-  trekking.addTarget(4, 2);
+  trekking.addTarget(30, 0);
   trekking.addTarget(0, 0);
+  //trekking.addTarget(0, 0);
 
   // Define o ponteiro para a classe de controle dos motores
   trekking.setMotorController(&motorController, 0.2);
 
   trekking.setBuzzerPin(BUZZER_PIN);
-
+  //digitalWrite(BUZZER_PIN, HIGH);
   // [TODO]
   pidController.setTunings(2.5, 0.004, 10);
   pidController.setSetPoint(0);
@@ -62,6 +61,20 @@ void readButtons()
 
 void loop()
 {
+  /*
+  auto input = sensoring.getInput();
+  if(input.getV().getY() != -1)
+  {
+    Serial.print("Ultrassom: X: ");
+    Serial.print(input.getV().getX());
+    Serial.print("\t Y: ");
+    Serial.println(input.getV().getY());
+  }
+  else {
+    Serial.println("Não está lendo");
+  }
+  */
+  ///*
   readButtons();
   if(pauseSwitch)
   {
@@ -82,6 +95,7 @@ void loop()
   }
   trekking.update();
   //float tempo = motorController.movingTime(0,0,10,0,0.5);
+  //*/
 }
 
 #endif //Longuinho_cpp

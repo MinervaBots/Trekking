@@ -21,13 +21,15 @@ void LonguinhoEncoder::update(Position *pPosition)
   float heading = pPosition->getHeading();
   float xPrime = deltaEncoderDistance * cos(heading);
   float yPrime = deltaEncoderDistance * sin(heading);
-  float headingPrime = 1.1 * (deltaEncoderRightDistance - deltaEncoderLeftDistance) / (2 * distanceFromAxis);
+  float headingPrime = (deltaEncoderRightDistance - deltaEncoderLeftDistance) / (2 * distanceFromAxis);
+  headingPrime *= 1.4;
 
-  float newHeading = pPosition->getHeading() + headingPrime;
+  float newHeading = heading + headingPrime;
   newHeading = atan2(sin(newHeading), cos(newHeading));
   pPosition->setX(pPosition->getX() + xPrime);
   pPosition->setY(pPosition->getY() + yPrime);
   pPosition->setHeading(newHeading);
+  //pPosition->setHeading(heading);
 /*
   m_LastEncoderLeft = encoderLeft;
   m_LastEncoderRight = encoderRight;

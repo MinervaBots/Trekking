@@ -52,7 +52,7 @@ private:
   unsigned long m_StopTime;
   unsigned long m_LastIterationTime;
   float m_LastDistance;
-  float m_LastLastDistance;
+  long m_LastDistanceTimeCheck;
   float m_CurrentLinearVelocity;
   unsigned long m_StartTimeOnSearch;
   /*--------------------------------------------------------------------------*/

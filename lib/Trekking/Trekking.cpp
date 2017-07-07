@@ -2,6 +2,8 @@
 #include "MathHelper.h"
 #include <Arduino.h>
 
+const long DistanceTimeCheck = 250;
+
 void Trekking::setup()
 {
   m_CurrentMode = &Trekking::standBy;
@@ -15,17 +17,17 @@ void Trekking::start()
   m_StartTime = millis();
   m_LastIterationTime = m_StartTime;
   m_IsRunning = true;
-  m_LastDistance = 100;
-  m_LastLastDistance = 110;
+  m_LastDistance = 9999;
+  m_LastDistanceTimeCheck = DistanceTimeCheck;
   m_pMotorController->reset();
 
   IRotation = 0;
-  KpRotation = 1;
+  KpRotation = 4;
   KiRotation = 0.01; //0.01;
   KdRotation = 5;
 
   ISearch = 0;
-  KpSearch = 3;
+  KpSearch = 5;
   KiSearch = 0.004; //0.01;
   KdSearch = 1;
 }
@@ -70,9 +72,9 @@ void Trekking::rotateToTarget(unsigned long deltaTime)
   if(abs(headingError) > 0.01)
   {
     IRotation += headingError * KiRotation * deltaTime;
-    float angularVelocity = headingError * KpRotation + IRotation + KdRotation * (headingError - lastErrorRotation)/ deltaTime;
+    float angularVelocity = 2 * headingError/abs(headingError);//headingError * KpRotation + IRotation + KdRotation * (headingError - lastErrorRotation)/ deltaTime;
     lastErrorRotation = headingError;
-    angularVelocity = constrain(angularVelocity, -1, 1);
+    //angularVelocity = constrain(angularVelocity, -4, 4);
     m_pMotorController->move(0, angularVelocity);//m_pSystemController->run(headingError));
     return;
   }
@@ -99,6 +101,7 @@ void Trekking::rotateToTarget(unsigned long deltaTime)
 
   IRotation = 0;
   m_LastDistance = 99999;
+  m_LastDistanceTimeCheck = DistanceTimeCheck;
   m_StartTimeOnSearch = millis();
   m_CurrentMode = &Trekking::search;
 }
@@ -110,31 +113,38 @@ void Trekking::search(unsigned long deltaTime)
   auto distanceToTarget = distance(target);
 
   //Serial.println(distanceToTarget);
-
-  if(distanceToTarget > 0.1)
-  //if(m_LastDistance >= distanceToTarget)
+  //if(distanceToTarget > 0.1)
+  m_LastDistanceTimeCheck -= deltaTime;
+  if(m_LastDistanceTimeCheck < 0)
   {
     m_LastDistance = distanceToTarget;
-
+    m_LastDistanceTimeCheck = DistanceTimeCheck;
+  }
+/*
+  Serial.print("m_LastDistance: ");
+  Serial.print(m_LastDistance);
+  Serial.print("\tdistanceToTarget: ");
+  Serial.print(distanceToTarget);
+  Serial.print("\tm_LastDistanceTimeCheck: ");
+  Serial.println(m_LastDistanceTimeCheck);
+*/
+  if(m_LastDistance >= distanceToTarget && distanceToTarget > 0.1)
+  {
     auto currentPosition = m_pTrekkingSensoring->getPosition();
     float heading = currentPosition.getHeading();
 
     float lineError = (m_ReferenceLine - heading);
     lineError = atan2(sin(lineError), cos(lineError));
 
-    /*if(lineError < 0)
-    {
-      lineError += 2 * PI;
-    }*/
     ISearch += lineError * KiSearch * deltaTime;
     float angularVelocity = lineError * KpSearch + ISearch;
-    angularVelocity = constrain(angularVelocity, -1, 1);
+    angularVelocity = constrain(angularVelocity, -3, 3);
 
     if(distanceToTarget < 1)
     {
       // Rampa de desaceleração
-      m_CurrentLinearVelocity = (distanceToTarget/2.0) + 0.1;
-      //m_CurrentLinearVelocity = lerp(0, 1, distanceToTarget + 0.1);
+      m_CurrentLinearVelocity = (distanceToTarget/1.5) + 0.3;
+      //m_CurrentLinearVelocity = lerp(0, 1, distanceToTarget + 0.5); nao usar esse
     }
     else
     {
@@ -182,10 +192,18 @@ void Trekking::search(unsigned long deltaTime)
     return;
   }
 
+
+  for(; m_CurrentLinearVelocity >= 0; m_CurrentLinearVelocity -= 0.1)
+  {
+    m_pMotorController->move(m_CurrentLinearVelocity, 0);
+    delay(30);
+  }
+  m_CurrentLinearVelocity = 0;
   /*
   Se já estamos a uma distância mínima do nosso objetivo (garante que não
   tenham problemas e nunca mude de estado) muda para 'refinedSearch'
   */
+
   m_CurrentMode = &Trekking::buzzer;
   m_LastDistance = 9999;
   /*
@@ -193,6 +211,9 @@ void Trekking::search(unsigned long deltaTime)
   Serial.println("POSIÇÃO DESEJADA ALCANÇADA!");
   */
   m_StartTimeInRefinedSearch = millis();
+
+  Serial.println("distance: ");
+  Serial.println(distanceToTarget);
 }
 
 void Trekking::refinedSearch(unsigned long deltaTime)

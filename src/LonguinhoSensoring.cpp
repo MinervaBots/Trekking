@@ -95,7 +95,6 @@ TrekkingOdometry LonguinhoSensoring::getInput()
   Serial.print("\tHeading: ");
   Serial.println(position.getHeading());
   */
-
   auto position = m_pCurrentEncoderPosition;
   Serial.print("Encoder Position - X: ");
   Serial.print(position.getX());
@@ -103,19 +102,29 @@ TrekkingOdometry LonguinhoSensoring::getInput()
   Serial.print(position.getY());
   Serial.print("\tHeading: ");
   Serial.println(position.getHeading());
-
+  /*
+  */
   /*
   Avaliar os sensores de ultrassom. O vetor resultado disse deve indicar a
   direção e distância até o que for detectado
   */
-  /*
-  auto leftDistance = m_UltrasonicLeft.getInput();
-  auto centerDistance = m_UltrasonicCenter.getInput();
-  auto rightDistance = m_UltrasonicRight.getInput();
 
+  m_UltrasonicRight.trigger();
+  auto rightDistance = m_UltrasonicRight.getInput();
+  auto centerDistance = m_UltrasonicCenter.getInput();
+  auto leftDistance = m_UltrasonicLeft.getInput();
+  /*
+  Serial.print("rightDistance: ");
+  Serial.println(rightDistance);
+  Serial.print("centerDistance: ");
+  Serial.println(centerDistance);
+  Serial.print("leftDistance: ");
+  Serial.println(leftDistance);
+  delay(500);
+  */
   float x = 0;
   float y = 0;
-  unsigned char cnt;
+  int cnt = 0;
   if(leftDistance > 0)
   {
     x -= 15;
@@ -134,7 +143,7 @@ TrekkingOdometry LonguinhoSensoring::getInput()
     cnt++;
   }
 
-  if(cnt < 0)
+  if(cnt <= 0)
   {
     x = -1;
     y = -1;
@@ -146,9 +155,15 @@ TrekkingOdometry LonguinhoSensoring::getInput()
     // Somei em graus alí em cima, agora converte pra radianos
     x = radians(x);
   }
-
+  /*
+  Serial.println(cnt);
+  Serial.print("x: ");
+  Serial.print(x);
+  Serial.print("\ty: ");
+  Serial.println(y);
+  //*/
   Vector2<float> result(x, y);
   m_CachedValue.setV(result);
-  */
+
   return m_CachedValue;
 }
