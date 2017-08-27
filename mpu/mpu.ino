@@ -1,5 +1,5 @@
-#include "SparkFunMPU9250-DMP.h"
-#include "PacketSerial.h"
+#include <SparkFunMPU9250-DMP.h>
+#include <PacketSerial.h>
 #include <EEPROM.h>
 
 #define E 2.7
