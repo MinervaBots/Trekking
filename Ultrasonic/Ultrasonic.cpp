@@ -3,7 +3,7 @@
 #include "Ultrasonic.h"
 
 
-Ultrasonic::Ultrasonic(uint8_t triggerPin, uint8_t echoPin) : Ultrasonic(triggerPin, echoPin, 1000)
+Ultrasonic::Ultrasonic(uint8_t triggerPin, uint8_t echoPin) : Ultrasonic(triggerPin, echoPin, 200)
 {
 }
 
