@@ -47,15 +47,19 @@ void Tcs230::setEnable(bool state)
 }
 
 
-void Tcs230::setCalibration(int32_t data[3], bool dark);
+void Tcs230::setCalibration(int32_t data[3], bool dark)
 {
 	if (dark)
 	{
-		blackCalibration_ = data;
+		blackCalibration_[0] = data[0];
+		blackCalibration_[1] = data[1];
+		blackCalibration_[2] = data[2];
 	}
 	else
 	{
-		whiteCalibration_ = data;
+		whiteCalibration_[0] = data[0];
+		whiteCalibration_[1] = data[1];
+		whiteCalibration_[2] = data[2];
 	}
 }
 
