@@ -6,7 +6,7 @@
 
 class Ultrasonic
 {
-  public:
+public:
     Ultrasonic(uint8_t triggerPin, uint8_t echoPin);
 	Ultrasonic(uint8_t triggerPin, uint8_t echoPin, uint16_t maxDistance);
 	
@@ -15,7 +15,7 @@ class Ultrasonic
 	
 	int getDistance();
 
-  private:
+private:
     uint8_t triggerPin_, echoPin_;
 	long timeout_;
 	
