@@ -1,4 +1,4 @@
-#include "Arduino.h"
+#include <Arduino.h>
 
 #include "Ultrasonic.h"
 
@@ -22,7 +22,7 @@ bool Ultrasonic::read()
 	delayMicroseconds(10);
 	digitalWrite(triggerPin_, LOW);
 	
-	long duration = pulseIn(echoPin_,HIGH, timeout_);
+	long duration = pulseIn(echoPin_, HIGH, timeout_);
 	if (duration == 0)
 	{
 		distance_ = 160000;
