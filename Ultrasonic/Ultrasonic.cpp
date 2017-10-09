@@ -37,6 +37,7 @@ bool Ultrasonic::read(int* distance)
 {
 	bool returnValue = read();
 	*distance = distance_;
+	return returnValue;
 }
 
 int Ultrasonic::getDistance()
