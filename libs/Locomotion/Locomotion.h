@@ -6,15 +6,16 @@
 class Locomotion
 {
 public:
-  Locomotion(uint8_t motorPin, uint8_t servoPin);
+  Locomotion(uint8_t escPin, uint8_t steeringServoPin);
   
   void move(float speed, float direction);
   void stop();
   void rotate(float direction);
   
 private:
-  uint8_t motorPin_;
-  Servo servo_;
+  Servo esc_;
+  Servo steeringServo_;
+  uint8_t currentSpeed_;
   uint8_t currentAngle_;
 };
 
