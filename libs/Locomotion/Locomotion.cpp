@@ -3,20 +3,20 @@
 #include "Locomotion.h"
 
 
-Locomotion::Locomotion(uint8_t motorPin, uint8_t servoPin) :
-  motorPin_(motorPin)
+Locomotion::Locomotion(uint8_t escPin, uint8_t steeringServoPin)
 {
-  servo_.attach(servoPin);
+  esc_.attach(escPin);
+  steeringServo_.attach(steeringServoPin);
 }
 
 void Locomotion::move(float speed, float direction)
 {
   speed = constrain(speed, -1, 1);
+
+  currentSpeed_ = map(direction, -1, -1, 0, 180);
+  esc_.write(currentSpeed_);
+  
   direction = constrain(direction, -1, 1);
-
-  int pwm = map(speed, -1, 1, 0, 255);
-  analogWrite(motorPin_, pwm);
-
   rotate(direction);
 }
 
@@ -28,6 +28,5 @@ void Locomotion::stop()
 void Locomotion::rotate(float direction)
 {
   currentAngle_ = map(direction, -1, -1, 0, 180);
-  servo_.write(currentAngle_);
+  steeringServo_.write(currentAngle_);
 }
-
