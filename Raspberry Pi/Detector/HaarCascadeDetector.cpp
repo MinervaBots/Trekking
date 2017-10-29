@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "HaarCascadeDetector.h"
 
 HaarCascadeDetector::HaarCascadeDetector(String pathToCascadeFile)
@@ -43,7 +42,7 @@ void HaarCascadeDetector::setMaxSize(int width, int height)
 
 void HaarCascadeDetector::enableColorCheck()
 {
-	//useColorInformation_ = true;
+	useColorInformation_ = true;
 }
 
 void HaarCascadeDetector::disableColorCheck()
@@ -72,19 +71,23 @@ std::vector<IntRect> HaarCascadeDetector::detect(Mat frame)
 		{
 			// Extrai o pedaço do frame em que o objeto foi detectado por haar cascade.
 			// A extração é feita do frame original, pois aqui queremos usar as informações de cor.
-			Mat objectInframe = frame(rect);
+			// Pra simplificar convertemos as cores de RGB para HSV. Isso permite calibrar os limites de cor mais facilmente.
+			Mat objectInframe;
+			cvtColor(frame(rect), objectInframe, cv::COLOR_BGR2HSV);
 
 			// Calcula uma mask pro intervalo de cor definido.
 			// Onde na imagem a cor estiver dentro dos limites fica em 1 (branco) na matriz 
 			// e onde não estiver fica 0 (preto).
-			Scalar colorMask;
+			Mat colorMask;
 			inRange(objectInframe, colorThresholdLow_, colorThresholdHigh_, colorMask);
 
 			// Verifica se a média da mask um valor configurado.
 			// Se for indica que a cor está bem presente na imagem.
 			// Aumentando muito as chances de ser o objeto que procuramos já que o haar cascade
 			// não leva em consideração as informações de cor
-			if (mean(colorMask)[0] < colorPresenceMin_)
+			Scalar maskMean = mean(colorMask);
+			//printf("Mean: %f\n", maskMean[0]);
+			if (maskMean[0] < colorPresenceMin_)
 			{
 				// Se a média for menor que o mínimo desconsidera essa objeto e pula para o proximo.
 				continue;
