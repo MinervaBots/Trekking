@@ -1,6 +1,8 @@
-
-
 #include "RPiMessageHandlers.h"
+#include "DistanceToCamera.h"
+#include "Constants.h"
+
+DistanceToCamera coneDistance(CONE_REAL_HEIGHT, FOCAL_LENGHT, SENSOR_HEIGHT, IMAGE_PIXEL_HEIGHT);
 
 void setup()
 {
