@@ -26,14 +26,22 @@ FiniteStateMachine::~FiniteStateMachine()
 void FiniteStateMachine::addTransition(int eventCode, State* fromState, State* toState, void (*onTransition)())
 {
 	if (fromState == nullptr || toState == nullptr)
+	{
 		return;
+	}
+	if (currentState_ == nullptr)
+	{
+		currentState_ = fromState;
+	}
 	transitions_.add(Transition(eventCode, fromState, toState, onTransition));
 }
 
 void FiniteStateMachine::addTimedTransition(unsigned long interval, State* fromState, State* toState, void (*onTransition)())
 {
 	if (fromState == nullptr || toState == nullptr)
+	{
 		return;
+	}
 
 	Transition transition(eventCode, fromState, toState, onTransition);
 	TimedTransition timedTransition(transition, interval);
@@ -46,7 +54,6 @@ void FiniteStateMachine::triggerEvent(int eventCode)
 {
 	if (initialized_)
 	{
-    	// Find the transition with the current state and given event.
 		for (int i = 0; i < transitions_.size(); i++)
 		{
 			State state = transitions_.get(i);
@@ -61,7 +68,6 @@ void FiniteStateMachine::triggerEvent(int eventCode)
 
 void FiniteStateMachine::runMachine()
 {
-	// first run must exec first state "on_enter"
 	if (!initialized_)
 	{
 		initialized_ = true;
@@ -101,7 +107,6 @@ void FiniteStateMachine::checkTimedTransitions()
 
 void FiniteStateMachine::makeTransition(Transition* transition)
 {
-	// Execute the handlers in the correct order.
 	if (transition->fromState->onExit() != nullptr)
 		transition->fromState->onExit();
 
@@ -113,7 +118,6 @@ void FiniteStateMachine::makeTransition(Transition* transition)
 
 	currentState_ = transition->toState;
 
-	//Initialice all timed transitions from m_current_state
 	unsigned long now = millis();
 	for (int i = 0; i < timedTransitions_.size(); i++)
 	{
