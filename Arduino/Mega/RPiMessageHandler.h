@@ -12,7 +12,7 @@ class RPiMessageHandler
 public:
   enum RPiMessageCodes
   {
-    SetDirection,
+    SetTargetData,
     SetMaxVelocity,
     SetDirectionPID,
     SetSpeedPID,
@@ -22,7 +22,7 @@ public:
   RPiMessageHandler(ControlVariables& variables, Stream& stream, int majorVersion, int minorVersion);
   ~RPiMessageHandler();
   
-  void handleMessage(RPiMessageCodes code, int value);
+  void handleMessage(RPiMessageCodes code, byte *arrayPointer, byte byteCount);
   void processData();
   
 private:
@@ -32,8 +32,13 @@ private:
 
 extern RPiMessageHandler raspberryPiMessageHandler;
 
-static void raspberryPiIntMessage(byte messageCode, int value)
+static void raspberryPiGenericCallbackFunction(byte messageCode, int value)
 {
-  raspberryPiMessageHandler.handleMessage((RPiMessageHandler::RPiMessageCodes)messageCode, value);
+  raspberryPiMessageHandler.handleMessage((RPiMessageHandler::RPiMessageCodes)messageCode, (byte*)value, sizeof(int));
+}
+
+static void raspberryPiSysexCallbackFunction(byte messageCode, byte byteCount, byte *arrayPointer)
+{
+  raspberryPiMessageHandler.handleMessage((RPiMessageHandler::RPiMessageCodes)messageCode, arrayPointer, byteCount);
 }
 #endif //RPI_MESSAGE_HANDLER_H

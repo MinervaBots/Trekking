@@ -2,6 +2,11 @@
 #define CONTROL_VARIABLES_H
 
 
+struct TargetPosition
+{
+  int x, y, w, h;
+};
+
 class ControlVariables
 {
 public:
@@ -13,7 +18,7 @@ public:
 
   float getMaxVelocity();
   void setMaxVelocity(float value);
-
+  
 private:
   float direction_;
   float maxVelocity_;

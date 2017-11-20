@@ -5,7 +5,8 @@ RPiMessageHandler::RPiMessageHandler(ControlVariables& variables, Stream& stream
   controlVariables_(variables)
 {
   firmata_.setFirmwareVersion(majorVersion, minorVersion);
-  firmata_.attach(ANALOG_MESSAGE, raspberryPiIntMessage);
+  firmata_.attach(ANALOG_MESSAGE, raspberryPiGenericCallbackFunction);
+  firmata_.attach(START_SYSEX, raspberryPiSysexCallbackFunction);
   firmata_.begin(stream);
 }
 
@@ -22,13 +23,14 @@ void RPiMessageHandler::processData()
   }
 }
 
-void RPiMessageHandler::handleMessage(RPiMessageCodes code, int value)
+void RPiMessageHandler::handleMessage(RPiMessageCodes code, byte *arrayPointer, byte byteCount)
 {
   switch(code)
   {
-    case RPiMessageCodes::SetDirection:
-      float dir = mapf(value, -2^15, (2^15) - 1, -1.0, 1.0);
-      controlVariables_.setDirection(dir);
+    case RPiMessageCodes::SetTargetData:
+      auto targetData = (TargetPosition*)arrayPointer;
+      // Determinar direção, e distancia pro alvo
+      // Setar isso em controlVariables_
       break;
   }
 }
