@@ -23,8 +23,7 @@ private:
 		State* toState;
     	void (*onTransition)();
 
-    	Transition(int eventCode, State* fromState, State* toState, void (*onTransition)()) : eventCode(eventCode), fromState(fromState), toState(toState), onTransition(onTransition)
-    	{}
+    	
 	};
 
 	struct TimedTransition
@@ -33,19 +32,21 @@ private:
 		unsigned long start;
 		unsigned long interval;
 
-    	TimedTransition(Transition transition, unsigned long interval) : transition(transition), start(start), interval(interval)
-    	{}
 	};
 
 
 	bool initialized_;
 	State* currentState_;
-	LinkedList<Transition*> transitions_;
-	LinkedList<TimedTransition*> timedTransitions_;
+	LinkedList<Transition> transitions_;
+	LinkedList<TimedTransition> timedTransitions_;
 
 
 	void checkTimedTransitions();
 	void makeTransition(Transition* transition);
+
+
+	Transition createTransition(int eventCode, State* fromState, State* toState, void (*onTransition)());
+	TimedTransition createTimedTransition(Transition transition, unsigned long interval);
 };
 
 
