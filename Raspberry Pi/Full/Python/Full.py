@@ -2,7 +2,7 @@ import numpy as np
 import cv2
  
 cap = cv2.VideoCapture(0)
-cascadeDetector = cv2.CascadeClassifier('haarcasCade.xml')
+cascadeDetector = cv2.CascadeClassifier('haarCascade.xml')
 
 if cap.isOpened() == False:
     print('Unable to open the camera')
