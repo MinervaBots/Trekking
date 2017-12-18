@@ -1,10 +1,11 @@
 from VideoStream import *
 from FPS import *
 import cv2
+import time
 
 
 fps = FPS().start()
-vs = VideoStream(usePiCamera=True, resolution=(640, 360)).start()
+vs = VideoStream(usePiCamera=True, resolution=(640, 368)).start()
 time.sleep(2.0)
 
 cascadeDetector = cv2.CascadeClassifier('haarCascade.xml')
@@ -28,6 +29,7 @@ while True:
     # if the `q` key was pressed, break from the loop
     if key == ord("q"):
         break
+    fps.update()
  
 fps.stop()
 print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
