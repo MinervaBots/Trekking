@@ -12,8 +12,8 @@ else:
 
 class FileVideoStream:
 	def __init__(self, path, queueSize=128):
-	# initialize the file video stream along with the boolean
-	# used to indicate if the thread should be stopped or not
+		# initialize the file video stream along with the boolean
+		# used to indicate if the thread should be stopped or not
 		self.stream = cv2.VideoCapture(path)
 		self.stopped = False
 
@@ -30,27 +30,27 @@ class FileVideoStream:
 		return self
 
 	def update(self):
-	# keep looping infinitely
+		# keep looping infinitely
 		while True:
 			# if the thread indicator variable is set, stop the
 			# thread
 			if self.stopped:
-			return
+				self.stream.release()
+				return
 	 
 			# otherwise, ensure the queue has room in it
 			if not self.Q.full():
-					# read the next frame from the file
-			(grabbed, frame) = self.stream.read()
+				# read the next frame from the file
+				(grabbed, frame) = self.stream.read()
 	 
-			# if the `grabbed` boolean is `False`, then we have
-			# reached the end of the video file
-			if not grabbed:
-				self.stop()
-				return
+				# if the `grabbed` boolean is `False`, then we have
+				# reached the end of the video file
+				if not grabbed:
+					self.stop()
+					return
 	 
-			# add the frame to the queue
-			self.Q.put(frame)
-
+				# add the frame to the queue
+				self.Q.put(frame)
 
 	def read(self):
 		# return next frame in the queue
