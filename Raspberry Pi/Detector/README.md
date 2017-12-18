@@ -1,1 +1,0 @@
-Bibioteca de detectção com OpenCV. Método de Haar Cascade implementado
