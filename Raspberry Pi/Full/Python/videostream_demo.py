@@ -1,13 +1,15 @@
 
 # import the necessary packages
 from VideoStream import *
+from FPS import *
+
 import datetime
 import argparse
 import imutils
 import time
 import cv2
  
-
+fps = FPS().start()
 # initialize the video stream and allow the cammera sensor to warmup
 vs = VideoStream(usePiCamera=True).start()
 time.sleep(2.0)
@@ -17,7 +19,7 @@ while True:
 	# grab the frame from the threaded video stream and resize it
 	# to have a maximum width of 400 pixels
 	frame = vs.read()
-	if frame == None:
+	if frame is None:
 		continue
 
 	frame = imutils.resize(frame, width=400)
@@ -35,7 +37,13 @@ while True:
 	# if the `q` key was pressed, break from the loop
 	if key == ord("q"):
 		break
+
+	fps.update()
  
+fps.stop()
+print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
+print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
+
 # do a bit of cleanup
 cv2.destroyAllWindows()
 vs.stop()
