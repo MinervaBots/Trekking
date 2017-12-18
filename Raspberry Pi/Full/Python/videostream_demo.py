@@ -9,7 +9,7 @@ import cv2
  
 
 # initialize the video stream and allow the cammera sensor to warmup
-vs = VideoStream(True).start()
+vs = VideoStream(usePiCamera=True).start()
 time.sleep(2.0)
 
 # loop over the frames from the video stream
@@ -17,6 +17,9 @@ while True:
 	# grab the frame from the threaded video stream and resize it
 	# to have a maximum width of 400 pixels
 	frame = vs.read()
+	if frame == None:
+		continue
+
 	frame = imutils.resize(frame, width=400)
  
 	# draw the timestamp on the frame
