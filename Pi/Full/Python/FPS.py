@@ -37,7 +37,7 @@ class FPS:
                 return (self._end - self._start).total_seconds()  
 
         def fps(self):
-                return 1.0 / self._delta
+                return 1.0 / self._delta.total_seconds()  
                 
 	def meanFps(self):
 		# compute the (approximate) frames per second
