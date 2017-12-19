@@ -7,11 +7,14 @@ class FPS:
 		# that were examined between the start and end intervals
 		self._start = None
 		self._end = None
+		self._last = None
+		self._delta = None
 		self._numFrames = 0
  
 	def start(self):
 		# start the timer
 		self._start = datetime.datetime.now()
+		self._last = datetime.datetime.now()
 		return self
  
 	def stop(self):
@@ -22,15 +25,20 @@ class FPS:
 		# increment the total number of frames examined during the
 		# start and end intervals
 		self._numFrames += 1
- 
+		self._delta = datetime.datetime.now() - self._last
+		self._last = datetime.datetime.now()
+
+        def deltaTime(self):
+		return self._delta.total_seconds()
+	
 	def elapsed(self):
 		# return the total number of seconds between the start and
 		# end interval
-		if self._end is None:
-                        return (datetime.datetime.now() - self._start).total_seconds()
-                else:
-                        return (self._end - self._start).total_seconds()  
- 
-	def fps(self):
+                return (self._end - self._start).total_seconds()  
+
+        def fps(self):
+                return 1.0 / self._delta
+                
+	def meanFps(self):
 		# compute the (approximate) frames per second
 		return self._numFrames / self.elapsed()

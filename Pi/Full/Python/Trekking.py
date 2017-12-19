@@ -31,7 +31,7 @@ try:
 except KeyboardInterrupt:
     fps.stop()
     print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
-    print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
+    print("[INFO] Mean. FPS: {:.2f}".format(fps.meanFps()))
 
     # do a bit of cleanup
     #cv2.destroyAllWindows()
