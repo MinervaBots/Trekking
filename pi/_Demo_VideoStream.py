@@ -1,7 +1,5 @@
-
-# import the necessary packages
-from VideoStream import *
-from FPS import *
+from utils import FPS
+from videoStream import VideoStream
 
 import datetime
 import argparse

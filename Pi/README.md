@@ -1,1 +1,1 @@
-Códigos e exemplos relacionados ao que rodaremos no RPi
+Código completo que rodará no RPi.
