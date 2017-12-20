@@ -1,6 +1,6 @@
+#include <CmdMessenger.h>
 #include <SparkFunMPU9250-DMP.h>
-#include <PacketSerial.h>
-#include <EEPROM.h>
+//#include <EEPROM.h>
 
 //#define E 2.7
 #define G 9.8
@@ -9,6 +9,14 @@
 
 #define CALIBRATION_BUTTON 10
 
+enum
+{
+    mpuData,
+    error,
+};
+
+const int BAUD_RATE = 9600;
+CmdMessenger c = CmdMessenger(Serial,',',';','/');
 MPU9250_DMP imu;
 
 float ax, ay, gyro;// mx, my;
@@ -23,22 +31,57 @@ float mapFloat(float x, float in_min, float in_max, float out_min, float out_max
  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 */
-union
+
+float accelerationX, accelerationY, heading;
+
+void readMPU();
+void calculateData();
+void calibrateGyroAccel();
+void calibrateGyroAccel();
+void setMPU();
+//void magnetometerCalibration();
+
+void attachHandlers();
+void onUnknownCommand();
+void sendData();
+
+void setup()
 {
-  float value;
-  byte buffer[4];
-} acceleration;
+  Serial.begin(BAUD_RATE);
+  attachHandlers();
+  imu.begin();
+  //magnetometerCalibration();
+  setMPU();
+  calibrateGyroAccel();
+}
 
-union
+void loop()
 {
-  float value;
-  byte buffer[4];
-} heading;
+  readMPU();
+  calculateData();
+}
 
+void onUnknownCommand()
+{
+  c.sendCmd(error, "Comando sem handler definido");
+}
 
-PacketSerial serial;
+void attachHandlers()
+{
+  c.attach(onUnknownCommand);
+}
 
-void readMPU() {
+void sendData()
+{
+  c.sendCmdStart(mpuData);
+  c.sendCmdBinArg(accelerationX);
+  c.sendCmdBinArg(accelerationY);
+  c.sendCmdBinArg(heading);
+  c.sendCmdEnd();  
+}
+
+void readMPU()
+{
   imu.update(UPDATE_ACCEL | UPDATE_GYRO | UPDATE_COMPASS);
   ax = imu.calcAccel(imu.ax);
   ay = imu.calcAccel(imu.ay);
@@ -47,7 +90,43 @@ void readMPU() {
   //my = imu.calcAccel(imu.my);
 }
 
-void calibrateGyroAccel() { // encontrar offsets
+void calculateData()
+{
+    /*
+  float mxReal = mapFloat(mx, minMxReal, maxMxReal, -1000, 1000);
+  float myReal = mapFloat(my, minMyReal, maxMyReal, -1000, 1000);
+  magHeading = atan2(mxReal,myReal) - offsetMag;
+  magHeading *= (180 / PI);
+  */
+  gyroHeading -= (lastGyro + (gyro - offsetGyro)) * (micros() - lastRun) / 4000; // integrando a velocidade angular -> ângulo
+  if (gyroHeading > 180.0) {
+    gyroHeading -= 360.0;
+  }
+  if (gyroHeading < -180.0){
+    gyroHeading += 360.0;
+  }
+  /*
+  if (magHeading > 180.0) {
+    magHeading -= 360.0;
+  }
+  if (magHeading < -180.0){
+    magHeading += 360.0;
+  }
+  Km = pow(E, -DECAY * abs((gyro - offsetGyro))); // função que encontra Km. Quanto maior a velocidade ângular, maior o peso do gyroscópio
+  //gyroHeading = Km * magHeading + (1 - Km) * gyroHeading; // filtro sendo feito e já atualizando o valor de gyroHeading
+  */
+  accelerationX = (ax - offsetAx) * G; //sqrt(pow((ax - offsetAx),2) + pow((ay - offsetAy),2))*G;
+  accelerationY = (ay - offsetAy) * G; //sqrt(pow((ax - offsetAx),2) + pow((ay - offsetAy),2))*G;
+  heading = gyroHeading;
+  
+  lastRun = micros();
+  lastGyro = gyro - offsetGyro;
+  //Serial.println(int(gyroHeading));
+}
+
+// encontrar offsets
+void calibrateGyroAccel()
+{
   //offsetMag = 0;
   gyroHeading = 0;
   offsetGyro = 0;
@@ -68,31 +147,14 @@ void calibrateGyroAccel() { // encontrar offsets
   lastRun = micros();
 }
 
-void receivedPacket(const uint8_t* buffer, size_t size)
+void reset()
 {
-  byte operationCode = (byte)buffer[0];
-  switch (operationCode)
-  {
-    case 1:
-      reset();
-      break;
-      
-    case 2:
-      byte response[10];
-      response[0] = operationCode;
-      memcpy(response[1], acceleration.buffer, sizeof(float));
-      memcpy(response[1 + sizeof(float)], heading.buffer, sizeof(float));
-      serial.send(response, 10);
-      break;
-  }
-}
-
-void reset() {
   gyroHeading = 0;
   lastRun = micros();
 }
 
-void setMPU() {
+void setMPU()
+{
    // Use setSensors to turn on or off MPU-9250 sensors.
   // Any of the following defines can be combined:
   // INV_XYZ_GYRO, INV_XYZ_ACCEL, INV_XYZ_COMPASS,
@@ -128,6 +190,7 @@ void setMPU() {
   //EEPROM.get(2*sizeof(float), minMyReal);
   //EEPROM.get(3*sizeof(float), maxMyReal);
 }
+
 /*
 void magnetometerCalibration() {
   float minMx, maxMx, minMy, maxMy;
@@ -161,45 +224,3 @@ void magnetometerCalibration() {
   EEPROM.put(3*sizeof(float), maxMy);
 }
 */
-void setup() {
-  Serial.begin(9600);
-  imu.begin();
-  //magnetometerCalibration();
-  setMPU();
-  serial.begin(9600);
-  serial.setPacketHandler(&receivedPacket);
-  calibrateGyroAccel();
-}
-
-void loop() {
-  serial.update();
-  readMPU();
-  /*
-  float mxReal = mapFloat(mx, minMxReal, maxMxReal, -1000, 1000);
-  float myReal = mapFloat(my, minMyReal, maxMyReal, -1000, 1000);
-  magHeading = atan2(mxReal,myReal) - offsetMag;
-  magHeading *= (180 / PI);
-  */
-  gyroHeading -= (lastGyro + (gyro - offsetGyro)) * (micros() - lastRun) / 4000; // integrando a velocidade angular -> ângulo
-  if (gyroHeading > 180.0) {
-    gyroHeading -= 360.0;
-  }
-  if (gyroHeading < -180.0){
-    gyroHeading += 360.0;
-  }
-  /*
-  if (magHeading > 180.0) {
-    magHeading -= 360.0;
-  }
-  if (magHeading < -180.0){
-    magHeading += 360.0;
-  }
-  Km = pow(E, -DECAY * abs((gyro - offsetGyro))); // função que encontra Km. Quanto maior a velocidade ângular, maior o peso do gyroscópio
-  //gyroHeading = Km * magHeading + (1 - Km) * gyroHeading; // filtro sendo feito e já atualizando o valor de gyroHeading
-  */
-  acceleration.value = (ax - offsetAx)*G; //sqrt(pow((ax - offsetAx),2) + pow((ay - offsetAy),2))*G;
-  heading.value = gyroHeading;
-  lastRun = micros();
-  lastGyro = gyro - offsetGyro;
-  Serial.println(int(gyroHeading));
-}
