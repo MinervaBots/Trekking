@@ -1,17 +1,19 @@
 # Exemplo em python para uso da biblioteca PyCmdMessager
 # A parte que roda no arduino se encontra em ../arduino/exemples/cmdMesseger
 import PyCmdMessenger
- 
+import CommandMessager
+
 arduino = PyCmdMessenger.ArduinoBoard("COM3", baud_rate = 9600)
 
-commands = [["objDetected", "fiiii"],
-            ["servoDirection", "i"],
-            ["error", "s"]]
+def error(msg, recvTime):
+    print(msg)
+    print(recvTime)
+    
+commands = [["targetData", "fiiii"],
+            #["servoDirection", "i"],
+            ["error", "s", error]]
 
 # Initialize the messenger
-c = PyCmdMessenger.CmdMessenger(arduino, commands)
+cmdMessenger = CommandMessager.CommandMessager(arduino, commands).start()
 
-c.send("objDetected", 0.1, 100, 20, 30, 50)
-# Recebe. Dee retornar ["servoDirection", [45], TIME_RECIEVED]
-msg = c.receive()
-print(msg)
+cmdMessenger.send("targetData", 0.1, 100, 20, 30, 50)
