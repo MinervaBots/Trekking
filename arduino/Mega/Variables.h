@@ -1,9 +1,11 @@
 #ifndef VARIABLES_H
 #define VARIABLES_H
 
-#include "Transform.h"
 #include <RunningMedian.h>
 #include <LinkedList.h>
+
+#include "Transform.h"
+#include "UltrassonicArray.h"
 
 extern bool isRunning;
 extern void (*state)(unsigned long);
@@ -25,5 +27,7 @@ extern double speedKp, speedKi, speedKd;
 extern Transform currentTransform;
 extern LinkedList<Vector2> targets;
 extern Vector2* currentTarget;
+
+extern UltrassonicArray ultrassonicArray;
 
 #endif //VARIABLES_H

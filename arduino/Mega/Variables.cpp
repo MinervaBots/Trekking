@@ -22,3 +22,6 @@ Transform currentTransform(3, 3, 0);
 
 LinkedList<Vector2> targets;
 Vector2* currentTarget;
+
+
+UltrassonicArray ultrassonicArray;

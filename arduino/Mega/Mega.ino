@@ -9,8 +9,8 @@
 #include "States.h"
 #include "CommandHandlers.h"
 
-
 Servo cameraServo, steeringServo, esc;
+
 
 PID cameraPid(&targetDirection, &cameraServoPosition, &setPointZero, cameraServoKp, cameraServoKi, cameraServoKd, P_ON_M, DIRECT);
 PID steeringPid(&targetDirection, &steeringServoPosition, &setPointZero, steeringServoKp, steeringServoKi, steeringServoKd, P_ON_M, DIRECT);
@@ -42,6 +42,13 @@ void setup()
   targets.add(Vector2(6, 18));
   currentTarget = &targets.get(0);
 
+  // Pinagem de placeholder
+  ultrassonicArray.add(-PI/2, 11, 11);
+  ultrassonicArray.add(-PI/4, 11, 11);
+  ultrassonicArray.add(    0, 11, 11);
+  ultrassonicArray.add(+PI/4, 11, 11);
+  ultrassonicArray.add(+PI/2, 11, 11);
+  
   state = idle;
 }
 
@@ -73,7 +80,8 @@ void loop()
 void attachHandlers()
 {
   rPiCmdMessenger.attach(targetData, onRecvTargetData);
-  mpuCmdMessenger.attach(mpuData, onRecvMpuData);
   rPiCmdMessenger.attach(onRecvUnknownCommand);
+  
+  mpuCmdMessenger.attach(mpuData, onRecvMpuData);
   mpuCmdMessenger.attach(onRecvUnknownCommand);
 }
