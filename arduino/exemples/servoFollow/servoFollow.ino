@@ -6,10 +6,12 @@
 
 enum
 {
-    targetData,
-    servoDirection,
-    error,
+  info,
+  error,
+  mpuData,
+  targetData,
 };
+
 
 const int BAUD_RATE = 9600;
 CmdMessenger c = CmdMessenger(Serial,',',';','/');
@@ -32,9 +34,7 @@ void onObjDetected(CmdMessenger* cmdMessenger)
   int value4 = cmdMessenger->readBinArg<int>();
   int value5 = cmdMessenger->readBinArg<int>();
 
-  cmdMessenger->sendCmdStart(servoDirection);
-  c.sendCmdBinArg<double>(servoPosition);
-  c.sendCmdEnd();
+  cmdMessenger->sendCmd(info, "Dados recebidos");
 }
 
 void onUnknownCommand(CmdMessenger* cmdMessenger)

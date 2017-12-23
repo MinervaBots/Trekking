@@ -29,6 +29,7 @@ void setup()
 {
   Serial.begin(RPI_BAUD_RATE);
   Serial1.begin(MPU_BAUD_RATE);
+  attachHandlers();
   
   cameraServo.attach(CAMERA_SERVO_PIN);
   steeringServo.attach(STEERING_SERVO_PIN);
@@ -41,6 +42,9 @@ void setup()
 
 void loop()
 {
+  rPiCmdMessenger.feedinSerialData();
+  mpuCmdMessenger.feedinSerialData();
+  
   if(isRunning)
   {
     state(millis() - lastRun);

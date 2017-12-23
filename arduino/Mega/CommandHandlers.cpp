@@ -43,6 +43,7 @@ void onRecvTargetData(CmdMessenger *cmdMesseger)
   int h = cmdMesseger->readBinArg<int>();
 
   targetDistance = (FOCAL_LENGHT * CONE_REAL_HEIGHT * IMAGE_PIXEL_HEIGHT) / (h * SENSOR_HEIGHT);
+  cmdMesseger->sendCmd(info, "Dados recebidos");
 }
 
 void onRecvUnknownCommand(CmdMessenger *cmdMesseger)
