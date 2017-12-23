@@ -29,7 +29,7 @@ def error(msg, recvTime):
     print ("ERROR: {}".format(msg))
 
 def mpuData(accX, accY, heading, recvTime):
-    print("{} {} {}".format(accX, accY, heading))
+    print("Aceleração X: {} \t Y:{} \t Heading: {}".format(accX, accY, heading))
 
 #PyCmdMessage
 baudRate = 9600
