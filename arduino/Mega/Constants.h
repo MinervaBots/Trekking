@@ -22,6 +22,7 @@
 
 #define REFINED_SEARCH_DISTANCE 7.0             // Quanto maior a distância de confiança conseguirmos com a câmera melhor
                                                 // Precisa ser maior que 5 pra já estar em refinedSearch quando chegar perto dos obstáculos
+#define GOAL_THRESHOLD          0.5             // Distância aceitável de um objetivo pra dizer que chagou (m)
 
 
 #endif

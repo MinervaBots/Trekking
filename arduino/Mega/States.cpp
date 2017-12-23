@@ -23,10 +23,10 @@ void search(unsigned long lastRun)
 
   // Usa atan2 para obter valores sempre entre [-π ; +π] radianos.
   targetDirection = atan2(sin(targetDirection), cos(targetDirection));
-  
+
   // Quando estivermos suficientemente próximos (REFINED_SEARCH_DISTANCE)
   // troca pra o estado refinedSearch.
-  if(targetDistance < REFINED_SEARCH_DISTANCE)
+  if (targetDistance < REFINED_SEARCH_DISTANCE)
   {
     state = refinedSearch;
   }
@@ -34,7 +34,47 @@ void search(unsigned long lastRun)
 
 void refinedSearch(unsigned long lastRun)
 {
+  if(targetDistance < GOAL_THRESHOLD)
+  {
+    state = targetFound;
+    return;
+  }
+
+  float obsDistX, obsDistY = 0;
+  float meanDirection;
+  for(int i = 0; i < ULTRASSONIC_COUNT; i++)
+  {
+    auto result = ultrassonicArray.evaluate(i);
+    if(result.distance > 10000)
+    {
+      // Nada foi detectado
+      continue;
+    }
+    obsDistX += result.distance * sin(result.direction);
+    obsDistY += result.distance * cos(result.direction);
+    meanDirection += result.direction;
+  }
+  obsDistX /= ULTRASSONIC_COUNT;
+  obsDistY /= ULTRASSONIC_COUNT;
+  meanDirection /= ULTRASSONIC_COUNT;
+  meanDirection = atan2(sin(meanDirection), cos(meanDirection));
   
+  // Se o obstáculo não estiver na direção que estamos indo ignora
+  if(abs(meanDirection - targetDirection) > PI/4)
+  {
+    return;
+  }
+
+  if(meanDirection > 0)
+  {
+    targetDirection -= PI/2;
+  }
+  else
+  {
+    targetDirection += PI/2;
+  }
+    
+  targetDirection = atan2(sin(targetDirection), cos(targetDirection));
 }
 
 void targetFound()
@@ -49,7 +89,7 @@ void targetFound()
   steeringServoPosition = 0;
   linearSpeed = -1;
   delay(1000);
-  
+
   state = search;
 }
 
