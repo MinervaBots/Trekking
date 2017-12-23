@@ -54,7 +54,10 @@ def setup():
     cmdMessenger.start()
     fps.start()
     while isRunning:
-        loop()
+        try:
+            loop()
+        except KeyboardInterrupt:
+            isRunning = False
 
     fps.stop()
     cmdMessenger.stop()
@@ -93,6 +96,6 @@ def loop():
             isRunning = False
 
         fps.update()
-        print("FPS: {:.2f}".format(fps.fps()))
+    print("FPS: {:.2f}".format(fps.fps()))
 
 setup()
