@@ -77,8 +77,11 @@ void refinedSearch(unsigned long lastRun)
   targetDirection = atan2(sin(targetDirection), cos(targetDirection));
 }
 
+int targetCount = 0;
 void targetFound()
 {
+  targetCount++;
+  
   // Sinaliza
   delay(1000);
   // Desliga o sinal
@@ -90,6 +93,13 @@ void targetFound()
   linearSpeed = -1;
   delay(1000);
 
-  state = search;
+  if(targetCount == targets.size())
+  {
+    state = idle;
+  }
+  else
+  {
+    state = search;
+  }
 }
 
