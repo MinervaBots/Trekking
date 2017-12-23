@@ -46,6 +46,7 @@ vs = VideoStream(usePiCamera = isRaspberryPi, resolution=(frameWidth, frameHeigh
 cascadeDetector = cv2.CascadeClassifier('haarCascades/face.xml')
 
 def setup():
+    global isRunning
     #Só inicializa a janela se solicitarmos
     if showWindows:
         cv2.namedWindow(windowName)
