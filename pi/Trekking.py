@@ -16,7 +16,7 @@ frameHeight = 368
 frameCenterX = frameWidth / 2.0
 
 def relay(msg, recvTime):
-    print (msg)
+    #print (msg)
     return None
 
 def servoDirection(position, recvTime):
@@ -69,8 +69,9 @@ def loop():
     objects = cascadeDetector.detectMultiScale(gray, 1.3, 5)
     if len(objects) > 0:
         (x, y, w, h) = objects[0]
-        centerX = (x + w) / 2.0
-        direction = (centerX / frameCenterX)
+        objCenterX = x + w / 2.0
+        direction = (objCenterX - 0) * (1 - -1) / (frameWidth - 0) + -1
+        #print(direction)
         cmdMessenger.send("targetData", direction, x, y, w, h)
         cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
 
