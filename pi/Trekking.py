@@ -2,7 +2,6 @@ from utils.FPS import FPS
 from videoStream.VideoStream import VideoStream
 from threading import Thread
 import cv2
-import time
 import PyCmdMessenger
 import CommandMessenger
 from sys import platform as _platform
