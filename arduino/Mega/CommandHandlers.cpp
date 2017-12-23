@@ -14,8 +14,8 @@ void onRecvMpuData(CmdMessenger *cmdMesseger)
   currTime = millis();
   unsigned long deltaTimeInSeconds = (currTime - prevTime) / 1000; // 1000 adicionado para obter as mesmas unidades
   
-  int accelerationX = cmdMesseger->readBinArg<float>();
-  int accelerationY = cmdMesseger->readBinArg<float>();
+  float accelerationX = cmdMesseger->readBinArg<float>();
+  float accelerationY = cmdMesseger->readBinArg<float>();
   currentTransform.heading = cmdMesseger->readBinArg<float>();
 
   velocityX += (1/2)*(accelerationX + prevAccelerationX) * deltaTimeInSeconds;
@@ -35,7 +35,7 @@ void onRecvMpuData(CmdMessenger *cmdMesseger)
 
 void onRecvTargetData(CmdMessenger *cmdMesseger)
 {
-  targetDirection = cmdMesseger->readBinArg<float>();
+  targetDirection = cmdMesseger->readBinArg<double>();
 
   int x = cmdMesseger->readBinArg<int>();
   int y = cmdMesseger->readBinArg<int>();

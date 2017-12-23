@@ -5,18 +5,18 @@
 
 extern bool isRunning;
 
-extern float setPointZero;
+extern double setPointZero;
 
-extern float targetDirection, targetDistance;
+extern double targetDirection, targetDistance;
 
-extern float cameraServoPosition;
-extern float cameraServoKp, cameraServoKi, cameraServoKd;
+extern double cameraServoPosition;
+extern double cameraServoKp, cameraServoKi, cameraServoKd;
 
-extern float steeringServoPosition;
-extern float steeringServoKp, steeringServoKi, steeringServoKd;
+extern double steeringServoPosition;
+extern double steeringServoKp, steeringServoKi, steeringServoKd;
 
-extern float linearSpeed;
-extern float speedKp, speedKi, speedKd;
+extern double linearSpeed;
+extern double speedKp, speedKi, speedKd;
 
 extern Transform currentTransform;
 
