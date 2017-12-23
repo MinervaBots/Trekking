@@ -33,11 +33,12 @@
 #endif
 
 //#include "Stream.h"
+class CmdMessenger;
 
 extern "C"
 {
 	// callback functions always follow the signature: void cmd(void);
-	typedef void(*messengerCallbackFunction) (void);
+	typedef void(*messengerCallbackFunction) (CmdMessenger* cmdMessenger);
 }
 
 #define MAXCALLBACKS        50   // The maximum number of commands   (default: 50)
