@@ -96,7 +96,7 @@ def loop():
         if cv2.waitKey(1) == 27:
             isRunning = False
 
-        fps.update()
+    fps.update()
     print("FPS: {:.2f}".format(fps.fps()))
 
 setup()
