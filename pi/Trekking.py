@@ -5,11 +5,13 @@ import cv2
 import time
 import PyCmdMessenger
 import CommandMessenger
+from sys import platform as _platform
 
 isRunning = True
+isRaspberryPi = "linux" in _platform
 
 #Configurações da imagem
-showWindows = True
+showWindows = not isRaspberryPi
 windowName = "cameraFeed"
 frameWidth = 640
 frameHeight = 368
@@ -32,7 +34,7 @@ cmdMessenger = CommandMessenger.CommandMessenger(arduino, commands)
 fps = FPS()
 
 #Captura de video
-vs = VideoStream(usePiCamera=False, resolution=(frameWidth, frameHeight)).start()
+vs = VideoStream(usePiCamera = isRaspberryPi, resolution=(frameWidth, frameHeight)).start()
 
 #cascadeDetector = cv2.CascadeClassifier('/home//pi//Trekking//Code//Pi//Full//Python//haarCascade.xml')
 cascadeDetector = cv2.CascadeClassifier('haarCascades/face.xml')
