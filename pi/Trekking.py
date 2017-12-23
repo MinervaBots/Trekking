@@ -17,17 +17,24 @@ frameWidth = 640
 frameHeight = 368
 frameCenterX = frameWidth / 2.0
 
+def info(msg, recvTime):
+    print ("INFO: {}".format(msg))
+
 def error(msg, recvTime):
     print ("ERROR: {}".format(msg))
 
-def servoDirection(position, recvTime):
-    print(position)
+def mpuData(accX, accY, heading, recvTime):
+    print("{} {} {}".format(accX, accY, heading))
 
 #PyCmdMessage
-arduino = PyCmdMessenger.ArduinoBoard("COM3", baud_rate = 9600)
-commands = [["targetData", "fffff"],
-            ["servoDirection", "f", servoDirection],
-            ["error", "s", error]]
+baudRate = 9600
+port = "/dev/ttyACM0" if isRaspberryPi else "COM3"
+arduino = PyCmdMessenger.ArduinoBoard(port, baud_rate = baudRate)
+commands = [["info", "s", info],
+            ["error", "s", error],
+            ["mpuData", "fff", mpuData],
+            ["targetData", "fffff"]]
+
 cmdMessenger = CommandMessenger.CommandMessenger(arduino, commands)
 
 #Medida de performance
