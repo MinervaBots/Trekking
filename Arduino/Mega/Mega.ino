@@ -1,28 +1,26 @@
 #include <Servo.h>
 #include <PID_v1.h>
 #include <CmdMessenger.h>
+#include <RunningMedian.h>
 
 #include "Pins.h"
 #include "Variables.h"
 #include "Constants.h"
+#include "States.h"
 #include "CommandHandlers.h"
 
 
 Servo cameraServo, steeringServo, esc;
 
-
 PID cameraPid(&targetDirection, &cameraServoPosition, &setPointZero, cameraServoKp, cameraServoKi, cameraServoKd, P_ON_M, DIRECT);
 PID steeringPid(&targetDirection, &steeringServoPosition, &setPointZero, steeringServoKp, steeringServoKi, steeringServoKd, P_ON_M, DIRECT);
 PID speedPid(&targetDistance, &linearSpeed, &setPointZero, speedKp, speedKi, speedKd, P_ON_M, DIRECT);
-
 
 void attachHandlers();
 CmdMessenger rPiCmdMessenger = CmdMessenger(Serial,',',';','/');
 CmdMessenger mpuCmdMessenger = CmdMessenger(Serial1,',',';','/');
 
-
 unsigned long lastRun;
-void (*state)(unsigned long);
 
 
 void setup()
@@ -37,7 +35,14 @@ void setup()
   
   cameraPid.SetOutputLimits(0, CAMERA_SERVO_LIMIT);
   steeringPid.SetOutputLimits(0, STEERING_SERVO_LIMIT);
-  speedPid.SetOutputLimits(0, ESC_PID_LIMIT);
+  speedPid.SetOutputLimits(ESC_PID_LIMIT_MIN, ESC_PID_LIMIT_MAX);
+
+  targets.add(Vector2(40, 20));
+  targets.add(Vector2(30, 2));
+  targets.add(Vector2(6, 18));
+  currentTarget = &targets.get(0);
+
+  state = idle;
 }
 
 void loop()
@@ -45,14 +50,21 @@ void loop()
   rPiCmdMessenger.feedinSerialData();
   mpuCmdMessenger.feedinSerialData();
   
+  targetDirection = targetDirectionFiltered.getAverage();
+  targetDistance = targetDistanceFiltered.getAverage();
+
+  cameraPid.Compute();
+  steeringPid.Compute();
+  speedPid.Compute();
+  
   if(isRunning)
   {
     state(millis() - lastRun);
   }
-  
+
   cameraServo.write(cameraServoPosition);
   steeringServo.write(steeringServoPosition);
-  esc.write(linearSpeed);
+  esc.write(map(linearSpeed, -1, 1, 0, 180));
 
   lastRun = millis();
 }

@@ -24,10 +24,10 @@ void onRecvMpuData(CmdMessenger *cmdMesseger)
   velocityY += (1/2)*(accelerationY + prevAccelerationY) * deltaTimeInSeconds;
   prevAccelerationY = accelerationY;
   
-  currentTransform.x += (1/2)*(velocityX + prevVelocityX) * deltaTimeInSeconds;
+  currentTransform.position.x += (1/2)*(velocityX + prevVelocityX) * deltaTimeInSeconds;
   prevVelocityX = velocityX;
   
-  currentTransform.y += (1/2)*(velocityY + prevVelocityY) * deltaTimeInSeconds;
+  currentTransform.position.y += (1/2)*(velocityY + prevVelocityY) * deltaTimeInSeconds;
   prevVelocityY = velocityY;
 
   prevTime = millis();
@@ -36,13 +36,14 @@ void onRecvMpuData(CmdMessenger *cmdMesseger)
 void onRecvTargetData(CmdMessenger *cmdMesseger)
 {
   targetDirection = cmdMesseger->readBinArg<double>();
-
+  targetDirectionFiltered.add(targetDirection);
+  
   int x = cmdMesseger->readBinArg<int>();
   int y = cmdMesseger->readBinArg<int>();
   int w = cmdMesseger->readBinArg<int>();
   int h = cmdMesseger->readBinArg<int>();
 
-  targetDistance = (FOCAL_LENGHT * CONE_REAL_HEIGHT * IMAGE_PIXEL_HEIGHT) / (h * SENSOR_HEIGHT);
+  targetDirectionFiltered.add((FOCAL_LENGHT * CONE_REAL_HEIGHT * IMAGE_PIXEL_HEIGHT) / (h * SENSOR_HEIGHT));
   cmdMesseger->sendCmd(info, "Dados recebidos");
 }
 

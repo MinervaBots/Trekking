@@ -2,7 +2,9 @@
 #define STATES_H
 
 
-void follow();
+void idle(unsigned long lastRun);
+void search(unsigned long lastRun);
+void refinedSearch(unsigned long lastRun);
 
 
 #endif //STATES_H
