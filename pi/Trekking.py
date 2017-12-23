@@ -93,6 +93,6 @@ def loop():
             isRunning = False
 
         fps.update()
-        #print("FPS: {:.2f}".format(fps.fps()))
+        print("FPS: {:.2f}".format(fps.fps()))
 
 setup()
