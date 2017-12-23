@@ -12,7 +12,10 @@ isRaspberryPi = "linux" in _platform
 
 # Configurações da imagem
 # Habilita as janelas caso estejamos em desktop mode ou no Windows
-showWindows = "DISPLAY" in os.environ if isRaspberryPi else True
+if(isRaspberryPi):
+    showWindows = "DISPLAY" in os.environ
+else:
+    showWindows = True
 
 windowName = "cameraFeed"
 frameWidth = 640
