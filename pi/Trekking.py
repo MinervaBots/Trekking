@@ -4,13 +4,16 @@ from threading import Thread
 import cv2
 import PyCmdMessenger
 import CommandMessenger
+import os
 from sys import platform as _platform
 
 isRunning = True
 isRaspberryPi = "linux" in _platform
 
-#Configurações da imagem
-showWindows = not isRaspberryPi
+# Configurações da imagem
+# Habilita as janelas caso estejamos em desktop mode ou no Windows
+showWindows = "DISPLAY" in os.environ if isRaspberryPi else True
+
 windowName = "cameraFeed"
 frameWidth = 640
 frameHeight = 368
@@ -81,7 +84,8 @@ def loop():
     # Futuramente vou implementar um controle de cor
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     objects = cascadeDetector.detectMultiScale(gray, 1.3, 5)
-    if len(objects) > 0:
+    detected = len(objects) > 0
+    if detected:
         (x, y, w, h) = objects[0]
         objCenterX = x + w / 2.0
 
@@ -89,9 +93,10 @@ def loop():
         # do centro do objeto relativo ao centro da tela
         direction = (objCenterX - 0) * (1 - (-1)) / (frameWidth - 0) + (-1)
         cmdMessenger.send("targetData", direction, x, y, w, h)
-        cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
 
     if showWindows:
+        if detected:
+            cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
         cv2.imshow(windowName, frame)
         if cv2.waitKey(1) == 27:
             isRunning = False
