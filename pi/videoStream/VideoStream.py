@@ -2,6 +2,8 @@ import time
 
 class VideoStream:
     def __init__(self, src=0, usePiCamera=False, resolution=(320, 240), framerate=32):
+        self.width = resolution[0]
+        self.height = resolution[1]
         # check to see if the picamera module should be used
         if usePiCamera:
             # only import the picamera packages unless we are

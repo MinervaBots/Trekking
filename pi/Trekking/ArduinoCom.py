@@ -3,28 +3,32 @@ import PyCmdMessenger
 import queue
 import datetime
 
-class CommandMessenger(Thread):
+class ArduinoCom(Thread):
+    def __init__(self, port, baudRate, commands):
+        super(ArduinoCom, self).__init__()
 
-    def __init__(self, arduino, commands):
-        super(CommandMessenger, self).__init__()
+        self._arduino = PyCmdMessenger.ArduinoBoard(port, baud_rate = baudRate)
+        self._cmdMessenger = PyCmdMessenger.CmdMessenger(self._arduino, commands)
+        
         self._commands = list(commands)
-        self._cmdMessenger = PyCmdMessenger.CmdMessenger(arduino, commands)
-        self.sendQueue = queue.Queue()
+        self._sendQueue = queue.Queue()
         self.isRunning = True
 
-    def stop(self):
+    def close(self):
         self.isRunning = False
+        self._arduino.close()
+        #self._cmdMessenger.close()
         
     def run(self):
         while self.isRunning:
-            if not self.sendQueue.empty():
-                cmd = self.sendQueue.get()
+            if not self._sendQueue.empty():
+                cmd = self._sendQueue.get()
                 self._cmdMessenger.send(cmd[0], *cmd[1])
             msg = self._cmdMessenger.receive()
             self.handle(msg)
             
     def send(self, cmd, *args):
-        self.sendQueue.put([cmd, args])
+        self._sendQueue.put([cmd, args])
         
     def handle(self, msg):
         if msg is None:

@@ -2,7 +2,7 @@
 import datetime
  
 class FPS:
-    def __init__(self):
+    def __init__(self, debug):
         # store the start time, end time, and total number of frames
         # that were examined between the start and end intervals
         self._start = None
@@ -10,7 +10,8 @@ class FPS:
         self._last = None
         self._delta = None
         self._numFrames = 0
- 
+        self.debug = debug
+        
     def start(self):
         # start the timer
         self._start = datetime.datetime.now()
@@ -20,14 +21,19 @@ class FPS:
     def stop(self):
         # stop the timer
         self._end = datetime.datetime.now()
- 
+        if(self.debug):
+            print("[INFO] Tempo percorrido: {:.2f}".format(self.elapsed()))
+            print("[INFO] FPS médio: {:.2f}".format(self.meanFps()))
+     
     def update(self):
         # increment the total number of frames examined during the
         # start and end intervals
         self._numFrames += 1
         self._delta = datetime.datetime.now() - self._last
         self._last = datetime.datetime.now()
-
+        if(self.debug):
+            print("FPS: {:.2f}".format(self.fps()))
+        
     def deltaTime(self):
         return self._delta.total_seconds()
     
