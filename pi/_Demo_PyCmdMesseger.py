@@ -1,7 +1,7 @@
 # Exemplo em python para uso da biblioteca PyCmdMessager
 # A parte que roda no arduino se encontra em ../arduino/exemples/cmdMesseger
 import PyCmdMessenger
-import CommandMessager
+import CommandMessenger
 
 arduino = PyCmdMessenger.ArduinoBoard("COM3", baud_rate = 9600)
 
@@ -14,6 +14,7 @@ commands = [["targetData", "fiiii"],
             ["error", "s", error]]
 
 # Initialize the messenger
-cmdMessenger = CommandMessager.CommandMessager(arduino, commands).start()
+cmdMessenger = CommandMessenger.CommandMessenger(arduino, commands)
+cmdMessenger.start()
 
 cmdMessenger.send("targetData", 0.1, 100, 20, 30, 50)
