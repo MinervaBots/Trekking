@@ -30,7 +30,7 @@ void setup()
   
   cameraPid.SetOutputLimits(0, degrees(CAMERA_SERVO_LIMIT));
   steeringPid.SetOutputLimits(0, degrees(STEERING_SERVO_LIMIT));
-  speedPid.SetOutputLimits(ESC_PID_LIMIT_MIN, ESC_PID_LIMIT_MAX);
+  speedPid.SetOutputLimits(ESC_MAX_BACKWARD, ESC_MAX_FORWARD);
 
   targets.add(Vector2(40, 20));
   targets.add(Vector2(30, 2));
@@ -66,6 +66,8 @@ void loop()
   
   cameraServo.write(cameraServoPosition);
   steeringServo.write(steeringServoPosition);
+  
+  linearSpeed = constrain(linearSpeed, ESC_MAX_BACKWARD, ESC_MAX_FORWARD);
   esc.write(map(linearSpeed, -1, 1, 0, 180));
 
   lastRun = millis();

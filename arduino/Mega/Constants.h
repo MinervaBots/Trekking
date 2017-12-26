@@ -14,8 +14,9 @@
 
 #define CAMERA_SERVO_LIMIT      PI
 #define STEERING_SERVO_LIMIT    PI/2
-#define ESC_PID_LIMIT_MAX       1               // Apesar do ESC ser controlado como um servo, é mais fácil 
-#define ESC_PID_LIMIT_MIN       -1              // pensar as velocidades como valores entre [-1; 1]
+#define ESC_MAX_FORWARD         1               // Apesar do ESC ser controlado como um servo, é mais fácil 
+#define ESC_MAX_BACKWARD        -1              // pensar as velocidades como valores entre [-1; 1]
+#define ESC_ZERO                90
 
 #define ULTRASSONIC_MAX_DIST    300               
 #define ULTRASSONIC_TIMEOUT     CM_TO_MS(ULTRASSONIC_MAX_DIST)

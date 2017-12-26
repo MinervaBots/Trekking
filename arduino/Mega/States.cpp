@@ -56,7 +56,7 @@ void refinedSearch(unsigned long deltaTime)
       // Caso tenha um obstáculo detectato, mas não conseguimos calcular uma direção
       // Volta um pouco e tenta novamente
       targetDirection = 0;
-      linearSpeed = -1;
+      linearSpeed = ESC_MAX_BACKWARD;
     }
   }
 }
@@ -65,6 +65,7 @@ int targetCount = 0;
 void targetFound(unsigned long deltaTime)
 {
   targetCount++;
+  esc.write(ESC_ZERO);
 
   // Sinaliza
   delay(1000);
@@ -74,7 +75,7 @@ void targetFound(unsigned long deltaTime)
   // Idealmente isso vai colocar o robô mais ou menos na direção
   // do proximo objetivo
   steeringServo.write(0);
-  esc.write(0);
+  esc.write(ESC_MAX_BACKWARD);
   delay(1000);
 
 
