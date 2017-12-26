@@ -33,8 +33,8 @@ void setup()
   steeringServo.attach(STEERING_SERVO_PIN);
   esc.attach(ESC_PIN);
   
-  cameraPid.SetOutputLimits(0, CAMERA_SERVO_LIMIT);
-  steeringPid.SetOutputLimits(0, STEERING_SERVO_LIMIT);
+  cameraPid.SetOutputLimits(0, degrees(CAMERA_SERVO_LIMIT));
+  steeringPid.SetOutputLimits(0, degrees(STEERING_SERVO_LIMIT));
   speedPid.SetOutputLimits(ESC_PID_LIMIT_MIN, ESC_PID_LIMIT_MAX);
 
   targets.add(Vector2(40, 20));
