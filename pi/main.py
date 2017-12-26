@@ -24,7 +24,7 @@ def stop(message):
 isRaspberryPi = "linux" in _platform
 if(isRaspberryPi):
     arduinoPort = "/dev/ttyACM0"
-    bluetoothPort = "/dev/rfcomm1"
+    bluetoothPort = "/dev/rfcomm0"
     enableWindow = "DISPLAY" in os.environ
 else:
     arduinoPort = "COM3"
