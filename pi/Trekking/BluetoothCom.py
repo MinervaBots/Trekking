@@ -6,10 +6,16 @@ class BluetoothCom(Thread):
     def __init__(self, port, baudRate, timeout, handlers):
         super(BluetoothCom, self).__init__()
 
-        self.stream = Serial(port, baudrate=baudRate, timeout=timeout)
+        self.port = port
+        self.baudRate = baudRate
+        self.timeout = timeout
         self._sendQueue = Queue()
         self.handlers = handlers
         self.isRunning = True
+
+    def start(self):
+        self.stream = Serial(self.port, baudrate=self.baudRate, timeout=self.timeout)
+        super(BluetoothCom, self).start()
         
     def close(self):
         self.isRunning = False
