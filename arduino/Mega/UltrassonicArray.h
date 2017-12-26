@@ -14,7 +14,7 @@ public:
   void setLeft(unsigned char trigger, unsigned char echo, float weight);
   void setRight(unsigned char trigger, unsigned char echo, float weight);
   
-  float evaluate();
+  bool evaluate(float *value);
 
 private:
   struct SensorConfig

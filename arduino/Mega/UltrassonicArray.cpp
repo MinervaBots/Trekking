@@ -31,30 +31,38 @@ void UltrassonicArray::setRight(unsigned char trigger, unsigned char echo, float
   rightSensor_ = SensorConfig(trigger, echo, weight);
 }
 
-float UltrassonicArray::evaluate()
+bool UltrassonicArray::evaluate(float *value)
 {
-  float result = 0;
+  *value = 0;
+  bool result = false;
+ 
   if(evaluateSensor(rightSensor_) < ULTRASSONIC_MAX_DIST)
   {
-    result = rightSensor_.weight;
+    *value = rightSensor_.weight;
+    result = true;
   }
   else if(evaluateSensor(leftSensor_) < ULTRASSONIC_MAX_DIST)
   {
-    result = leftSensor_.weight;
+    *value = leftSensor_.weight;
+    result = true;
   }
 
   if(evaluateSensor(forwardSensor_) < ULTRASSONIC_MAX_DIST)
   {
-    result += forwardSensor_.weight;
+    *value += forwardSensor_.weight;
+    result = true;
   }
   if(evaluateSensor(forwardRightSensor_) < ULTRASSONIC_MAX_DIST)
   {
-    result += forwardRightSensor_.weight;
+    *value += forwardRightSensor_.weight;
+    result = true;
   }
   if(evaluateSensor(forwardLeftSensor_) < ULTRASSONIC_MAX_DIST)
   {
-    result += forwardRightSensor_.weight;
+    *value += forwardRightSensor_.weight;
+    result = true;
   }
+  
   return result;
 }
 

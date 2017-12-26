@@ -2,9 +2,9 @@
 #define STATES_H
 
 
-void idle(unsigned long lastRun);
-void search(unsigned long lastRun);
-void refinedSearch(unsigned long lastRun);
-void targetFound(unsigned long lastRun);
+void idle(unsigned long deltaTime);
+void search(unsigned long deltaTime);
+void refinedSearch(unsigned long deltaTime);
+void targetFound(unsigned long deltaTime);
 
 #endif //STATES_H

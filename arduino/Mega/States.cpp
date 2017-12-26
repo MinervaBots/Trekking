@@ -2,14 +2,14 @@
 #include "Variables.h"
 #include "Constants.h"
 
-void idle(unsigned long lastRun)
+void idle(unsigned long deltaTime)
 {
   linearSpeed = 0;
   steeringServoPosition = 0;
   cameraServoPosition = 0;
 }
 
-void search(unsigned long lastRun)
+void search(unsigned long deltaTime)
 {
   // Como sempre vamos começar muito longe dos objetivos
   // seria muito difícil a câmera detectar o cone.
@@ -32,21 +32,35 @@ void search(unsigned long lastRun)
   }
 }
 
-
-void refinedSearch(unsigned long lastRun)
+void refinedSearch(unsigned long deltaTime)
 {
   if(targetDistance < GOAL_THRESHOLD)
   {
     state = targetFound;
     return;
   }
-  float avoidMultiplyer = ultrassonicArray.evaluate();
-  targetDirection = STEERING_SERVO_LIMIT * avoidMultiplyer;
-  targetDirection = atan2(sin(targetDirection), cos(targetDirection));
+  
+  float avoidMultiplyer;
+  if(ultrassonicArray.evaluate(&avoidMultiplyer))
+  {
+    if(avoidMultiplyer != 0)
+    {
+      targetDirection = STEERING_SERVO_LIMIT * avoidMultiplyer;
+      targetDirection = atan2(sin(targetDirection), cos(targetDirection));
+    }
+    else
+    {
+      // Caso tenha um obstáculo detectato, mas não conseguimos calcular uma direção
+      // Volta um pouco e tenta novamente
+      targetDirection = 0;
+      linearSpeed = -1;
+    }
+  }
 }
 
 int targetCount = 0;
-void targetFound(unsigned long lastRun)
+unsigned long countDown = 1000;
+void targetFound(unsigned long deltaTime)
 {
   targetCount++;
   
@@ -59,15 +73,18 @@ void targetFound(unsigned long lastRun)
   // do proximo objetivo
   steeringServoPosition = 0;
   linearSpeed = -1;
-  delay(1000);
 
-  if(targetCount == targets.size())
+  if(countDown <= 0)
   {
-    state = idle;
-  }
-  else
-  {
-    state = search;
+    countDown = 1000;
+    if(targetCount == targets.size())
+    {
+      state = idle;
+    }
+    else
+    {
+      state = search;
+    }
   }
 }
 
