@@ -29,6 +29,7 @@ void search(unsigned long deltaTime)
   if (targetDistance < REFINED_SEARCH_DISTANCE)
   {
     state = refinedSearch;
+    rPiCmdMessenger.sendCmd(startDetection);
   }
 }
 
@@ -37,6 +38,7 @@ void refinedSearch(unsigned long deltaTime)
   if(targetDistance < GOAL_THRESHOLD)
   {
     state = targetFound;
+    rPiCmdMessenger.sendCmd(pauseDetection);
     return;
   }
   
