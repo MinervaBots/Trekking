@@ -39,46 +39,13 @@ void refinedSearch(unsigned long lastRun)
     state = targetFound;
     return;
   }
-
-  float obsDistX, obsDistY = 0;
-  float meanDirection;
-  for(int i = 0; i < ULTRASSONIC_COUNT; i++)
-  {
-    auto result = ultrassonicArray.evaluate(i);
-    if(result.distance > 10000)
-    {
-      // Nada foi detectado
-      continue;
-    }
-    obsDistX += result.distance * sin(result.direction);
-    obsDistY += result.distance * cos(result.direction);
-    meanDirection += result.direction;
-  }
-  obsDistX /= ULTRASSONIC_COUNT;
-  obsDistY /= ULTRASSONIC_COUNT;
-  meanDirection /= ULTRASSONIC_COUNT;
-  meanDirection = atan2(sin(meanDirection), cos(meanDirection));
-  
-  // Se o obstáculo não estiver na direção que estamos indo ignora
-  if(abs(meanDirection - targetDirection) > PI/4)
-  {
-    return;
-  }
-
-  if(meanDirection > 0)
-  {
-    targetDirection -= PI/2;
-  }
-  else
-  {
-    targetDirection += PI/2;
-  }
-    
+  float avoidMultiplyer = ultrassonicArray.evaluate();
+  targetDirection = targetDirection * avoidMultiplyer;
   targetDirection = atan2(sin(targetDirection), cos(targetDirection));
 }
 
 int targetCount = 0;
-void targetFound()
+void targetFound(unsigned long lastRun)
 {
   targetCount++;
   

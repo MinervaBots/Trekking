@@ -43,11 +43,11 @@ void setup()
   currentTarget = &targets.get(0);
 
   // Pinagem de placeholder
-  ultrassonicArray.add(-PI/2, 11, 11);
-  ultrassonicArray.add(-PI/4, 11, 11);
-  ultrassonicArray.add(    0, 11, 11);
-  ultrassonicArray.add(+PI/4, 11, 11);
-  ultrassonicArray.add(+PI/2, 11, 11);
+  ultrassonicArray.setForward(11, 11, 1);
+  ultrassonicArray.setForwardLeft(11, 11, 0.5);
+  ultrassonicArray.setForwardRight(11, 11, -0.5);
+  ultrassonicArray.setLeft(11, 11, 0.25);
+  ultrassonicArray.setRight(11, 11, -0.25);
   
   state = idle;
 }

@@ -17,8 +17,8 @@
 #define ESC_PID_LIMIT_MAX       1               // Apesar do ESC ser controlado como um servo, é mais fácil 
 #define ESC_PID_LIMIT_MIN       -1              // pensar as velocidades como valores entre [-1; 1]
 
-#define ULTRASSONIC_COUNT       5               // Número de sensores de ultrassom usados
-#define ULTRASSONIC_TIMEOUT     CM_TO_MS(300)   // Número de sensores de ultrassom usados
+#define ULTRASSONIC_MAX_DIST    300               
+#define ULTRASSONIC_TIMEOUT     CM_TO_MS(ULTRASSONIC_MAX_DIST)
 
 #define REFINED_SEARCH_DISTANCE 7.0             // Quanto maior a distância de confiança conseguirmos com a câmera melhor
                                                 // Precisa ser maior que 5 pra já estar em refinedSearch quando chegar perto dos obstáculos

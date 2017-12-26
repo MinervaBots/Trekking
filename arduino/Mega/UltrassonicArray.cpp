@@ -1,58 +1,59 @@
 #include "UltrassonicArray.h"
 #include "Macros.h"
 
-UltrassonicArray::UltrassonicArray() : sensorCount_(0)
+UltrassonicArray::UltrassonicArray()
 {
-  
+
 }
 
-bool UltrassonicArray::add(float direction, unsigned char trigger, unsigned char echo)
+void UltrassonicArray::setForward(unsigned char trigger, unsigned char echo, float weight)
 {
-  if(sensorCount_ == ULTRASSONIC_COUNT)
-  {
-    return false;
-  }
-  sensors_[sensorCount_] = SensorConfig(trigger, echo, direction);
-  sensorCount_++;
-  return true;
+  forwardSensor_ = SensorConfig(trigger, echo, weight);
 }
 
-SensorResult UltrassonicArray::evaluate(int sensorId)
+void UltrassonicArray::setForwardLeft(unsigned char trigger, unsigned char echo, float weight)
 {
-  //assert(sensorId < sensorCount_);
-  
-  SensorResult result;
-  
-  if(sensorId >= sensorCount_)
-  {
-    result.distance = 160000;
-    result.direction = 160000;
-  }
-  else
-  {
-    auto sensor = sensors_[sensorId];
+  forwardLeftSensor_ = SensorConfig(trigger, echo, weight);
+}
 
-    // Na versão de 2018.1 isso será substituido por um
-    // sistema usando interrupções.
-    //
-    // Isso vai retirar todo esse delay entre o trigger
-    // e receber o echo.
-    result.direction = sensor.direction;
-    digitalWrite(sensor.trigger, LOW);
-    delayMicroseconds(2);
-    digitalWrite(sensor.trigger, HIGH);
-    delayMicroseconds(10);
-    digitalWrite(sensor.trigger, LOW);
-    
-    long duration = pulseIn(sensor.echo, HIGH, ULTRASSONIC_TIMEOUT);
-    if (duration == 0)
-    {
-      result.distance = 160000;
-    }
-    else
-    {
-      result.distance = MS_TO_CM(duration);
-    }
+void UltrassonicArray::setForwardRight(unsigned char trigger, unsigned char echo, float weight)
+{
+  forwardRightSensor_ = SensorConfig(trigger, echo, weight);
+}
+
+void UltrassonicArray::setLeft(unsigned char trigger, unsigned char echo, float weight)
+{
+  leftSensor_ = SensorConfig(trigger, echo, weight);
+}
+
+void UltrassonicArray::setRight(unsigned char trigger, unsigned char echo, float weight)
+{
+  rightSensor_ = SensorConfig(trigger, echo, weight);
+}
+
+float UltrassonicArray::evaluate()
+{
+  float result = 0;
+  if(evaluateSensor(rightSensor_) < ULTRASSONIC_MAX_DIST)
+  {
+    result = rightSensor_.weight;
+  }
+  else if(evaluateSensor(leftSensor_) < ULTRASSONIC_MAX_DIST)
+  {
+    result = leftSensor_.weight;
+  }
+
+  if(evaluateSensor(forwardSensor_) < ULTRASSONIC_MAX_DIST)
+  {
+    result += forwardSensor_.weight;
+  }
+  if(evaluateSensor(forwardRightSensor_) < ULTRASSONIC_MAX_DIST)
+  {
+    result += forwardRightSensor_.weight;
+  }
+  if(evaluateSensor(forwardLeftSensor_) < ULTRASSONIC_MAX_DIST)
+  {
+    result += forwardRightSensor_.weight;
   }
   return result;
 }
