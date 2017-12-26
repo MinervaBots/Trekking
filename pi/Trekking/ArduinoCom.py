@@ -7,7 +7,7 @@ class ArduinoCom(Thread):
     def __init__(self, port, baudRate, commands):
         super(ArduinoCom, self).__init__()
 
-        self._arduino = PyCmdMessenger.ArduinoBoard(port, baud_rate = baudRate)
+        self._arduino = PyCmdMessenger.ArduinoBoard(port, baud_rate = baudRate, settle_time = 0.5)
         self._cmdMessenger = PyCmdMessenger.CmdMessenger(self._arduino, commands)
         
         self._commands = list(commands)
