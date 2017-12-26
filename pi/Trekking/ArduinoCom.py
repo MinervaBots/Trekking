@@ -16,8 +16,6 @@ class ArduinoCom(Thread):
 
     def close(self):
         self.isRunning = False
-        self._arduino.close()
-        #self._cmdMessenger.close()
         
     def run(self):
         while self.isRunning:
@@ -26,6 +24,9 @@ class ArduinoCom(Thread):
                 self._cmdMessenger.send(cmd[0], *cmd[1])
             msg = self._cmdMessenger.receive()
             self.handle(msg)
+        
+        self._arduino.close()
+        #self._cmdMessenger.close()
             
     def send(self, cmd, *args):
         self._sendQueue.put([cmd, args])

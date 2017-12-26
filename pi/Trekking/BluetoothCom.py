@@ -9,16 +9,17 @@ class BluetoothCom(Thread):
         self.stream = Serial(port, baudrate=baudRate, timeout=timeout)
         self._sendQueue = Queue()
         self.handlers = handlers
-
+        self.isRunning = True
+        
     def close(self):
-        self.stream.close()
+        self.isRunning = False
         
     def send(self, *msg):
         msgAsStr = "/".join(msg)
         self._sendQueue.put(msgAsStr+"\r\n")
 
     def run(self):
-        while self.stream.is_open:
+        while self.isRunning:
             if not self._sendQueue.empty():
                 cmd = self._sendQueue.get()
                 self.stream.write(cmd.encode())
@@ -36,3 +37,4 @@ class BluetoothCom(Thread):
                 self.handlers[opCode](cmd)
             else:
                 self.send("error", "Handler invalido")
+        self.stream.close()
