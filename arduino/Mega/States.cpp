@@ -32,6 +32,7 @@ void search(unsigned long lastRun)
   }
 }
 
+
 void refinedSearch(unsigned long lastRun)
 {
   if(targetDistance < GOAL_THRESHOLD)
@@ -40,7 +41,7 @@ void refinedSearch(unsigned long lastRun)
     return;
   }
   float avoidMultiplyer = ultrassonicArray.evaluate();
-  targetDirection = targetDirection * avoidMultiplyer;
+  targetDirection = STEERING_SERVO_LIMIT * avoidMultiplyer;
   targetDirection = atan2(sin(targetDirection), cos(targetDirection));
 }
 
