@@ -12,6 +12,7 @@ import cv2
 import os
 from sys import platform as _platform
 
+
 isRunning = False
 def start(message):
     global isRunning
@@ -61,7 +62,7 @@ def setup():
     video.start()
     arduino.start()
     fps.start()
-    
+
     while isRunning:
         try:
             loop()
@@ -82,7 +83,8 @@ def loop():
         print(u'Não foi possível recuperar um frame da câmera')
         return None
 
-    objects = detection.detect(frame)
+    #objects = detection.detect(frame, (5, 50, 50), (65, 255, 255))
+    objects = detection.detect(frame, (0, 0, 0), (360, 255, 255))
     detected = len(objects) > 0
     if detected:
         (x, y, w, h) = objects[0]
