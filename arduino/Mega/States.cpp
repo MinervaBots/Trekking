@@ -36,17 +36,17 @@ void search(unsigned long deltaTime)
 
 void refinedSearch(unsigned long deltaTime)
 {
-  if(targetDistance < GOAL_THRESHOLD)
+  if (targetDistance < GOAL_THRESHOLD)
   {
     state = targetFound;
     rPiCmdMessenger.sendCmd(pauseDetection);
     return;
   }
-  
+
   float avoidMultiplyer;
-  if(ultrassonicArray.evaluate(&avoidMultiplyer))
+  if (ultrassonicArray.evaluate(&avoidMultiplyer))
   {
-    if(avoidMultiplyer != 0)
+    if (avoidMultiplyer != 0)
     {
       targetDirection = STEERING_SERVO_LIMIT * avoidMultiplyer;
       targetDirection = atan2(sin(targetDirection), cos(targetDirection));
@@ -62,11 +62,10 @@ void refinedSearch(unsigned long deltaTime)
 }
 
 int targetCount = 0;
-unsigned long countDown = 1000;
 void targetFound(unsigned long deltaTime)
 {
   targetCount++;
-  
+
   // Sinaliza
   delay(1000);
   // Desliga o sinal
@@ -74,20 +73,19 @@ void targetFound(unsigned long deltaTime)
   // Vira a direção totalmente para a esquerda anda de ré.
   // Idealmente isso vai colocar o robô mais ou menos na direção
   // do proximo objetivo
-  steeringServoPosition = 0;
-  linearSpeed = -1;
+  steeringServo.write(0);
+  esc.write(0);
+  delay(1000);
 
-  if(countDown <= 0)
+
+  if (targetCount == targets.size())
   {
-    countDown = 1000;
-    if(targetCount == targets.size())
-    {
-      state = idle;
-    }
-    else
-    {
-      state = search;
-    }
+    state = idle;
   }
+  else
+  {
+    state = search;
+  }
+
 }
 
