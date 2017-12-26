@@ -9,6 +9,8 @@ enum
   error,
   mpuData,
   targetData,
+  startDetection,
+  pauseDetection
 };
 
 void onRecvMpuData(CmdMessenger *cmdMesseger);

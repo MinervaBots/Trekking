@@ -37,5 +37,5 @@ class ArduinoCom(Thread):
         for command in self._commands:
             if command[0] == msg[0]:
                 args = msg[1:]
-                command[2](*args)
+                command[2](*args[:-1])
                 return
