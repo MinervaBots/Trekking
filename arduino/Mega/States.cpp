@@ -1,6 +1,7 @@
 #include "States.h"
 #include "Variables.h"
 #include "Constants.h"
+#include "CommandHandlers.h"
 
 void idle(unsigned long deltaTime)
 {

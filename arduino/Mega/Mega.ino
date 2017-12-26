@@ -1,7 +1,5 @@
 #include <Servo.h>
 #include <PID_v1.h>
-#include <CmdMessenger.h>
-#include <RunningMedian.h>
 
 #include "Pins.h"
 #include "Variables.h"
@@ -9,7 +7,6 @@
 #include "States.h"
 #include "CommandHandlers.h"
 
-Servo cameraServo, steeringServo, esc;
 
 
 PID cameraPid(&targetDirection, &cameraServoPosition, &setPointZero, cameraServoKp, cameraServoKi, cameraServoKd, P_ON_M, DIRECT);
@@ -17,8 +14,6 @@ PID steeringPid(&targetDirection, &steeringServoPosition, &setPointZero, steerin
 PID speedPid(&targetDistance, &linearSpeed, &setPointZero, speedKp, speedKi, speedKd, P_ON_M, DIRECT);
 
 void attachHandlers();
-CmdMessenger rPiCmdMessenger = CmdMessenger(Serial,',',';','/');
-CmdMessenger mpuCmdMessenger = CmdMessenger(Serial1,',',';','/');
 
 unsigned long lastRun;
 

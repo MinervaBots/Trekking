@@ -1,7 +1,14 @@
 #include "Variables.h"
 
+#include <Arduino.h>
+
 bool isRunning = false;
 void (*state)(unsigned long);
+
+Servo cameraServo, steeringServo, esc;
+
+CmdMessenger rPiCmdMessenger = CmdMessenger(Serial,',',';','/');
+CmdMessenger mpuCmdMessenger = CmdMessenger(Serial1,',',';','/');
 
 double setPointZero = 0;
 

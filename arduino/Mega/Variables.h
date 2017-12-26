@@ -3,12 +3,17 @@
 
 #include <RunningMedian.h>
 #include <LinkedList.h>
+#include <CmdMessenger.h>
+#include <Servo.h>
 
 #include "Transform.h"
 #include "UltrassonicArray.h"
 
 extern bool isRunning;
 extern void (*state)(unsigned long);
+
+extern Servo cameraServo, steeringServo, esc;
+extern CmdMessenger rPiCmdMessenger, mpuCmdMessenger;
 
 extern double setPointZero;
 
