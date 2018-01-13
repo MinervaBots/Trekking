@@ -23,6 +23,11 @@ struct Vector2
   {
     return sqrt(pow(this->x - x, 2) + pow(this->y - y, 2));
   }
+
+  float magnitude()
+  {
+    return sqrt(pow(this->x, 2) + pow(this->y, 2));
+  }
 };
 
 struct Transform

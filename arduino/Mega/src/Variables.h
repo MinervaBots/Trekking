@@ -29,6 +29,7 @@ extern double steeringServoKp, steeringServoKi, steeringServoKd;
 extern double linearSpeed;
 extern double speedKp, speedKi, speedKd;
 
+extern Vector2 currentVelocity;
 extern Transform currentTransform;
 extern LinkedList<Vector2> targets;
 extern Vector2* currentTarget;

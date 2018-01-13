@@ -3,6 +3,7 @@
 
 #include "Macros.h"
 
+#define DISTANCE_BETWEEN_AXES   0.35            // Distância entre os eixo dianteiro e traseiro (eixos das rodas) em metros
 
 #define RPI_BAUD_RATE           9600
 #define MPU_BAUD_RATE           9600

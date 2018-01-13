@@ -25,6 +25,7 @@ double steeringServoKp = 1, steeringServoKi = 0, steeringServoKd = 2;
 double linearSpeed;
 double speedKp = 2, speedKi = 0.4, speedKd = 1;
 
+Vector2 currentVelocity;
 Transform currentTransform(3, 3, 0);
 
 LinkedList<Vector2> targets;

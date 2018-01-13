@@ -1,3 +1,4 @@
+
 #include <Servo.h>
 #include <PID_v1.h>
 
@@ -6,8 +7,6 @@
 #include "Constants.h"
 #include "States.h"
 #include "CommandHandlers.h"
-
-
 
 PID cameraPid(&targetDirection, &cameraServoPosition, &setPointZero, cameraServoKp, cameraServoKi, cameraServoKd, P_ON_M, DIRECT);
 PID steeringPid(&targetDirection, &steeringServoPosition, &setPointZero, steeringServoKp, steeringServoKi, steeringServoKd, P_ON_M, DIRECT);
@@ -27,7 +26,7 @@ void setup()
   cameraServo.attach(CAMERA_SERVO_PIN);
   steeringServo.attach(STEERING_SERVO_PIN);
   esc.attach(ESC_PIN);
-  
+
   cameraPid.SetOutputLimits(0, degrees(CAMERA_SERVO_LIMIT));
   steeringPid.SetOutputLimits(0, degrees(STEERING_SERVO_LIMIT));
   speedPid.SetOutputLimits(ESC_MAX_BACKWARD, ESC_MAX_FORWARD);
