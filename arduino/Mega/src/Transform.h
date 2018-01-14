@@ -1,7 +1,7 @@
 #ifndef TRANSFORM_H
 #define TRANSFORM_H
 
-#include <Arduino.h>
+#include "Macros.h"
 
 struct Vector2
 {
@@ -21,12 +21,12 @@ struct Vector2
 
   float distance(float x, float y)
   {
-    return sqrt(pow(this->x - x, 2) + pow(this->y - y, 2));
+    return MODULE(this->x - x, this->y - y);
   }
 
   float magnitude()
   {
-    return sqrt(pow(this->x, 2) + pow(this->y, 2));
+    return MODULE(this->x, this->y);
   }
 };
 

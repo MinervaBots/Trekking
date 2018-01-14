@@ -2,6 +2,7 @@
 #include "Variables.h"
 #include "Constants.h"
 #include "CommandHandlers.h"
+#include "Macros.h"
 
 void idle(unsigned long deltaTime)
 {
@@ -20,10 +21,10 @@ void search(unsigned long deltaTime)
   // Pra isso precisamos sobreescrever os valores que estamos
   // recebendo do Raspberry Pi via porta serial.
   targetDistance = currentTransform.position.distance(currentTarget->x, currentTarget->y);
-  targetDirection = atan((currentTarget->y - currentTransform.position.y) / (currentTarget->x - currentTransform.position.x));
+  targetDirection = DIRECTION((*currentTarget), currentTransform.position);
 
   // Usa atan2 para obter valores sempre entre [-π ; +π] radianos.
-  targetDirection = atan2(sin(targetDirection), cos(targetDirection));
+  targetDirection = CORRECT_DIRECTION(targetDirection);
 
   // Quando estivermos suficientemente próximos (REFINED_SEARCH_DISTANCE)
   // troca pra o estado refinedSearch.
@@ -49,11 +50,11 @@ void refinedSearch(unsigned long deltaTime)
     if (avoidMultiplyer != 0)
     {
       targetDirection = STEERING_SERVO_LIMIT * avoidMultiplyer;
-      targetDirection = atan2(sin(targetDirection), cos(targetDirection));
+      targetDirection = CORRECT_DIRECTION(targetDirection);
     }
     else
     {
-      // Caso tenha um obstáculo detectato, mas não conseguimos calcular uma direção
+      // Caso tenha um obstáculo detectado, mas não conseguimos calcular uma direção
       // Volta um pouco e tenta novamente
       targetDirection = 0;
       linearSpeed = ESC_MAX_BACKWARD;
@@ -87,6 +88,5 @@ void targetFound(unsigned long deltaTime)
   {
     state = search;
   }
-
 }
 

@@ -3,8 +3,8 @@
 #include "Constants.h"
 
 unsigned long prevTime = millis(); // Tempo da última leitura
-float prevAccelerationX, prevAccelerationY;
-float prevVelocityX, prevVelocityY;
+Vector2 prevAcceleration;
+Vector2 prevVelocity;
 
 void onRecvMpuData(CmdMessenger *cmdMesseger)
 {
@@ -16,8 +16,8 @@ void onRecvMpuData(CmdMessenger *cmdMesseger)
   unsigned long deltaTimeInSeconds = (millis() - prevTime) / 1000; // 1000 adicionado para obter as mesmas unidades
   
   // Integra por trapézios a aceleração para ober a velocidade em cada eixo
-  currentVelocity.x += (1/2)*(accelerationX + prevAccelerationX) * deltaTimeInSeconds;
-  currentVelocity.y += (1/2)*(accelerationY + prevAccelerationY) * deltaTimeInSeconds;
+  currentVelocity.x += INTEGRATION_TERM(prevAcceleration.x, accelerationX, deltaTimeInSeconds);
+  currentVelocity.y += INTEGRATION_TERM(prevAcceleration.y, accelerationY, deltaTimeInSeconds);
 
   float xVar, yVar, newHeading = 0;
 
@@ -30,8 +30,8 @@ void onRecvMpuData(CmdMessenger *cmdMesseger)
 #else
   // Calcula a variação de posição usando a integração da velocidade
   // Futuramente todos esses calculos devem ser movidos para o MPU
-  xVar = (1/2)*(currentVelocity.x + prevVelocityX) * deltaTimeInSeconds * cos(heading);
-  yVar = (1/2)*(currentVelocity.y + prevVelocityY) * deltaTimeInSeconds * cos(heading);
+  xVar = INTEGRATION_TERM(currentVelocity.x, prevVelocity.x, deltaTimeInSeconds) * cos(heading);
+  yVar = INTEGRATION_TERM(currentVelocity.y, prevVelocity.y, deltaTimeInSeconds) * cos(heading);
   newHeading = heading;
 #endif
 
@@ -41,12 +41,12 @@ void onRecvMpuData(CmdMessenger *cmdMesseger)
   currentTransform.heading = newHeading;
 
   // Salva os ultimos valores de aceleração
-  prevAccelerationX = accelerationX;
-  prevAccelerationY = accelerationY;
+  prevAcceleration.x = accelerationX;
+  prevAcceleration.y = accelerationY;
 
   // Salva os ultimos valores de velocidade
-  prevVelocityX = currentVelocity.x;
-  prevVelocityY = currentVelocity.y;
+  prevVelocity.x = currentVelocity.x;
+  prevVelocity.y = currentVelocity.y;
 
   // Salva o tempo da ultima execução para usar na integração
   prevTime = millis();
@@ -57,9 +57,9 @@ void onRecvTargetData(CmdMessenger *cmdMesseger)
   targetDirection = cmdMesseger->readBinArg<double>();
   targetDirectionFiltered.add(targetDirection);
   
-  int x = cmdMesseger->readBinArg<int>();
-  int y = cmdMesseger->readBinArg<int>();
-  int w = cmdMesseger->readBinArg<int>();
+  //int x = cmdMesseger->readBinArg<int>();
+  //int y = cmdMesseger->readBinArg<int>();
+  //int w = cmdMesseger->readBinArg<int>();
   int h = cmdMesseger->readBinArg<int>();
 
   targetDirectionFiltered.add((FOCAL_LENGHT * CONE_REAL_HEIGHT * IMAGE_PIXEL_HEIGHT) / (h * SENSOR_HEIGHT));

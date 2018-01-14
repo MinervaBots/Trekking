@@ -3,7 +3,6 @@
 
 UltrassonicArray::UltrassonicArray()
 {
-
 }
 
 void UltrassonicArray::setForward(unsigned char triggerPin, unsigned char echo, float weight)
@@ -69,10 +68,10 @@ bool UltrassonicArray::evaluate(float *value)
 float UltrassonicArray::evaluateSensor(SensorConfig sensor)
 {
   sensor.trigger();
-  int duration = pulseIn(sensor.echoPin, HIGH);
+  int duration = pulseIn(sensor.echoPin, HIGH, CM_TO_MS(200) * 1000);
   if (duration == 0)
   {
 	  return ULTRASSONIC_MAX_DIST;
   }
-  return duration / 29.4 / 2;
+  return MS_TO_CM(duration);
 }
