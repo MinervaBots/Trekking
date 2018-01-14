@@ -43,7 +43,6 @@ else:
     bluetoothPort = "COM4"
     enableWindow = True
 
-
 arduinoCommands = [["info", "s", ArduinoCommands.info],
             ["error", "s", ArduinoCommands.error],
             ["mpuData", "fff", ArduinoCommands.mpuData],
@@ -57,7 +56,7 @@ arduino = ArduinoCom(arduinoPort, 9600, arduinoCommands)
 bluetooth = BluetoothCom(bluetoothPort, 9600, 0.1, bluetoothHandlers)
 
 window = DebugWindow(enableWindow, "debug", 640, 368)
-detection = Detection("haarCascades/face.xml", True, (255, 0, 0), 1.3, 5, 0)
+detection = Detection("cascades/face.xml", True, (255, 0, 0), 1.3, 5, 0)
 
 #Medida de performance
 fps = FPS(True)
