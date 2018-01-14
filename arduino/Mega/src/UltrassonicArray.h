@@ -8,33 +8,42 @@ class UltrassonicArray
 {
 public:
   UltrassonicArray();
-  void setForward(unsigned char trigger, unsigned char echo, float weight);
-  void setForwardLeft(unsigned char trigger, unsigned char echo, float weight);
-  void setForwardRight(unsigned char trigger, unsigned char echo, float weight);
-  void setLeft(unsigned char trigger, unsigned char echo, float weight);
-  void setRight(unsigned char trigger, unsigned char echo, float weight);
+  void setForward(unsigned char triggerPin, unsigned char echoPin, float weight);
+  void setForwardLeft(unsigned char triggerPin, unsigned char echoPin, float weight);
+  void setForwardRight(unsigned char triggerPin, unsigned char echoPin, float weight);
+  void setLeft(unsigned char triggerPin, unsigned char echoPin, float weight);
+  void setRight(unsigned char triggerPin, unsigned char echoPin, float weight);
   
   bool evaluate(float *value);
 
 private:
   struct SensorConfig
   {
-    unsigned char trigger, echo;
+    unsigned char triggerPin, echoPin;
     float weight;
     
-    SensorConfig(unsigned char trigger, unsigned char echo, float weight)
+    SensorConfig(unsigned char triggerPin, unsigned char echoPin, float weight)
     {
-      this->trigger = trigger;
-      this->echo = echo;
+      this->triggerPin = triggerPin;
+      this->echoPin = echoPin;
       this->weight = weight;
   
-      pinMode(trigger, OUTPUT);
-      pinMode(echo, INPUT);
+      pinMode(triggerPin, OUTPUT);
+      pinMode(echoPin, INPUT);
     }
     
     SensorConfig()
     {
       
+    }
+
+    void trigger()
+    {
+      digitalWrite(triggerPin, LOW);
+      delayMicroseconds(2);
+      digitalWrite(triggerPin, HIGH);
+      delayMicroseconds(10);
+      digitalWrite(triggerPin, LOW);
     }
   };
 

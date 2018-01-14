@@ -6,29 +6,29 @@ UltrassonicArray::UltrassonicArray()
 
 }
 
-void UltrassonicArray::setForward(unsigned char trigger, unsigned char echo, float weight)
+void UltrassonicArray::setForward(unsigned char triggerPin, unsigned char echo, float weight)
 {
-  forwardSensor_ = SensorConfig(trigger, echo, weight);
+  forwardSensor_ = SensorConfig(triggerPin, echo, weight);
 }
 
-void UltrassonicArray::setForwardLeft(unsigned char trigger, unsigned char echo, float weight)
+void UltrassonicArray::setForwardLeft(unsigned char triggerPin, unsigned char echo, float weight)
 {
-  forwardLeftSensor_ = SensorConfig(trigger, echo, weight);
+  forwardLeftSensor_ = SensorConfig(triggerPin, echo, weight);
 }
 
-void UltrassonicArray::setForwardRight(unsigned char trigger, unsigned char echo, float weight)
+void UltrassonicArray::setForwardRight(unsigned char triggerPin, unsigned char echo, float weight)
 {
-  forwardRightSensor_ = SensorConfig(trigger, echo, weight);
+  forwardRightSensor_ = SensorConfig(triggerPin, echo, weight);
 }
 
-void UltrassonicArray::setLeft(unsigned char trigger, unsigned char echo, float weight)
+void UltrassonicArray::setLeft(unsigned char triggerPin, unsigned char echo, float weight)
 {
-  leftSensor_ = SensorConfig(trigger, echo, weight);
+  leftSensor_ = SensorConfig(triggerPin, echo, weight);
 }
 
-void UltrassonicArray::setRight(unsigned char trigger, unsigned char echo, float weight)
+void UltrassonicArray::setRight(unsigned char triggerPin, unsigned char echo, float weight)
 {
-  rightSensor_ = SensorConfig(trigger, echo, weight);
+  rightSensor_ = SensorConfig(triggerPin, echo, weight);
 }
 
 bool UltrassonicArray::evaluate(float *value)
@@ -66,3 +66,13 @@ bool UltrassonicArray::evaluate(float *value)
   return result;
 }
 
+float UltrassonicArray::evaluateSensor(SensorConfig sensor)
+{
+  sensor.trigger();
+  int duration = pulseIn(sensor.echoPin, HIGH);
+  if (duration == 0)
+  {
+	  return ULTRASSONIC_MAX_DIST;
+  }
+  return duration / 29.4 / 2;
+}
