@@ -1,8 +1,8 @@
 from utils.FPS import FPS
+from utils.DebugWindow import *
 from videoStream.VideoStream import VideoStream
 from Trekking.ArduinoCom import *
 from Trekking.BluetoothCom import *
-from Trekking.DebugWindow import *
 from Trekking.Detection import *
 from Trekking.Tracker import *
 
@@ -102,43 +102,35 @@ def loop():
         return None
 
     if(isRunningDetection):
+        if detected:
+            (detected, boundingBox) = tracker.update(frame)
 
-        if not detected:
+            if detected:
+                boundingBox = tuple(map(lambda a: int(a), boundingBox))
+                p1 = boundingBox[0], boundingBox[1]
+                p2 = boundingBox[0] + boundingBox[2], boundingBox[1] + boundingBox[3]
+                window.rectangle(frame, p1, p2, (255,0,0), 2, 1)
+            else:
+                window.putTextError(frame, "Tracking failure detected", (20,80), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
+            window.putTextInfo(frame, tracker.methodName + " Tracker: " + str(boundingBox), (20,20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
+      
+        else:
             #objects = detection.detect(frame, (5, 50, 50), (65, 255, 255))
             objects = detection.detect(frame, (0, 0, 0), (360, 255, 255))
             detected = len(objects) > 0
             if detected:
                 tracker.clear()
                 detected = tracker.init(frame, tuple(objects[0]))
-                print(detected)
                 
-            # Display tracker type on frame
             cv2.putText(frame, "Trying detect...", (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 255), 2)
-        else:
-            (detected, boundingBox) = tracker.update(frame)
 
-            if detected:
-                # Tracking success
-                boundingBox = tuple(map(lambda a: int(a), boundingBox))
-                p1 = boundingBox[0], boundingBox[1]
-                p2 = boundingBox[0] + boundingBox[2], boundingBox[1] + boundingBox[3]
-                cv2.rectangle(frame, p1, p2, (255,0,0), 2, 1)
-            else:
-                # Tracking failure
-                cv2.putText(frame, "Tracking failure detected", (20,80), cv2.FONT_HERSHEY_SIMPLEX, 0.75,(0,0,255),2)
-                
-            
-            # Display tracker type on frame
-            cv2.putText(frame, tracker.methodName + " Tracker: " + str(boundingBox), (20,20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (50,170,50),2)
-      
         objCenterX = boundingBox[0] + (boundingBox[2] / 2.0)
-
         # Faz uma interpolação para calcular a direção
         # do centro do objeto relativo ao centro da tela
         direction = (objCenterX - 0) * (1 - (-1)) / (video.width - 0) + (-1)
         #arduino.send("targetData", direction, *boundingBox)
-    # Display FPS on frame
-    cv2.putText(frame, "FPS : " + str(int(fps.fps())), (20,50), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (50,170,50), 2)
+
+    window.putTextInfo(frame, "FPS : " + str(int(fps.fps())), (20,50), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
     window.update(frame)
    
 setup()

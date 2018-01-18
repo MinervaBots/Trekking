@@ -1,8 +1,8 @@
 from utils.FPS import FPS
+from utils.DebugWindow import *
 from videoStream.VideoStream import VideoStream
 from Trekking.ArduinoCom import *
 from Trekking.BluetoothCom import *
-from Trekking.DebugWindow import *
 from Trekking.Detection import *
 
 import Trekking.ArduinoCommands as ArduinoCommands
@@ -111,15 +111,14 @@ def loop():
             boundingBox = tuple(map(lambda a: int(a), boundingBox))
             p1 = boundingBox[0], boundingBox[1]
             p2 = boundingBox[0] + boundingBox[2], boundingBox[1] + boundingBox[3]
-                
-            cv2.rectangle(frame, p1, p2, (255,0,0), 2, 1)
-
-            cv2.putText(frame, "Cascade Detection: " + str(boundingBox), (20,20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (50,170,50),2)
+               
+            window.rectangle(frame, p1, p2, (255,0,0), 2, 1)
+            window.putTextInfo(frame, "Cascade Detection: " + str(boundingBox), (20,20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
       
         else:
-            cv2.putText(frame, "Trying detect...", (20,20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0,255,255),2)
+            window.putTextWarning(frame, "Trying detect...", (20,20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
             
-    cv2.putText(frame, "FPS : " + str(int(fps.fps())), (20,50), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (50,170,50), 2)
+    window.putTextInfo(frame, "FPS : " + str(int(fps.fps())), (20,50), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
     window.update(frame)
     
 setup()
