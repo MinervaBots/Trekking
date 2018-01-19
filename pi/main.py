@@ -1,17 +1,17 @@
+import cv2
+import os
+import time
+from sys import platform as _platform
+from scipy.interpolate import interp1d
+
 from utils.FPS import FPS
 from utils.DebugWindow import *
 from videoStream.VideoStream import VideoStream
 from communication.ArduinoCom import *
 from communication.BluetoothCom import *
 from tracking.Tracker import *
-
 import communication.ArduinoCommands as ArduinoCommands
 import communication.BluetoothHandlers as BluetoothHandlers
-
-import cv2
-import os
-import time
-from sys import platform as _platform
 
 
 isRunning = True
@@ -120,7 +120,10 @@ def loop():
                 objCenterX = boundingBox[0] + (boundingBox[2] / 2.0)
                 # Faz uma interpolação para calcular a direção
                 # do centro do objeto relativo ao centro da tela
-                direction = (objCenterX - 0) * (1 - (-1)) / (video.width - 0) + (-1)
+
+                # Mapeia a posição em pixels na tela para uma direção entre -1 e 1
+                direction = float(interp1d([0,video.width],[-1,1])(objCenterX))
+                print(direction)
                 #arduino.send("targetData", direction, *boundingBox)
             else:
                 window.putTextError(frame, "Tracking failure detected", (20,80), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
