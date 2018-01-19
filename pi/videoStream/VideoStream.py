@@ -1,5 +1,3 @@
-import time
-
 class VideoStream:
     def __init__(self, src=0, usePiCamera=False, resolution=(320, 240), framerate=32):
         self.width = resolution[0]
@@ -16,7 +14,7 @@ class VideoStream:
             # sensor to warmup
             self.stream = PiVideoStream(resolution=resolution, framerate=framerate)
             #Usando a Câmera do Raspberry Pi precisamos dar um tempinho pra ela "esquentar"
-            time.sleep(2.0)
+            
         # otherwise, we are using OpenCV so initialize the webcam
         # stream
         else:

@@ -1,15 +1,16 @@
 from utils.FPS import FPS
 from utils.DebugWindow import *
 from videoStream.VideoStream import VideoStream
-from Trekking.ArduinoCom import *
-from Trekking.BluetoothCom import *
-from Trekking.Detection import *
+from communication.ArduinoCom import *
+from communication.BluetoothCom import *
+from tracking.Tracker import *
 
-import Trekking.ArduinoCommands as ArduinoCommands
-import Trekking.BluetoothHandlers as BluetoothHandlers
+import communication.ArduinoCommands as ArduinoCommands
+import communication.BluetoothHandlers as BluetoothHandlers
 
 import cv2
 import os
+import time
 from sys import platform as _platform
 
 
@@ -56,7 +57,7 @@ bluetoothHandlers = {"start" : start, "stop" : stop, "startDetection" : startDet
 #bluetooth = BluetoothCom(bluetoothPort, 9600, 0.1, bluetoothHandlers)
 
 window = DebugWindow(enableWindow, "debug", 640, 368)
-detection = Detection("cascades/face.xml", 1.3, 5, 0)
+tracker = Tracker("cascades/face.xml", "MEDIANFLOW")
 
 #Medida de performance
 fps = FPS(False)
@@ -66,7 +67,10 @@ video = VideoStream(usePiCamera = isRaspberryPi, resolution = (window.width, win
 
 def setup():
     #bluetooth.start()
-    
+
+    if(isRaspberryPi):
+        time.sleep(2.0)
+
     while not isRunning:
         continue
 
@@ -87,38 +91,46 @@ def setup():
     bluetooth.close()
     window.close()
     video.stop()
-    
+
+isTracking = False
+boundingBox = (0,0,0,0)
 
 def loop():
+    global isTracking, boundingBox
+    
     frame = video.read()
     if frame is None:
         print(u'Não foi possível recuperar um frame da câmera')
         return None
 
     if(isRunningDetection):
-        #objects = detection.detect(frame, (5, 50, 50), (65, 255, 255))
-        objects = detection.detect(frame, (0, 0, 0), (360, 255, 255))
-        detected = len(objects) > 0
-        if detected:
-            boundingBox = objects[0]
-            objCenterX = boundingBox[0] + (boundingBox[2] / 2.0)
+        
+        if not isTracking:
+            (isTracking, boundingBox) = tracker.init(frame)
+            cv2.putText(frame, "Trying detect...", (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 255), 2)
+        else:   
+            (isTracking, boundingBox) = tracker.update(frame)
 
-            # Faz uma interpolação para calcular a direção
-            # do centro do objeto relativo ao centro da tela
-            direction = (objCenterX - 0) * (1 - (-1)) / (video.width - 0) + (-1)
-            #arduino.send("targetData", direction, *boundingBox)
-            
-            boundingBox = tuple(map(lambda a: int(a), boundingBox))
-            p1 = boundingBox[0], boundingBox[1]
-            p2 = boundingBox[0] + boundingBox[2], boundingBox[1] + boundingBox[3]
-               
-            window.rectangle(frame, p1, p2, (255,0,0), 2, 1)
-            window.putTextInfo(frame, "Cascade Detection: " + str(boundingBox), (20,20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
-      
-        else:
-            window.putTextWarning(frame, "Trying detect...", (20,20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
-            
+            if boundingBox is not None:
+                boundingBox = tuple(map(lambda a: int(a), boundingBox))
+                p1 = boundingBox[0], boundingBox[1]
+                p2 = boundingBox[0] + boundingBox[2], boundingBox[1] + boundingBox[3]
+                window.rectangle(frame, p1, p2, (255,0,0), 2, 1)
+
+                objCenterX = boundingBox[0] + (boundingBox[2] / 2.0)
+                # Faz uma interpolação para calcular a direção
+                # do centro do objeto relativo ao centro da tela
+                direction = (objCenterX - 0) * (1 - (-1)) / (video.width - 0) + (-1)
+                #arduino.send("targetData", direction, *boundingBox)
+            else:
+                window.putTextError(frame, "Tracking failure detected", (20,80), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
+
+            methodName = tracker.methodName
+            if methodName == "":
+                methodName = "Cascade"
+            window.putTextInfo(frame, methodName + " Tracker: " + str(boundingBox), (20,20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
+
     window.putTextInfo(frame, "FPS : " + str(int(fps.fps())), (20,50), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
     window.update(frame)
-    
+   
 setup()
