@@ -21,8 +21,8 @@ class BluetoothCom(Thread):
         self.isRunning = False
         
     def send(self, *msg):
-        msgAsStr = "/".join(msg)
-        self._sendQueue.put(msgAsStr+"\r\n")
+        msgAsStr = ",".join(msg)
+        self._sendQueue.put(msgAsStr+";")
 
     def run(self):
         while self.isRunning:
@@ -30,17 +30,18 @@ class BluetoothCom(Thread):
                 cmd = self._sendQueue.get()
                 self.stream.write(cmd.encode())
                 
-            val = str(self.stream.readline().decode().strip('\r\n'))
+            val = str(self.stream.readline().decode().strip(';'))
+            
             if(val == ""):
                 continue
             
-            cmd = val.split("/")
+            cmd = val.split(",")
             if(len(cmd) == 0):
                 continue
             
             opCode = cmd[0]
             if(opCode in self.handlers):
-                self.handlers[opCode](cmd)
+                self.handlers[opCode](cmd[1:])
             else:
                 self.send("error", "Handler invalido")
         self.stream.close()
