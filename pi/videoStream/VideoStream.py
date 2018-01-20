@@ -19,7 +19,7 @@ class VideoStream:
         # stream
         else:
             from .WebcamVideoStream import WebcamVideoStream
-            self.stream = WebcamVideoStream(src=src)
+            self.stream = WebcamVideoStream(src=src,resolution=resolution,framerate=framerate)
     	
     def start(self):
         # start the threaded video stream
