@@ -6,11 +6,18 @@ class Tracker:
         self._tracker = None
         self.usingTracker = False
         self._cascadeDetector = cv2.CascadeClassifier(cascadePath)
+        self.methodName = None
         self.setTrackerMethod(trackingMethodName)
         
     def setTrackerMethod(self, trackingMethodName):
+        prevMethod = self.methodName
+        
         self.methodName = trackingMethodName
         self._selectTracker()
+        if(self._tracker is None and trackingMethodName != "CASCADE"):
+            self.methodName = prevMethod
+            self._selectTracker()
+            
         
     def init(self, frame, minSize = (0,0), maxSize = (0,0), colorLower = None, colorUpper = None, minPresence = 0.0):
         detected, boundingBox = self._detect(frame, minSize, maxSize, colorLower, colorUpper, minPresence)
@@ -60,7 +67,7 @@ class Tracker:
         return False, None
     
     def _selectTracker(self):
-        if self.methodName == '':
+        if self.methodName == '' or self.methodName == 'CASCADE':
             self._tracker = None
         elif self.methodName == 'BOOSTING':
             self._tracker = cv2.TrackerBoosting_create()

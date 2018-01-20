@@ -15,7 +15,7 @@ import communication.BluetoothHandlers as BluetoothHandlers
 
 
 isRunning = True
-isRunningDetection = True
+isRunningTracker = False
 
 def start(message):
     global isRunning
@@ -25,14 +25,17 @@ def stop(message):
     global isRunning
     isRunning = False
 
-def startDetection(message = None):
-    global isRunningDetection
-    isRunningDetection = True
+def startTracker(message = None):
+    global isRunningTracker
+    isRunningTracker = True
 
-def pauseDetection(message = None):
-    global isRunningDetection
-    isRunningDetection = False
+def pauseTracker(message = None):
+    global isRunningTracker
+    isRunningTracker = False
 
+def setTrackerMethod(message):
+    methodName = str(message[0])
+    tracker.setTrackerMethod(methodName)
     
 isRaspberryPi = "linux" in _platform
 if(isRaspberryPi):
@@ -48,25 +51,25 @@ arduinoCommands = [["info", "s", ArduinoCommands.info],
             ["error", "s", ArduinoCommands.error],
             ["mpuData", "fff", ArduinoCommands.mpuData],
             ["targetData", "fffff"],
-            ["startDetection", "", startDetection],
-            ["pauseDetection", "", pauseDetection]]
+            ["startTracker", "", startTracker],
+            ["pauseTracker", "", pauseTracker]]
 
-bluetoothHandlers = {"start" : start, "stop" : stop, "startDetection" : startDetection, "pauseDetection" : pauseDetection}
+bluetoothHandlers = {"start" : start, "stop" : stop, "startTracker" : startTracker, "pauseTracker" : pauseTracker, "setTrackerMethod" : setTrackerMethod}
 
 #arduino = ArduinoCom(arduinoPort, 9600, arduinoCommands)
-#bluetooth = BluetoothCom(bluetoothPort, 9600, 0.1, bluetoothHandlers)
+bluetooth = BluetoothCom(bluetoothPort, 9600, 0.1, bluetoothHandlers)
 
-window = DebugWindow(enableWindow, "debug", 640, 368)
+window = DebugWindow(enableWindow, "debug", 640, 366)
 tracker = Tracker("cascades/face.xml", "MEDIANFLOW")
 
 #Medida de performance
 fps = FPS(False)
 
 #Captura de video
-video = VideoStream(usePiCamera = isRaspberryPi, resolution = (window.width, window.height))
+video = VideoStream(usePiCamera = isRaspberryPi, framerate=60, resolution = (window.width, window.height))
 
 def setup():
-    #bluetooth.start()
+    bluetooth.start()
 
     if(isRaspberryPi):
         time.sleep(2.0)
@@ -87,7 +90,7 @@ def setup():
             stop(None)
 
     fps.stop()
-    arduino.close()
+    #arduino.close()
     bluetooth.close()
     window.close()
     video.stop()
@@ -103,11 +106,11 @@ def loop():
         print(u'Não foi possível recuperar um frame da câmera')
         return None
 
-    if(isRunningDetection):
+    if(isRunningTracker):
         
         if not isTracking:
             (isTracking, boundingBox) = tracker.init(frame)
-            cv2.putText(frame, "Trying detect...", (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 255), 2)
+            window.putTextWarning(frame, "Trying detect...", (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
         else:   
             (isTracking, boundingBox) = tracker.update(frame)
 
@@ -117,13 +120,12 @@ def loop():
                 p2 = boundingBox[0] + boundingBox[2], boundingBox[1] + boundingBox[3]
                 window.rectangle(frame, p1, p2, (255,0,0), 2, 1)
 
-                objCenterX = boundingBox[0] + (boundingBox[2] / 2.0)
+                objCenterX = ((boundingBox[0] + boundingBox[2]) / 2.0)
                 # Faz uma interpolação para calcular a direção
                 # do centro do objeto relativo ao centro da tela
 
                 # Mapeia a posição em pixels na tela para uma direção entre -1 e 1
                 direction = float(interp1d([0,video.width],[-1,1])(objCenterX))
-                print(direction)
                 #arduino.send("targetData", direction, *boundingBox)
             else:
                 window.putTextError(frame, "Tracking failure detected", (20,80), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
