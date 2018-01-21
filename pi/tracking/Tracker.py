@@ -2,11 +2,11 @@ import cv2
 import datetime
 
 class Tracker:
-    def __init__(self, cascadePath, trackingMethodName = ""):
+    def __init__(self, cascadePath, trackingMethodName = "CASCADE"):
         self._tracker = None
         self.usingTracker = False
         self._cascadeDetector = cv2.CascadeClassifier(cascadePath)
-        self.methodName = None
+        self.methodName = "CASCADE"
         self.setTrackerMethod(trackingMethodName)
         
     def setTrackerMethod(self, trackingMethodName):
@@ -24,6 +24,7 @@ class Tracker:
 
         if self.usingTracker and detected:
             self.clear()
+            boundingBox = tuple(boundingBox)
             return self._tracker.init(frame, boundingBox), boundingBox
             
         return detected, boundingBox
@@ -31,7 +32,7 @@ class Tracker:
     def update(self, frame):
         if self.usingTracker:
             delta = datetime.datetime.now() - self.lastDetectRunTime
-            if delta.seconds > 1:
+            if delta.seconds > 3:
                 self.init(frame, *self.lastDetectionParameters)
             return self._tracker.update(frame)
         else:
@@ -52,8 +53,7 @@ class Tracker:
         objects = self._cascadeDetector.detectMultiScale(frame, scaleFactor=1.3, minNeighbors=5, flags=0, minSize=minSize, maxSize=maxSize)
 
         for obj in objects:
-            boundingBox = tuple(map(lambda a: int(a), obj))
-            (x, y, w, h) = boundingBox
+            (x, y, w, h) = obj
             if(userColor):
                 objInHVS = cv2.cvtColor(frame[y:y+h, x:x+w], cv2.COLOR_BGR2HSV)
                 mask = cv2.inRange(objInHVS, colorLower, colorUpper)
@@ -61,8 +61,8 @@ class Tracker:
                 if(presence < minPresence):
                     # Se não tiver essa porcentagem de cor, pula esse objeto
                     continue
-
-            return True, boundingBox
+                
+            return True, obj
             
         return False, None
     
