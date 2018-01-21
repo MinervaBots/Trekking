@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import cv2
 import os
 import time
@@ -15,7 +16,7 @@ import communication.BluetoothHandlers as BluetoothHandlers
 
 
 isRunning = True
-isRunningTracker = False
+isRunningTracker = True
 
 def start(message):
     global isRunning
@@ -90,16 +91,16 @@ def setup():
             stop(None)
 
     fps.stop()
+    print(fps.meanFps())
     #arduino.close()
     bluetooth.close()
     window.close()
     video.stop()
 
 isTracking = False
-boundingBox = (0,0,0,0)
 
 def loop():
-    global isTracking, boundingBox
+    global isTracking, isRunning
     
     frame = video.read()
     if frame is None:
@@ -115,12 +116,12 @@ def loop():
             (isTracking, boundingBox) = tracker.update(frame)
 
             if boundingBox is not None:
-                boundingBox = tuple(map(lambda a: int(a), boundingBox))
+                boundingBox = tuple(map(int, boundingBox))
                 p1 = boundingBox[0], boundingBox[1]
                 p2 = boundingBox[0] + boundingBox[2], boundingBox[1] + boundingBox[3]
                 window.rectangle(frame, p1, p2, (255,0,0), 2, 1)
 
-                objCenterX = ((boundingBox[0] + boundingBox[2]) / 2.0)
+                objCenterX = boundingBox[0] + (boundingBox[2] / 2.0)
                 # Faz uma interpolação para calcular a direção
                 # do centro do objeto relativo ao centro da tela
 
@@ -130,12 +131,14 @@ def loop():
             else:
                 window.putTextError(frame, "Tracking failure detected", (20,80), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
 
-            methodName = tracker.methodName
-            if methodName == "":
-                methodName = "Cascade"
-            window.putTextInfo(frame, methodName + " Tracker: " + str(boundingBox), (20,20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
+            window.putTextInfo(frame, tracker.methodName + " Tracker: " + str(boundingBox), (20,20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
 
     window.putTextInfo(frame, "FPS : " + str(int(fps.fps())), (20,50), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
-    window.update(frame)
+
+    # ESC pressionado
+    if window.update(frame) == 27:
+        isRunning = False
+
+    
    
 setup()
