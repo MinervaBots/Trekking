@@ -1,5 +1,4 @@
 import cv2
-from colorama import init, Fore
 
 class DebugWindow:
     def __init__(self, enabled, windowName, width, height):
@@ -7,7 +6,6 @@ class DebugWindow:
         self.width = width
         self.height = height
         self.windowName = windowName
-        init(convert=True)
         
     def open(self):
         if self.enabled:
@@ -28,32 +26,32 @@ class DebugWindow:
         if(self.enabled):
             cv2.rectangle(frame, p1, p2, color, thickness, lineType, shift)
 
-    def putTextWarning(self, frame, text, org, fontFace, fontSccale, thickness = 1, lineType = cv2.LINE_8, bottomLeftOrigin = False):
+    def putTextWarning(self, frame, text, org, fontFace, fontScale, thickness = 1, lineType = cv2.LINE_8, bottomLeftOrigin = False):
         if(self.enabled):
-            cv2.putText(frame, text, org, fontFace, fontSccale, (0, 255, 255), thickness, lineType, bottomLeftOrigin)
+            cv2.putText(frame, text, org, fontFace, fontScale, (0, 255, 255), thickness, lineType, bottomLeftOrigin)
         else:
-            print(Fore.YELLOW + text)
+            print("[WARNING]: " + text)
 
-    def putTextInfo(self, frame, text, org, fontFace, fontSccale, thickness = 1, lineType = cv2.LINE_8, bottomLeftOrigin = False):
+    def putTextInfo(self, frame, text, org, fontFace, fontScale, thickness = 1, lineType = cv2.LINE_8, bottomLeftOrigin = False):
         if(self.enabled):
-            cv2.putText(frame, text, org, fontFace, fontSccale, (0, 255, 0), thickness, lineType, bottomLeftOrigin)
+            cv2.putText(frame, text, org, fontFace, fontScale, (0, 255, 0), thickness, lineType, bottomLeftOrigin)
         else:
-            print(Fore.GREEN + text)
+            print("[INFO]: " + text)
 
-    def putTextError(self, frame, text, org, fontFace, fontSccale, thickness = 1, lineType = cv2.LINE_8, bottomLeftOrigin = False):
+    def putTextError(self, frame, text, org, fontFace, fontScale, thickness = 1, lineType = cv2.LINE_8, bottomLeftOrigin = False):
         if(self.enabled):
-            cv2.putText(frame, text, org, fontFace, fontSccale, (0, 0, 255), thickness, lineType, bottomLeftOrigin)
+            cv2.putText(frame, text, org, fontFace, fontScale, (0, 0, 255), thickness, lineType, bottomLeftOrigin)
         else:
-            print(Fore.RED + text)
+            print("[ERROR]: " + text)
 
-    def putTextDebug(self, frame, text, org, fontFace, fontSccale, thickness = 1, lineType = cv2.LINE_8, bottomLeftOrigin = False):
+    def putTextDebug(self, frame, text, org, fontFace, fontScale, thickness = 1, lineType = cv2.LINE_8, bottomLeftOrigin = False):
         if(self.enabled):
-            cv2.putText(frame, text, org, fontFace, fontSccale, (255, 0, 0), thickness, lineType, bottomLeftOrigin)
+            cv2.putText(frame, text, org, fontFace, fontScale, (255, 0, 0), thickness, lineType, bottomLeftOrigin)
         else:
-            print(Fore.BLUE + text)
+            print("[DEBUG]: " + text)
 
-    def putText(self, frame, text, org, fontFace, fontSccale, color, thickness = 1, lineType = cv2.LINE_8, bottomLeftOrigin = False):
+    def putText(self, frame, text, org, fontFace, fontScale, color, thickness = 1, lineType = cv2.LINE_8, bottomLeftOrigin = False):
         if(self.enabled):
-            cv2.putText(frame, text, org, fontFace, fontSccale, color, thickness, lineType, bottomLeftOrigin)
+            cv2.putText(frame, text, org, fontFace, fontScale, color, thickness, lineType, bottomLeftOrigin)
         else:
             print(text)
