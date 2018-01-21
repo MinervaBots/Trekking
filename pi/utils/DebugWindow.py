@@ -17,7 +17,8 @@ class DebugWindow:
     def update(self, frame):
         if self.enabled:
             cv2.imshow(self.windowName, frame)
-        return cv2.waitKey(1)
+            return cv2.waitKey(1)
+        return -1
         
     def close(self):
         if self.enabled:
