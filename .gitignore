@@ -106,4 +106,10 @@ venv.bak/
 # mypy
 .mypy_cache/
 *.pyc
-Pi/Full/Python/FPS.pyc
+
+.vscode/*
+!.vscode/arduino.json
+#!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
