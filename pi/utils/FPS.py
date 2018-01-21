@@ -1,6 +1,7 @@
 # import the necessary packages
+import time
 import datetime
- 
+
 class FPS:
     def __init__(self, debug):
         # store the start time, end time, and total number of frames
@@ -14,14 +15,14 @@ class FPS:
         
     def start(self):
         # start the timer
-        self._start = datetime.datetime.now()
-        self._last = datetime.datetime.now()
+        self._start = time.time()
+        self._last = time.time()
         return self
  
-    def stop(self):
+    def stop(self, log):
         # stop the timer
-        self._end = datetime.datetime.now()
-        if(self.debug):
+        self._end = time.time()
+        if(self.debug or log):
             print("[INFO] Tempo percorrido: {:.2f}".format(self.elapsed()))
             print("[INFO] FPS médio: {:.2f}".format(self.meanFps()))
      
@@ -29,22 +30,23 @@ class FPS:
         # increment the total number of frames examined during the
         # start and end intervals
         self._numFrames += 1
-        self._delta = datetime.datetime.now() - self._last
-        self._last = datetime.datetime.now()
-        if(self.debug):
-            print("FPS: {:.2f}".format(self.fps()))
+
+        fps = 1.0 / (time.time() - self._last)
+        self._last = time.time()
         
-    def deltaTime(self):
-        return self._delta.total_seconds()
-    
+        if(self.debug):
+            print("FPS: {:.2f}".format(fps))
+        
+        return fps
+        
     def elapsed(self):
         # return the total number of seconds between the start and
         # end interval
-        return (self._end - self._start).total_seconds()  
+        dateTimeStart = datetime.datetime.fromtimestamp(self._end)
+        dateTimeEnd = datetime.datetime.fromtimestamp(self._start)
+        return (dateTimeStart - dateTimeEnd).total_seconds()
 
-    def fps(self):
-        return 1.0 / self._delta.total_seconds()  
-        
+
     def meanFps(self):
         # compute the (approximate) frames per second
         return self._numFrames / self.elapsed()

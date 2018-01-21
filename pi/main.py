@@ -60,38 +60,38 @@ bluetoothHandlers = {"start" : start, "stop" : stop, "startTracker" : startTrack
 #arduino = ArduinoCom(arduinoPort, 9600, arduinoCommands)
 bluetooth = BluetoothCom(bluetoothPort, 9600, 0.1, bluetoothHandlers)
 
-window = DebugWindow(enableWindow, "debug", 640, 366)
+window = DebugWindow(enableWindow, "debug", 640, 368)
 tracker = Tracker("cascades/face.xml", "MEDIANFLOW")
-
-#Medida de performance
-fps = FPS(False)
 
 #Captura de video
 video = VideoStream(usePiCamera = isRaspberryPi, framerate=60, resolution = (window.width, window.height))
 
+#Medida de performance
+fps = FPS(False)
+
 def setup():
     bluetooth.start()
-
-    if(isRaspberryPi):
-        time.sleep(2.0)
 
     while not isRunning:
         continue
 
-    fps.start()
     window.open()
     video.start()
+    
+    if(isRaspberryPi):
+        time.sleep(2.0)
+
     #arduino.start()
 
+    fps.start()
     while isRunning:
         try:
-            fps.update()
             loop()
         except KeyboardInterrupt:
             stop(None)
 
-    fps.stop()
-    print(fps.meanFps())
+    fps.stop(True)
+    
     #arduino.close()
     bluetooth.close()
     window.close()
@@ -133,7 +133,7 @@ def loop():
 
             window.putTextInfo(frame, tracker.methodName + " Tracker: " + str(boundingBox), (20,20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
 
-    window.putTextInfo(frame, "FPS : " + str(int(fps.fps())), (20,50), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
+    window.putTextInfo(frame, "FPS : " + str(int(fps.update())), (20,50), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
 
     # ESC pressionado
     if window.update(frame) == 27:
