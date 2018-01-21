@@ -6,16 +6,17 @@ from sys import platform as _platform
 from scipy.interpolate import interp1d
 
 from utils.FPS import FPS
-from utils.DebugWindow import *
+from utils.DebugWindow import DebugWindow
+from utils.TemperatureControl import TemperatureControl
 from videoStream.VideoStream import VideoStream
-from communication.ArduinoCom import *
-from communication.BluetoothCom import *
-from tracking.Tracker import *
+from communication.ArduinoCom import ArduinoCom
+from communication.BluetoothCom import BluetoothCom
+from tracking.Tracker import Tracker
 import communication.ArduinoCommands as ArduinoCommands
 import communication.BluetoothHandlers as BluetoothHandlers
 
 
-isRunning = False
+isRunning = True
 isRunningTracker = True
 
 def start(message):
@@ -65,13 +66,14 @@ arduinoCommands = [["info", "s", ArduinoCommands.info],
 
 bluetoothHandlers = {"start" : start, "stop" : stop, "startTracker" : startTracker, "pauseTracker" : pauseTracker, "setTrackerMethod" : setTrackerMethod}
 
-arduino = ArduinoCom(arduinoPort, 9600, arduinoCommands)
+#arduino = ArduinoCom(arduinoPort, 9600, arduinoCommands)
 bluetooth = BluetoothCom(bluetoothPort, 9600, 0.1, bluetoothHandlers)
 
 
  
 #Medida de performance
 fps = FPS(False)
+temp = TemperatureControl(1)
 
 def setup():
     bluetooth.start()
@@ -80,7 +82,7 @@ def setup():
         continue
     
     window.open()
-    arduino.start()
+    #arduino.start()
 
     fps.start()
     while isRunning:
@@ -91,7 +93,7 @@ def setup():
 
     fps.stop(True)
     
-    arduino.close()
+    #arduino.close()
     bluetooth.close()
     window.close()
     video.stop()
@@ -103,8 +105,8 @@ def loop():
     
     frame = video.read()
     if frame is None:
-        print(u'Não foi possível recuperar um frame da câmera')
-        return None
+        #print(u'Não foi possível recuperar um frame da câmera')
+        return
 
     if(isRunningTracker):
         
@@ -114,7 +116,9 @@ def loop():
         else:   
             (isTracking, boundingBox) = tracker.update(frame)
 
-            if boundingBox is not None:
+            if boundingBox is None or boundingBox == (0, 0, 0, 0):
+                window.putTextError(frame, "Tracking failure detected", (20,80), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
+            else:    
                 boundingBox = [int(i) for i in boundingBox] #tuple(map(int, boundingBox))
                 p1 = boundingBox[0], boundingBox[1]
                 p2 = boundingBox[0] + boundingBox[2], boundingBox[1] + boundingBox[3]
@@ -126,14 +130,12 @@ def loop():
 
                 # Mapeia a posição em pixels na tela para uma direção entre -1 e 1
                 direction = float(interp1d([0,video.width],[-1,1])(objCenterX))
-                arduino.send("targetData", direction, *boundingBox)
-            else:
-                window.putTextError(frame, "Tracking failure detected", (20,80), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
+                #arduino.send("targetData", direction, *boundingBox)
+                window.putTextInfo(frame, tracker.methodName + " Tracker: " + str(boundingBox), (20,20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
 
-            window.putTextInfo(frame, tracker.methodName + " Tracker: " + str(boundingBox), (20,20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
-
+    temperature = temp.update()
     framerate = fps.update()
-    window.putTextInfo(frame, "FPS : " + str(int(framerate)), (20,50), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
+    window.putTextInfo(frame, "FPS : " + str(int(framerate)) + " - Temp: " + str(temperature), (20,50), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
 
     # ESC pressionado
     if window.update(frame) == 27:
