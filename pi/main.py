@@ -15,12 +15,13 @@ import communication.ArduinoCommands as ArduinoCommands
 import communication.BluetoothHandlers as BluetoothHandlers
 
 
-isRunning = True
+isRunning = False
 isRunningTracker = True
 
 def start(message):
     global isRunning
     isRunning = True
+    print("Started")
 
 def stop(message):
     global isRunning
@@ -48,6 +49,13 @@ else:
     bluetoothPort = "COM4"
     enableWindow = True
 
+window = DebugWindow(enableWindow, "debug", 640, 368)
+tracker = Tracker("cascades/face.xml", "MEDIANFLOW")
+
+#Captura de video
+video = VideoStream(usePiCamera = isRaspberryPi, framerate=60, resolution = (window.width, window.height))
+video.start() # Inicializa a câmera aqui pra ter tempo de esquentar se for no Raspberry Pi
+   
 arduinoCommands = [["info", "s", ArduinoCommands.info],
             ["error", "s", ArduinoCommands.error],
             ["mpuData", "fff", ArduinoCommands.mpuData],
@@ -57,15 +65,11 @@ arduinoCommands = [["info", "s", ArduinoCommands.info],
 
 bluetoothHandlers = {"start" : start, "stop" : stop, "startTracker" : startTracker, "pauseTracker" : pauseTracker, "setTrackerMethod" : setTrackerMethod}
 
-#arduino = ArduinoCom(arduinoPort, 9600, arduinoCommands)
+arduino = ArduinoCom(arduinoPort, 9600, arduinoCommands)
 bluetooth = BluetoothCom(bluetoothPort, 9600, 0.1, bluetoothHandlers)
 
-window = DebugWindow(enableWindow, "debug", 640, 368)
-tracker = Tracker("cascades/face.xml", "MEDIANFLOW")
 
-#Captura de video
-video = VideoStream(usePiCamera = isRaspberryPi, framerate=60, resolution = (window.width, window.height))
-
+ 
 #Medida de performance
 fps = FPS(False)
 
@@ -74,14 +78,9 @@ def setup():
 
     while not isRunning:
         continue
-
-    window.open()
-    video.start()
     
-    if(isRaspberryPi):
-        time.sleep(2.0)
-
-    #arduino.start()
+    window.open()
+    arduino.start()
 
     fps.start()
     while isRunning:
@@ -92,7 +91,7 @@ def setup():
 
     fps.stop(True)
     
-    #arduino.close()
+    arduino.close()
     bluetooth.close()
     window.close()
     video.stop()
@@ -116,7 +115,7 @@ def loop():
             (isTracking, boundingBox) = tracker.update(frame)
 
             if boundingBox is not None:
-                boundingBox = tuple(map(int, boundingBox))
+                boundingBox = [int(i) for i in boundingBox] #tuple(map(int, boundingBox))
                 p1 = boundingBox[0], boundingBox[1]
                 p2 = boundingBox[0] + boundingBox[2], boundingBox[1] + boundingBox[3]
                 window.rectangle(frame, p1, p2, (255,0,0), 2, 1)
@@ -127,18 +126,17 @@ def loop():
 
                 # Mapeia a posição em pixels na tela para uma direção entre -1 e 1
                 direction = float(interp1d([0,video.width],[-1,1])(objCenterX))
-                #arduino.send("targetData", direction, *boundingBox)
+                arduino.send("targetData", direction, *boundingBox)
             else:
                 window.putTextError(frame, "Tracking failure detected", (20,80), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
 
             window.putTextInfo(frame, tracker.methodName + " Tracker: " + str(boundingBox), (20,20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
 
-    window.putTextInfo(frame, "FPS : " + str(int(fps.update())), (20,50), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
+    framerate = fps.update()
+    window.putTextInfo(frame, "FPS : " + str(int(framerate)), (20,50), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
 
     # ESC pressionado
     if window.update(frame) == 27:
         isRunning = False
 
-    
-   
 setup()
