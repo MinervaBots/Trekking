@@ -4,7 +4,7 @@ import queue
 import datetime
 
 class ArduinoCom(Thread):
-    def __init__(self, port, baudRate, commands):
+    def __init__(self, port, baudRate, commands, bufferQueueSize = 1000):
         super(ArduinoCom, self).__init__()
 
         self._arduino = PyCmdMessenger.ArduinoBoard(port, baud_rate = baudRate, settle_time = 0.5)
@@ -12,6 +12,8 @@ class ArduinoCom(Thread):
         
         self._commands = list(commands)
         self._sendQueue = queue.Queue()
+        self._bufferQueueSize = bufferQueueSize
+        
         self.isRunning = True
 
     def close(self):
@@ -24,11 +26,11 @@ class ArduinoCom(Thread):
                 self._cmdMessenger.send(cmd[0], *cmd[1])
             msg = self._cmdMessenger.receive()
             self.handle(msg)
-        
         self._arduino.close()
-        #self._cmdMessenger.close()
             
     def send(self, cmd, *args):
+        if self._sendQueu.qsize() >= self._bufferQueueSize:
+            self._sendQueue.get()
         self._sendQueue.put([cmd, args])
         
     def handle(self, msg):

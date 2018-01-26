@@ -54,7 +54,7 @@ window = DebugWindow(enableWindow, "debug", 640, 368)
 tracker = Tracker("cascades/face.xml", "MEDIANFLOW")
 
 #Captura de video
-video = VideoStream(usePiCamera = isRaspberryPi, framerate=60, resolution = (window.width, window.height))
+video = VideoStream(usePiCamera = isRaspberryPi, framerate=30, resolution = (window.width, window.height))
 video.start() # Inicializa a câmera aqui pra ter tempo de esquentar se for no Raspberry Pi
    
 arduinoCommands = [["info", "s", ArduinoCommands.info],
@@ -66,7 +66,7 @@ arduinoCommands = [["info", "s", ArduinoCommands.info],
 
 bluetoothHandlers = {"start" : start, "stop" : stop, "startTracker" : startTracker, "pauseTracker" : pauseTracker, "setTrackerMethod" : setTrackerMethod}
 
-#arduino = ArduinoCom(arduinoPort, 9600, arduinoCommands)
+#arduino = ArduinoCom(arduinoPort, 9600, arduinoCommands, 15)
 bluetooth = BluetoothCom(bluetoothPort, 9600, 0.1, bluetoothHandlers)
 
 
@@ -117,12 +117,12 @@ def loop():
             (isTracking, boundingBox) = tracker.update(frame)
 
             if boundingBox is None or boundingBox == (0, 0, 0, 0):
-                window.putTextError(frame, "Tracking failure detected", (20,80), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
+                window.putTextError(frame, "Tracking failure detected", (20, 80), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
             else:    
-                boundingBox = [int(i) for i in boundingBox] #tuple(map(int, boundingBox))
+                boundingBox = [int(i) for i in boundingBox]
                 p1 = boundingBox[0], boundingBox[1]
                 p2 = boundingBox[0] + boundingBox[2], boundingBox[1] + boundingBox[3]
-                window.rectangle(frame, p1, p2, (255,0,0), 2, 1)
+                window.rectangle(frame, p1, p2, (255, 0, 0), 2, 1)
 
                 objCenterX = boundingBox[0] + (boundingBox[2] / 2.0)
                 # Faz uma interpolação para calcular a direção
@@ -131,11 +131,11 @@ def loop():
                 # Mapeia a posição em pixels na tela para uma direção entre -1 e 1
                 direction = float(interp1d([0,video.width],[-1,1])(objCenterX))
                 #arduino.send("targetData", direction, *boundingBox)
-                window.putTextInfo(frame, tracker.methodName + " Tracker: " + str(boundingBox), (20,20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
+                window.putTextInfo(frame, tracker.methodName + " Tracker: " + str(boundingBox), (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
 
     temperature = temp.update()
     framerate = fps.update()
-    window.putTextInfo(frame, "FPS : " + str(int(framerate)) + " - Temp: " + str(temperature), (20,50), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
+    window.putTextInfo(frame, "FPS : " + str(int(framerate)) + " - Temp: " + str(temperature) + " 'C", (20, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
 
     # ESC pressionado
     if window.update(frame) == 27:
