@@ -1,91 +1,73 @@
 #!/usr/bin/env python
 import cv2
-import os
-import time
-from sys import platform as _platform
-from scipy.interpolate import interp1d
+import dic
 
+from SystemInfo import SystemInfo
 from utils.FPS import FPS
 from utils.DebugWindow import DebugWindow
 from utils.TemperatureControl import TemperatureControl
 from videoStream.VideoStream import VideoStream
-from communication.ArduinoCom import ArduinoCom
-from communication.BluetoothCom import BluetoothCom
 from tracking.Tracker import Tracker
-import communication.ArduinoCommands as ArduinoCommands
-import communication.BluetoothHandlers as BluetoothHandlers
 
+from messaging.ArduinoMessagingThread import ArduinoMessagingThread
+from messaging.BluetoothMessagingThread import BluetoothMessagingThread
+from messaging.CommonMessageHandlers import *
+from messaging.ArduinoMessageHandlers import *
+from messaging.BluetoothMessageHandlers import *
 
-isRunning = True
-isRunningTracker = True
-
-def start(message):
-    global isRunning
-    isRunning = True
-    print("Started")
-
-def stop(message):
-    global isRunning
-    isRunning = False
-
-def startTracker(message = None):
-    global isRunningTracker
-    isRunningTracker = True
-
-def pauseTracker(message = None):
-    global isRunningTracker
-    isRunningTracker = False
-
-def setTrackerMethod(message):
-    methodName = str(message[0])
-    tracker.setTrackerMethod(methodName)
-    
-isRaspberryPi = "linux" in _platform
-if(isRaspberryPi):
-    arduinoPort = "/dev/ttyACM0"
-    bluetoothPort = "/dev/rfcomm0"
-    enableWindow = "DISPLAY" in os.environ
-else:
-    arduinoPort = "COM3"
-    bluetoothPort = "COM4"
-    enableWindow = True
-
-window = DebugWindow(enableWindow, "debug", 640, 368)
-tracker = Tracker("cascades/face.xml", "MEDIANFLOW")
+systemInfo = SystemInfo()
+tracker = Tracker("cascades/face.xml", (640, 368), "MEDIANFLOW")
+window = DebugWindow(systemInfo.enableWindow, "debug", tracker.resolution)
 
 #Captura de video
-video = VideoStream(usePiCamera = isRaspberryPi, framerate=30, resolution = (window.width, window.height))
+video = VideoStream(usePiCamera = systemInfo.isRaspberryPi, framerate = 30, resolution = tracker.resolution)
 video.start() # Inicializa a câmera aqui pra ter tempo de esquentar se for no Raspberry Pi
-   
-arduinoCommands = [["info", "s", ArduinoCommands.info],
-            ["error", "s", ArduinoCommands.error],
-            ["mpuData", "fff", ArduinoCommands.mpuData],
-            ["targetData", "fffff"],
-            ["startTracker", "", startTracker],
-            ["pauseTracker", "", pauseTracker]]
 
-bluetoothHandlers = {"start" : start, "stop" : stop, "startTracker" : startTracker, "pauseTracker" : pauseTracker, "setTrackerMethod" : setTrackerMethod}
-
-#arduino = ArduinoCom(arduinoPort, 9600, arduinoCommands, 15)
-bluetooth = BluetoothCom(bluetoothPort, 9600, 0.1, bluetoothHandlers)
-
-
- 
 #Medida de performance
 fps = FPS(False)
 temp = TemperatureControl(1)
 
-def setup():
-    bluetooth.start()
+builder = dic.container.ContainerBuilder()
 
-    while not isRunning:
+# Registra as threads de comunicação. Os Handlers vão ser resolvidos automaticamente
+builder.register_class(ArduinoMessagingThread)
+builder.register_class(BluetoothMessagingThread)
+# Registra os handlers
+builder.register_module(BluetoothMessageHandlersModule())
+builder.register_module(ArduinoMessageHandlersModule())
+builder.register_class(StartTrackerHandler, register_as = [ArduinoMessageHandler, BluetoothMessageHandler], component_scope=dic.scope.SingleInstance)
+builder.register_class(PauseTrackerHandler, register_as = [ArduinoMessageHandler, BluetoothMessageHandler], component_scope=dic.scope.SingleInstance)
+
+
+#Registra instancias para serem acessiveis dentro dos handlers
+builder.register_instance(SystemInfo, systemInfo)
+builder.register_instance(DebugWindow, window)
+builder.register_instance(Tracker, tracker)
+builder.register_instance(VideoStream, video)
+builder.register_instance(FPS, fps)
+builder.register_instance(TemperatureControl, temp)
+
+# Constroi o container
+container = builder.build()
+
+# E extrai as instancias com as dependencias já resolvidas
+arduinoMessagingThread = container.resolve(ArduinoMessagingThread)
+bluetoothMessagingThread = container.resolve(BluetoothMessagingThread)
+
+
+def setup():
+    arduinoMessagingThread.setPort(systemInfo.arduinoPort)
+    bluetoothMessagingThread.setPort(systemInfo.bluetoothPort)
+
+    #arduinoMessagingThread.start()
+    bluetoothMessagingThread.start()
+    
+    while not systemInfo.isRunning:
         continue
     
-    window.open()
-    #arduino.start()
-
     fps.start()
-    while isRunning:
+    window.open()
+    while systemInfo.isRunning:
         try:
             loop()
         except KeyboardInterrupt:
@@ -93,52 +75,39 @@ def setup():
 
     fps.stop(True)
     
-    #arduino.close()
-    bluetooth.close()
+    #arduinoMessagingThread.close()
+    bluetoothMessagingThread.close()
     window.close()
     video.stop()
 
-isTracking = False
-
 def loop():
-    global isTracking, isRunning
-    
     frame = video.read()
     if frame is None:
-        #print(u'Não foi possível recuperar um frame da câmera')
         return
 
-    if(isRunningTracker):
-        
-        if not isTracking:
-            (isTracking, boundingBox) = tracker.init(frame)
-            window.putTextWarning(frame, "Trying detect...", (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
-        else:   
-            (isTracking, boundingBox) = tracker.update(frame)
+    if not tracker.isRunning:
+        pass
+    elif not systemInfo.isTracking:
+        (systemInfo.isTracking, systemInfo.trackedRect, systemInfo.trackedDirection) = tracker.init(frame)
+        window.putTextWarning(frame, "Tentando detectar...", (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
+    else:   
+        (systemInfo.isTracking, systemInfo.trackedRect, systemInfo.trackedDirection) = tracker.update(frame)
 
-            if boundingBox is None or boundingBox == (0, 0, 0, 0):
-                window.putTextError(frame, "Tracking failure detected", (20, 80), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
-            else:    
-                boundingBox = [int(i) for i in boundingBox]
-                p1 = boundingBox[0], boundingBox[1]
-                p2 = boundingBox[0] + boundingBox[2], boundingBox[1] + boundingBox[3]
-                window.rectangle(frame, p1, p2, (255, 0, 0), 2, 1)
+        if systemInfo.trackedRect is None:
+            window.putTextError(frame, "Falha detectada no rastreamento", (20, 80), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
+        else:    
+            systemInfo.trackedRect = [int(i) for i in systemInfo.trackedRect]
+            p1, p2 = Tracker.rectToPoints(systemInfo.trackedRect)
+            window.rectangle(frame, p1, p2, (255, 0, 0), 2, 1)
+            
+            # Mapeia a posição em pixels na tela para uma direção entre -1 e 1
+            #arduinoMessagingThread.send(ArduinoMessageCodes.TARGET_DATA, direction, *systemInfo.trackedRect)
+            window.putTextInfo(frame, tracker.methodName + ": " + str(systemInfo.trackedRect), (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
 
-                objCenterX = boundingBox[0] + (boundingBox[2] / 2.0)
-                # Faz uma interpolação para calcular a direção
-                # do centro do objeto relativo ao centro da tela
-
-                # Mapeia a posição em pixels na tela para uma direção entre -1 e 1
-                direction = float(interp1d([0,video.width],[-1,1])(objCenterX))
-                #arduino.send("targetData", direction, *boundingBox)
-                window.putTextInfo(frame, tracker.methodName + " Tracker: " + str(boundingBox), (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
-
-    temperature = temp.update()
-    framerate = fps.update()
-    window.putTextInfo(frame, "FPS : " + str(int(framerate)) + " - Temp: " + str(temperature) + " 'C", (20, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
+    window.putTextInfo(frame, "FPS : " + str(int(fps.update())) + " - Temp: " + str(temp.update()) + " 'C", (20, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
 
     # ESC pressionado
     if window.update(frame) == 27:
-        isRunning = False
+        systemInfo.isRunning = False
 
 setup()

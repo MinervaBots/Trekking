@@ -1,56 +1,67 @@
 import cv2
 import datetime
+#from scipy.interpolate import interp1d
 
 class Tracker:
-    def __init__(self, cascadePath, trackingMethodName = "CASCADE"):
-        self._tracker = None
+    def __init__(self, cascadePath, resolution, trackingMethodName = "CASCADE"):
+        self.__tracker = None
         self.usingTracker = False
-        self._cascadeDetector = cv2.CascadeClassifier(cascadePath)
-        self.methodName = "CASCADE"
-        self.setTrackerMethod(trackingMethodName)
+        self.__cascadeDetector = cv2.CascadeClassifier(cascadePath)
+        self.setTrackingMethod(trackingMethodName)
+        self.resolution = resolution
+        self.isRunning = False
         
-    def setTrackerMethod(self, trackingMethodName):
-        prevMethod = self.methodName
-        
+    def setTrackingMethod(self, trackingMethodName):
         self.methodName = trackingMethodName
-        self._selectTracker()
-        if(self._tracker is None and trackingMethodName != "CASCADE"):
-            self.methodName = prevMethod
-            self._selectTracker()
+        self.__selectTracker()
+
             
+    def pause(self):
+        self.isRunning = False
+        
+    def start(self):
+        self.isRunning = True
         
     def init(self, frame, minSize = (0,0), maxSize = (0,0), colorLower = None, colorUpper = None, minPresence = 0.0):
-        detected, boundingBox = self._detect(frame, minSize, maxSize, colorLower, colorUpper, minPresence)
+        if not self.isRunning:
+            return False, None, 0
+            
+        detected, boundingBox, direction = self.__detect(frame, minSize, maxSize, colorLower, colorUpper, minPresence)
 
         if self.usingTracker and detected:
             self.clear()
             boundingBox = tuple(boundingBox)
-            return self._tracker.init(frame, boundingBox), boundingBox
+            return self.__tracker.init(frame, boundingBox), boundingBox, self.__rectToDirection(boundingBox)
             
-        return detected, boundingBox
+        return detected, boundingBox, direction
     
     def update(self, frame):
+        if not self.isRunning:
+            return False, None, 0
+            
         if self.usingTracker:
             delta = datetime.datetime.now() - self.lastDetectRunTime
             if delta.seconds > 3:
-                self.init(frame, *self.lastDetectionParameters)
-            return self._tracker.update(frame)
+                return self.init(frame, *self.lastDetectionParameters)
+
+            found, boundingBox = self.__tracker.update(frame)
+            return found, boundingBox, self.__rectToDirection(boundingBox)
         else:
-            return self._detect(frame, *self.lastDetectionParameters)
+            return self.__detect(frame, *self.lastDetectionParameters)
         
     def clear(self):
-        if(self._tracker is not None):
-            self._tracker.clear()
-        self._selectTracker()
+        if(self.__tracker is not None):
+            self.__tracker.clear()
+        self.__selectTracker()
 
-    def _detect(self, frame, minSize, maxSize, colorLower, colorUpper, minPresence):
+    def __detect(self, frame, minSize, maxSize, colorLower, colorUpper, minPresence):
         self.lastDetectRunTime = datetime.datetime.now()
         self.lastDetectionParameters = (minSize, maxSize, colorLower, colorUpper, minPresence)
         
         userColor = (colorLower is not None) and (colorUpper is not None)
         minPresence *= 255.0
         
-        objects = self._cascadeDetector.detectMultiScale(frame, scaleFactor=1.3, minNeighbors=5, flags=0, minSize=minSize, maxSize=maxSize)
+        objects = self.__cascadeDetector.detectMultiScale(frame, scaleFactor=1.3, minNeighbors=5, flags=0, minSize=minSize, maxSize=maxSize)
 
         for obj in objects:
             (x, y, w, h) = obj
@@ -62,27 +73,41 @@ class Tracker:
                     # Se não tiver essa porcentagem de cor, pula esse objeto
                     continue
                 
-            return True, obj
+            return True, obj, self.__rectToDirection(obj)
             
-        return False, None
+        return False, None, 0
     
-    def _selectTracker(self):
+    def __selectTracker(self):
         if self.methodName == '' or self.methodName == 'CASCADE':
-            self._tracker = None
+            self.__tracker = None
         elif self.methodName == 'BOOSTING':
-            self._tracker = cv2.TrackerBoosting_create()
+            self.__tracker = cv2.TrackerBoosting_create()
         elif self.methodName == 'MIL':
-            self._tracker = cv2.TrackerMIL_create()
+            self.__tracker = cv2.TrackerMIL_create()
         elif self.methodName == 'KCF':
-            self._tracker = cv2.TrackerKCF_create()
+            self.__tracker = cv2.TrackerKCF_create()
         elif self.methodName == 'TLD':
-            self._tracker = cv2.TrackerTLD_create()
+            self.__tracker = cv2.TrackerTLD_create()
         elif self.methodName == 'MEDIANFLOW':
-            self._tracker = cv2.TrackerMedianFlow_create()
+            self.__tracker = cv2.TrackerMedianFlow_create()
         elif self.methodName == 'GOTURN':
-            self._tracker = cv2.TrackerGOTURN_create()
+            self.__tracker = cv2.TrackerGOTURN_create()
         else:
             print("Algortimo '" + self.methodName + "' não reconhecido")
             self.methodName = ""
             
-        self.usingTracker = not(self._tracker is None)
+        self.usingTracker = not(self.__tracker is None)
+
+    # Faz uma interpolação para calcular a direção
+    # do centro do objeto relativo ao centro da tela
+    # Mapeia a posição em pixels na tela para uma direção entre -1 e 1
+    def __rectToDirection(self, rect):
+        objCenterX = rect[0] + (rect[2] / 2.0)
+        #direction = float(interp1d([0, self.resolution[0]], [-1, 1])(objCenterX))
+        return 0
+
+    @staticmethod
+    def rectToPoints(rect):
+        p1 = rect[0], rect[1]
+        p2 = rect[0] + rect[2], rect[1] + rect[3]
+        return p1, p2

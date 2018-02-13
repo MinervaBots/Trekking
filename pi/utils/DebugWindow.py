@@ -1,10 +1,10 @@
 import cv2
 
 class DebugWindow:
-    def __init__(self, enabled, windowName, width, height):
+    def __init__(self, enabled, windowName, resolution):
         self.enabled = enabled
-        self.width = width
-        self.height = height
+        self.width = resolution[0]
+        self.height = resolution[1]
         self.windowName = windowName
         
     def open(self):

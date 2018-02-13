@@ -8,11 +8,11 @@ class TemperatureControl:
         self.lastMeasure = time.time()
         self._temp = os.popen("vcgencmd measure_temp").readline()
         self._isWindows = isRaspberryPi = "linux" not in _platform
-        
+
     def update(self, log = False):
         if self._isWindows:
             return -1.0
-        
+            
         if time.time() - self.lastMeasure > self.delay:
             self._temp = os.popen("vcgencmd measure_temp").readline()
             self.lastMeasure = time.time()
