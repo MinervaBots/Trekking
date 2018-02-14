@@ -1,26 +1,30 @@
 from queue import Queue
 from serial import Serial
 from threading import Thread
-from typing import List
+from typing import List, Dict, Any
 from .MessageHandler import MessageHandler
 from .CommonMessageCodes import CommonMessageCodes
+import io
 
-class DefaultMessagingThread(Thread):
+class MessagingThread(Thread):
+    HandlerCollection = Dict[int, List[MessageHandler]]
+    
     def __init__(self, handlers : List[MessageHandler]):
-        super(DefaultMessagingThread, self).__init__()
+        super(MessagingThread, self).__init__()
         self.__sendQueue = Queue()
         
         self.__handlers = {}
         for handler in handlers:
             opCode = int(handler.opCode)
-            #print(opCode)
-            self.__handlers[opCode] = handler
+            if(opCode not in self.__handlers):
+                self.__handlers[opCode] = list()
+            self.__handlers[opCode].append(handler)
         
         self.setPort("")
         self.setOptions(9600, 0.1, 1000);
         self.setSeparators(",", ";")
         self.isRunning = False
-    
+        
     def setPort(self, port):
         self.port = port
         
@@ -39,33 +43,38 @@ class DefaultMessagingThread(Thread):
             
         self.stream = Serial(self.port, baudrate=self.baudRate, timeout=self.timeout)
         self.isRunning = True
-        super(DefaultMessagingThread, self).start()
+        super(MessagingThread, self).start()
         
     def close(self):
         self.isRunning = False
         
     def send(self, opCode, *args):
-        message = str(int(opCode)) + self.fieldSeparator + self.fieldSeparator.join(args) + self.messageSeparator
+        message = str(int(opCode)) + self.fieldSeparator + self.fieldSeparator.join(str(field) for field in args) + self.messageSeparator
         self.__sendQueue.put(message.encode())
 
     def run(self):
-        while self.isRunning:
+        while self.isRunning and self.stream.isOpen():
             # Primeiro envia as mensagens
             if not self.__sendQueue.empty():
                 self.stream.write(self.__sendQueue.get())
-                
-            streamInput = str(self.stream.readline().decode().strip(self.messageSeparator))
-            if(streamInput == ""):
-                continue
-            
-            message = streamInput.split(self.fieldSeparator)
+               
+            decodedBuffer : str = ""
+            while True:
+                oneByte = self.stream.read(1).decode()
+                if oneByte == self.messageSeparator:
+                    if(decodedBuffer != ""):
+                        break
+                else:
+                    decodedBuffer += oneByte
+
+            message = decodedBuffer.split(self.fieldSeparator)
             if(len(message) == 0):
                 continue
             
             opCode = int(message[0])
-            #print(opCode)
             if(opCode in self.__handlers):
-                self.__handlers[opCode].handle(message[1:])
+                for handler in self.__handlers[opCode]:
+                    handler.handle(self, message[1:])
             else:
                 self.send(CommonMessageCodes.ERROR, "Handler invalido")
         
