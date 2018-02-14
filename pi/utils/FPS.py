@@ -12,6 +12,7 @@ class FPS:
         self._delta = None
         self._numFrames = 0
         self.debug = debug
+        self.__lastFps = 0
         
     def start(self):
         # start the timer
@@ -37,6 +38,7 @@ class FPS:
         if(self.debug):
             print("FPS: {:.2f}".format(fps))
         
+        self.__lastFps = fps
         return fps
         
     def elapsed(self):
@@ -46,6 +48,8 @@ class FPS:
         dateTimeEnd = datetime.datetime.fromtimestamp(self._start)
         return (dateTimeStart - dateTimeEnd).total_seconds()
 
+    def lastFps(self):
+        return self.__lastFps
 
     def meanFps(self):
         # compute the (approximate) frames per second

@@ -33,8 +33,8 @@ builder = dic.container.ContainerBuilder()
 builder.register_class(ArduinoMessagingThread)
 builder.register_class(BluetoothMessagingThread)
 # Registra os handlers
-builder.register_module(BluetoothMessageHandlersModule())
 builder.register_module(ArduinoMessageHandlersModule())
+builder.register_module(BluetoothMessageHandlersModule())
 builder.register_class(StartTrackerHandler, register_as = [ArduinoMessageHandler, BluetoothMessageHandler], component_scope=dic.scope.SingleInstance)
 builder.register_class(PauseTrackerHandler, register_as = [ArduinoMessageHandler, BluetoothMessageHandler], component_scope=dic.scope.SingleInstance)
 
@@ -67,18 +67,7 @@ def setup():
     
     fps.start()
     window.open()
-    while systemInfo.isRunning:
-        try:
-            loop()
-        except KeyboardInterrupt:
-            stop(None)
-
-    fps.stop(True)
     
-    #arduinoMessagingThread.close()
-    bluetoothMessagingThread.close()
-    window.close()
-    video.stop()
 
 def loop():
     frame = video.read()
@@ -110,4 +99,22 @@ def loop():
     if window.update(frame) == 27:
         systemInfo.isRunning = False
 
-setup()
+def stop():
+    fps.stop(True)
+    
+    #arduinoMessagingThread.close()
+    bluetoothMessagingThread.close()
+    window.close()
+    video.stop()
+    
+def main():
+    setup()
+    
+    while systemInfo.isRunning:
+        try:
+            loop()
+        except KeyboardInterrupt:
+            break
+    stop()
+
+main()

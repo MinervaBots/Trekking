@@ -6,13 +6,14 @@ from .CommonMessageCodes import CommonMessageCodes
 from .ArduinoMessageHandlers import ArduinoMessageHandler
 from .BluetoothMessageHandlers import BluetoothMessageHandler
 from tracking.Tracker import Tracker
+from .MessagingThread import MessagingThread
 
 class StartTrackerHandler(ArduinoMessageHandler, BluetoothMessageHandler):
     def __init__(self, tracker : Tracker):
         self.opCode = CommonMessageCodes.START_TRACKING
         self.__tracker = tracker
         
-    def handle(self, message):
+    def handle(self, sender : MessagingThread, message):
         self.__tracker.start()
         
 class PauseTrackerHandler(ArduinoMessageHandler, BluetoothMessageHandler):
@@ -20,5 +21,5 @@ class PauseTrackerHandler(ArduinoMessageHandler, BluetoothMessageHandler):
         self.opCode = CommonMessageCodes.PAUSE_TRACKING
         self.__tracker = tracker
     
-    def handle(self, message):
+    def handle(self, sender : MessagingThread, message):
         self.__tracker.pause()

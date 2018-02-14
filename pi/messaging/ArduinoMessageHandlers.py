@@ -5,6 +5,7 @@ from enum import IntEnum, auto
 from .MessageHandler import *
 from .CommonMessageCodes import CommonMessageCodes
 from .BluetoothMessagingThread import BluetoothMessagingThread
+from .MessagingThread import MessagingThread
 
 class ArduinoMessageCodes(IntEnum):
 	LOG = 400
@@ -22,7 +23,7 @@ class ArduinoMessageHandler(MessageHandler, ABC):
 		self.opCode = 0
 	
 	@abstractmethod
-	def handle(self, message : List):
+	def handle(self, sender : MessagingThread, message : List):
 		raise NotImplementedError
 		
 class ArduinoLogMessageHandler(ArduinoMessageHandler):
@@ -30,6 +31,6 @@ class ArduinoLogMessageHandler(ArduinoMessageHandler):
 		self.opCode = ArduinoMessageCodes.LOG
 		self.__bluetoothMessager = bluetoothMessager
 		
-	def handle(self, message : List):
+	def handle(self, sender : MessagingThread, message : List):
 		print(message)
 		self.__bluetoothMessager.send(message[0], message[1:])

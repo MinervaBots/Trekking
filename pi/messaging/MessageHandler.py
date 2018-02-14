@@ -6,5 +6,5 @@ class MessageHandler(ABC):
 		self.opCode = 0
 	
 	@abstractmethod
-	def handle(self, message : List):
+	def handle(self, sender, message : List):
 		raise NotImplementedError
