@@ -15,7 +15,6 @@ class Tracker:
         self.methodName = trackingMethodName
         self.__selectTracker()
 
-            
     def pause(self):
         self.isRunning = False
         

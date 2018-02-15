@@ -1,7 +1,5 @@
 class VideoStream:
     def __init__(self, src=0, usePiCamera=False, resolution=(320, 240), framerate=32):
-        self.resolution = resolution
-        
         # check to see if the picamera module should be used
         if usePiCamera:
             # only import the picamera packages unless we are
@@ -20,7 +18,11 @@ class VideoStream:
         else:
             from .WebcamVideoStream import WebcamVideoStream
             self.stream = WebcamVideoStream(src=src,resolution=resolution,framerate=framerate)
-    	
+    
+    @property
+    def resolution(self):
+        return self.stream.resolution
+        
     def start(self):
         # start the threaded video stream
         return self.stream.start()

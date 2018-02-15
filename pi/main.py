@@ -15,13 +15,15 @@ from messaging.CommonMessageHandlers import *
 from messaging.ArduinoMessageHandlers import *
 from messaging.BluetoothMessageHandlers import *
 
+
 systemInfo = SystemInfo()
-tracker = Tracker("cascades/face.xml", (640, 368), "MEDIANFLOW")
-window = DebugWindow(systemInfo.enableWindow, "debug", tracker.resolution)
 
 #Captura de video
-video = VideoStream(usePiCamera = systemInfo.isRaspberryPi, framerate = 30, resolution = tracker.resolution)
+video = VideoStream(usePiCamera = systemInfo.isRaspberryPi, framerate = 30, resolution = (640, 360))
 video.start() # Inicializa a câmera aqui pra ter tempo de esquentar se for no Raspberry Pi
+
+tracker = Tracker("cascades/face.xml", video.resolution, "MEDIANFLOW")
+window = DebugWindow(systemInfo.enableWindow, "debug", tracker.resolution, True)
 
 #Medida de performance
 fps = FPS(False)
@@ -87,7 +89,7 @@ def loop():
         else:    
             systemInfo.trackedRect = [int(i) for i in systemInfo.trackedRect]
             p1, p2 = Tracker.rectToPoints(systemInfo.trackedRect)
-            window.rectangle(frame, p1, p2, (255, 0, 0), 2, 1)
+            window.rectangle(frame, p1, p2, (255, 255, 0), 2, 1)
             
             # Mapeia a posição em pixels na tela para uma direção entre -1 e 1
             #arduinoMessagingThread.send(ArduinoMessageCodes.TARGET_DATA, direction, *systemInfo.trackedRect)

@@ -1,24 +1,33 @@
 import cv2
 
 class DebugWindow:
-    def __init__(self, enabled, windowName, resolution):
+    def __init__(self, enabled : bool, windowName : str, resolution, record : bool):
         self.enabled = enabled
-        self.width = resolution[0]
-        self.height = resolution[1]
+        self.width = int(resolution[0])
+        self.height = int(resolution[1])
         self.windowName = windowName
+        self.record = record
         
+        if self.record:
+            self.out = cv2.VideoWriter('output.avi', cv2.VideoWriter_fourcc('M','J','P','G'), 60, (self.width, self.height))
+
     def open(self):
         if self.enabled:
             cv2.namedWindow(self.windowName)
             cv2.resizeWindow(self.windowName, self.width, self.height)
             
     def update(self, frame):
+        if self.record:
+            self.out.write(frame)
+
         if self.enabled:
             cv2.imshow(self.windowName, frame)
             return cv2.waitKey(1)
         return -1
         
     def close(self):
+        if self.record:
+            self.out.release()
         if self.enabled:
             cv2.destroyWindow(self.windowName)
 

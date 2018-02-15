@@ -17,6 +17,10 @@ class PiVideoStream:
         self.frame = None
         self.stopped = False
 
+    @property
+    def resolution(self):
+        return self.camera.resolution
+        
     def start(self):
         self.stream = self.camera.capture_continuous(self.rawCapture, format="bgr", use_video_port=True)
         # start the thread to read frames from the video stream

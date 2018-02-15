@@ -8,7 +8,7 @@ class WebcamVideoStream:
         # be stopped
         self.stopped = False
         self.src = src
-        self.resolution = resolution
+        self.resolution = list(resolution)
         self.framerate = framerate
         
     def start(self):
@@ -21,6 +21,10 @@ class WebcamVideoStream:
             self.stream.set(cv2.CAP_PROP_FRAME_WIDTH, int(self.resolution[0]))
             self.stream.set(cv2.CAP_PROP_FRAME_HEIGHT, int(self.resolution[1]))
 
+            
+        self.resolution[0] = self.stream.get(cv2.CAP_PROP_FRAME_WIDTH)
+        self.resolution[1] = self.stream.get(cv2.CAP_PROP_FRAME_HEIGHT)
+        
         (self.grabbed, self.frame) = self.stream.read()
         # start the thread to read frames from the video stream
         Thread(target=self.update, args=()).start()
