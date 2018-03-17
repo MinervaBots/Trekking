@@ -9,7 +9,7 @@ class DebugWindow:
         self.record = record
         
         if self.record:
-            self.out = cv2.VideoWriter('output.avi', cv2.VideoWriter_fourcc('M','J','P','G'), 60, (self.width, self.height))
+            self.out = cv2.VideoWriter('output.mp4', cv2.VideoWriter_fourcc('F','M','P', '4'), 60, (self.width, self.height))
 
     def open(self):
         if self.enabled:
