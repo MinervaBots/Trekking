@@ -7,7 +7,7 @@
 #include <Servo.h>
 
 #include "Transform.h"
-#include "UltrassonicArray.h"
+#include "SonicArray.h"
 
 extern bool isRunning;
 extern void (*state)(unsigned long);
@@ -34,6 +34,6 @@ extern Transform currentTransform;
 extern LinkedList<Vector2> targets;
 extern Vector2* currentTarget;
 
-extern UltrassonicArray ultrassonicArray;
+extern SonicArray sonicArray;
 
 #endif //VARIABLES_H

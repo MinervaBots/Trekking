@@ -5,4 +5,6 @@
 #define STEERING_SERVO_PIN 11
 #define ESC_PIN 11
 
+#define PIN_ULTRASSONIC_TRIGGER 8
+
 #endif

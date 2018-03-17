@@ -1,5 +1,5 @@
 #include "Variables.h"
-
+#include "Pins.h"
 #include <Arduino.h>
 
 bool isRunning = false;
@@ -32,4 +32,4 @@ LinkedList<Vector2> targets;
 Vector2* currentTarget;
 
 
-UltrassonicArray ultrassonicArray;
+SonicArray sonicArray(PIN_ULTRASSONIC_TRIGGER);

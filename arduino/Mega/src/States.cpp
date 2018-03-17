@@ -44,6 +44,8 @@ void refinedSearch(unsigned long deltaTime)
     return;
   }
 
+  sonicArray.update();
+  /*
   float avoidMultiplyer;
   if (ultrassonicArray.evaluate(&avoidMultiplyer))
   {
@@ -60,6 +62,7 @@ void refinedSearch(unsigned long deltaTime)
       linearSpeed = ESC_MAX_BACKWARD;
     }
   }
+  */
 }
 
 int targetCount = 0;
