@@ -1,4 +1,12 @@
-.pioenvs
-.piolibdeps
-.vscode/c_cpp_properties.json
-.vscode/launch.json
+# Referentes ao VSCode
+.vscode/*
+#!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+
+
+#Referentes ao PlatformIO
+.pioenvs/
+.sconsign.dblite
