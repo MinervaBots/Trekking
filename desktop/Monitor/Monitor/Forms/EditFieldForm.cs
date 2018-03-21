@@ -1,24 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Monitor.Controls;
+using System;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Monitor.Forms
 {
     public partial class EditFieldForm : Form
     {
-        private ParameterField _fieldToEdit;
+        private ParameterField.Data _fieldToEdit;
 
-        public EditFieldForm(ParameterField fieldToEdit, bool creating = false)
+        public EditFieldForm(ParameterField.Data fieldToEdit, bool creating = false)
         {
             InitializeComponent();
 
-            this.cb_ValueType.DataSource = Enum.GetValues(typeof(ParameterField.FieldType))
+            this.cb_ValueType.DataSource = Enum.GetValues(typeof(ParameterField.Data.FieldType))
                 .Cast<Enum>()
                 .Select(value => new
                 {
@@ -31,7 +27,6 @@ namespace Monitor.Forms
             cb_ValueType.ValueMember = "value";
 
             _fieldToEdit = fieldToEdit;
-
             if (creating)
             {
                 Text = "Novo campo";
@@ -41,36 +36,31 @@ namespace Monitor.Forms
                 Text = "Editando campo";
             }
 
-            if (fieldToEdit.Parent != null)
-            {
-                groupBox1.Text = fieldToEdit.Parent.Name;
-                Text += " - " + fieldToEdit.Parent.Name;
-            }
-
+        
+            groupBox1.Text = fieldToEdit.ParentGroupData.Name;
+            Text += " - " + fieldToEdit.ParentGroupData.Name;
+            
             tb_Name.Text = fieldToEdit.Name;
             tb_Tooltip.Text = fieldToEdit.Tooltip;
             cb_ValueType.DataBindings.Add(new Binding("SelectedValue", fieldToEdit, nameof(fieldToEdit.Type), true));
+            tb_Name.DataBindings.Add(new Binding("Text", fieldToEdit, nameof(fieldToEdit.Name), true));
+            tb_Tooltip.DataBindings.Add(new Binding("Text", fieldToEdit, nameof(fieldToEdit.Tooltip), true));
 
             timer1.Start();
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            _fieldToEdit.Name = tb_Name.Text;
-            _fieldToEdit.Tooltip = tb_Tooltip.Text;
-
-            _fieldToEdit.Type = (ParameterField.FieldType)cb_ValueType.SelectedValue;
-
             switch (_fieldToEdit.Type)
             {
-                case ParameterField.FieldType.Text:
+                case ParameterField.Data.FieldType.Text:
                     _fieldToEdit.Value = tb_DefaultValueText.Text;
                     break;
-                case ParameterField.FieldType.Numeric:
+                case ParameterField.Data.FieldType.Numeric:
                     _fieldToEdit.Value = tb_DefaultValueNumeric.Text;
                     tb_DefaultValueNumeric.Visible = true;
                     break;
-                case ParameterField.FieldType.Boolean:
+                case ParameterField.Data.FieldType.Boolean:
                     _fieldToEdit.Value = cb_DefaultValueBoolean.Checked;
                     break;
             }
@@ -86,21 +76,21 @@ namespace Monitor.Forms
             
             switch (_fieldToEdit.Type)
             {
-                case ParameterField.FieldType.Numeric:
+                case ParameterField.Data.FieldType.Numeric:
                     if(!tb_DefaultValueNumeric.Visible)
                         tb_DefaultValueNumeric.Visible = true;
                     tb_DefaultValueText.Visible = false;
                     cb_DefaultValueBoolean.Visible = false;
                     break;
 
-                case ParameterField.FieldType.Text:
+                case ParameterField.Data.FieldType.Text:
                     tb_DefaultValueNumeric.Visible = false;
                     if (!tb_DefaultValueText.Visible)
                         tb_DefaultValueText.Visible = true;
                     cb_DefaultValueBoolean.Visible = false;
                     break;
 
-                case ParameterField.FieldType.Boolean:
+                case ParameterField.Data.FieldType.Boolean:
                     tb_DefaultValueNumeric.Visible = false;
                     tb_DefaultValueText.Visible = false;
                     if (!cb_DefaultValueBoolean.Visible)

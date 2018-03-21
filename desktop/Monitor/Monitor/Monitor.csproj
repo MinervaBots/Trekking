@@ -47,11 +47,23 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Classes\Configuration.cs" />
-    <Compile Include="Forms\CreateFieldForm.cs">
+    <Compile Include="Controls\ParameterField.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\ParameterField.Designer.cs">
+      <DependentUpon>ParameterField.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ParameterGroup.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\ParameterGroup.Designer.cs">
+      <DependentUpon>ParameterGroup.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\EditFieldForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\CreateFieldForm.Designer.cs">
-      <DependentUpon>CreateFieldForm.cs</DependentUpon>
+    <Compile Include="Forms\EditFieldForm.Designer.cs">
+      <DependentUpon>EditFieldForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Main.cs">
       <SubType>Form</SubType>
@@ -63,8 +75,14 @@
     <Compile Include="Classes\ParameterGroup.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Forms\CreateFieldForm.resx">
-      <DependentUpon>CreateFieldForm.cs</DependentUpon>
+    <EmbeddedResource Include="Controls\ParameterField.resx">
+      <DependentUpon>ParameterField.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\ParameterGroup.resx">
+      <DependentUpon>ParameterGroup.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\EditFieldForm.resx">
+      <DependentUpon>EditFieldForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Main.resx">
       <DependentUpon>Main.cs</DependentUpon>

@@ -1,18 +1,10 @@
 ﻿using Monitor.Classes;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.VisualBasic;
-using Monitor.Forms;
 using System.Xml.Serialization;
 using System.IO;
-using System.Xml;
+using Monitor.Controls;
 
 namespace Monitor
 {
@@ -24,6 +16,8 @@ namespace Monitor
         {
             InitializeComponent();
             LoadConfiguration(Program.Configuration);
+
+            timer1.Start();
         }
         
         private void LoadConfiguration(Configuration config)
@@ -31,37 +25,73 @@ namespace Monitor
             _configuration = config;
             foreach (var group in config.Groups)
             {
-                CreateGroup(group);
+                var control = new ParameterGroup(group);
+                pnl_Variables.Controls.Add(control);
             }
         }
-        
-        private void CreateGroup(ParameterGroup parameterGroup)
+
+        private void salvarToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var groupBox = new GroupBox();
-            groupBox.Text = parameterGroup.Name;
-            groupBox.Width = pnl_Variables.Width;
+            if (saveFileDialog1.ShowDialog() != DialogResult.OK || string.IsNullOrWhiteSpace(saveFileDialog1.FileName))
+                return;
 
-            if (pnl_Variables.Controls.Count > 0)
+
+            var serializer = new XmlSerializer(typeof(Configuration));
+
+            using (StreamWriter writer = new StreamWriter(saveFileDialog1.FileName))
             {
-                var previousControl = pnl_Variables.Controls[pnl_Variables.Controls.Count - 1];
-                var location = new Point(0, previousControl.Location.Y + previousControl.Height + 5);
-                groupBox.Location = location;
-            }
-
-            groupBox.ContextMenuStrip = cms_Group;
-
-            parameterGroup.Object = groupBox;
-            groupBox.Height = 45;
-            pnl_Variables.Controls.Add(groupBox);
-
-            groupBox.Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top;
-            foreach (var field in parameterGroup.Fields)
-            {
-                field.Parent = parameterGroup;
-                CreateField(field, parameterGroup.Object);
+                serializer.Serialize(writer, _configuration);
             }
         }
 
+        private void abrirToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (openFileDialog1.ShowDialog() != DialogResult.OK || string.IsNullOrWhiteSpace(openFileDialog1.FileName))
+                return;
+
+            pnl_Variables.Controls.Clear();
+            var serializer = new XmlSerializer(typeof(Configuration));
+
+            using (StreamReader reader = new StreamReader(openFileDialog1.FileName))
+            {
+                if (serializer.Deserialize(reader) is Configuration configuration)
+                {
+                    Program.Configuration = configuration;
+                    LoadConfiguration(configuration);
+                }
+            }
+        }
+
+        private void btn_NewGroup_Click(object sender, EventArgs e)
+        {
+            var groupName = Interaction.InputBox("Digite o nome do novo grupo", "Novo grupo", "");
+            if (string.IsNullOrWhiteSpace(groupName))
+                return;
+
+            var group = new ParameterGroup.Data() { Name = groupName };
+
+            _configuration.Groups.Add(group);
+            //CreateGroup(group);
+
+            var control = new ParameterGroup(group);
+            pnl_Variables.Controls.Add(control);
+            control.Anchor = (AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right);
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            for (int i = _configuration.Groups.Count - 1; i >= 0; i--)
+            {
+                var group = _configuration.Groups[i];
+                if(group.WasRemoved)
+                {
+                    _configuration.Groups.Remove(group);
+                    pnl_Variables.Controls.Remove(group.Container);
+                }
+            }
+        }
+
+        /*
         private void CreateField(ParameterField parameterField, Control parent)
         {
             Control field = null;
@@ -76,11 +106,6 @@ namespace Monitor
                 case ParameterField.FieldType.Boolean:
                     field = new CheckBox() { Text = "", Checked = (bool)parameterField.Value };
                     break;
-                    /*
-                case ParameterField.FieldType.Selection:
-                    field = new ComboBox();
-                    break;
-                    */
             }
             
             var label = new Label();
@@ -158,37 +183,7 @@ namespace Monitor
             }
         }
 
-        private void salvarToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (saveFileDialog1.ShowDialog() != DialogResult.OK || string.IsNullOrWhiteSpace(saveFileDialog1.FileName))
-                return;
-
-            
-            var serializer = new XmlSerializer(typeof(Configuration));
-
-            using (StreamWriter writer = new StreamWriter(saveFileDialog1.FileName))
-            {
-                serializer.Serialize(writer, _configuration);
-            }
-        }
-
-        private void abrirToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (openFileDialog1.ShowDialog() != DialogResult.OK || string.IsNullOrWhiteSpace(openFileDialog1.FileName))
-                return;
-
-            pnl_Variables.Controls.Clear();
-            var serializer = new XmlSerializer(typeof(Configuration));
-
-            using (StreamReader reader = new StreamReader(openFileDialog1.FileName))
-            {
-                if (serializer.Deserialize(reader) is Configuration configuration)
-                {
-                    Program.Configuration = configuration;
-                    LoadConfiguration(configuration);
-                }
-            }
-        }
+        
         
         private void tsmi_DeleteField_Click(object sender, EventArgs e)
         {
@@ -274,5 +269,6 @@ namespace Monitor
             }
             return senderField;
         }
+        */
     }
 }
