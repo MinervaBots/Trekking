@@ -42,6 +42,89 @@ void SonicArray::update()
     }
 }
 
+/**
+ * Handles the echo signal from an ultrasonic sensor.
+ * To be called from within an interrupt, it checks all the echo
+ * pins to see if any of them is HIGH or LOW and updates the echo
+ * pulse times of the respective sensor.
+ * If a pulse has already been set, then the new value is ignored.
+ * @param intVector The vector that the interrupt originated from
+ */
+void SonicArray::handleEcho(Vector intVector) 
+{
+    // Determine which vector the interrupt originated from
+    // so we only check signals from those specific sensors
+    int sensorsInVector[7] = {0}; // We have up to 7 sensors in each vector
+    switch (intVector) {
+        case VECTOR_0:
+            // Ultrasonic 0 is on PCINT0_vect
+            sensorsInVector[0] = 0;
+            sensorsInVector[1] = 0;
+            sensorsInVector[2] = 0;
+            sensorsInVector[3] = 0;
+            sensorsInVector[4] = 0;
+            sensorsInVector[5] = 0;
+            sensorsInVector[6] = 0;
+            break;
+
+        case VECTOR_2:
+            // Ultrasonics 1, 2, 3, 4, 5, 6, 7 and 8 are on PCINT2_vect
+            sensorsInVector[0] = 1;
+            sensorsInVector[1] = 2;
+            sensorsInVector[2] = 3;
+            sensorsInVector[3] = 4;
+            sensorsInVector[4] = 5;
+            sensorsInVector[5] = 6;
+            sensorsInVector[6] = 7;
+            // sensorsInVector[7] = 8;
+            break;
+        default:
+            break; // We should not be here
+    }
+
+    // Iterate through the specific vector's ultrasonic echo pins
+    for (int i : sensorsInVector) 
+    {
+        // If a pin is HIGH, it means that a pulse
+        // is either just starting or has previously started.
+        // We only care about the former.
+        if (digitalRead(sensors_[i].getEchoPin()) == HIGH) 
+        {
+            // We only care for newly generated pulses and not ones
+            // we have handled before.
+            if (sensors_[i].getStartOfPulse() == 0) 
+            {
+                sensors_[i].setStartOfPulse(micros());
+            }
+        } else 
+        {
+            // If a pin is LOW, it means that a pulse has just ended,
+            // has already ended or not started. We only care about
+            // the first case. We can determine this by pulses which
+            // we have not handled before AND that have already started
+            if (sensors_[i].getEndOfPulse() == 0 && sensors_[i].getStartOfPulse() != 0) 
+            {
+                sensors_[i].setEndOfPulse(micros());
+            }
+        }
+    }
+}
+
+void SonicArray::setupChangeInterrupt() 
+{
+    for (int i = 0; i < NUM_OF_SENSORS; i++)
+    {
+        auto echoPin = sensors_[i].getEchoPin(); 
+        pinMode(echoPin, INPUT);
+        // Enable interrupt for pin
+        *digitalPinToPCMSK(echoPin) |= bit(digitalPinToPCMSKbit(echoPin));
+        // Clear any outstanding interrupt
+        PCIFR |= bit(digitalPinToPCICRbit(echoPin));
+        // Enable interrupt for the pin's group
+        PCICR |= bit(digitalPinToPCICRbit(echoPin));
+    }
+}
+
 void SonicArray::triggerSensors()
 {
     digitalWrite(triggerPin_, LOW);

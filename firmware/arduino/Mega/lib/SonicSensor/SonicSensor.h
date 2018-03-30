@@ -13,12 +13,6 @@ public:
     SonicSensor(uint8_t echoPin);
 
     /**
-     * Gets the trigger pin of the ultrasonic sensor
-     * @return The trigger pin of the ultrasonic sensor
-     */
-    uint8_t getTriggerPin();
-
-    /**
      * Gets the echo pin of the ultrasonic sensor
      * @return The echo pin of the ultrasonic sensor
      */

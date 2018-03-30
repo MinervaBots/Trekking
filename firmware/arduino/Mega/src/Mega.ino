@@ -16,12 +16,14 @@ void attachHandlers();
 
 unsigned long lastRun;
 
+SonicArray sonicArray(PIN_ULTRASSONIC_TRIGGER);
 
 void setup()
 {
+  attachHandlers();
   Serial.begin(RPI_BAUD_RATE);
   Serial1.begin(MPU_BAUD_RATE);
-  attachHandlers();
+  sonicArray.setupChangeInterrupt();
   
   cameraServo.attach(CAMERA_SERVO_PIN);
   steeringServo.attach(STEERING_SERVO_PIN);
@@ -73,4 +75,12 @@ void attachHandlers()
   
   mpuCmdMessenger.attach(mpuData, onRecvMpuData);
   mpuCmdMessenger.attach(onRecvUnknownCommand);
+}
+
+ISR (PCINT0_vect) {
+    sonicArray.handleEcho(SonicArray::Vector::VECTOR_0);
+}
+
+ISR (PCINT2_vect) {
+    sonicArray.handleEcho(SonicArray::Vector::VECTOR_2);
 }
