@@ -3,8 +3,9 @@
 
 #include <stdint.h>
 
-class SonicSensor {
-public:
+class SonicSensor
+{
+  public:
     /**
      * The default constructor of a SonicSensor (HC-SR04 Ultrasonic sensor)
      * @param triggerPin The trigger pin of the ultrasonic sensor
@@ -82,8 +83,8 @@ public:
      * @return Distance in centimeters or error code (0)
      */
     uint8_t getDistance();
-    
-private:
+
+  private:
     uint8_t mEchoPin, mDistance;
     unsigned long mStartOfPulseNonVolatile, mEndOfPulseNonVolatile;
     volatile unsigned long mStartOfPulse, mEndOfPulse;
