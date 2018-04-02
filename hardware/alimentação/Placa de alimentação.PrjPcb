@@ -71,6 +71,10 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=SNTLKYEV
 
+[GeneratedDocument1]
+DocumentPath=Project Outputs for Placa de alimentação\Placa de alimentação.nsx
+DItemRevisionGUID=
+
 [Configuration1]
 Name=Sources
 ParameterCount=0
@@ -79,11 +83,12 @@ ReleaseItemId=
 Variant=[No Variations]
 OutputJobsCount=0
 ContentTypeGUID=CB6F2064-E317-11DF-B822-12313F0024A2
+ConfigurationType=Source
 
 [OutputGroup1]
 Name=Netlist Outputs
 Description=
-TargetPrinter=HP LaserJet P2015 PCL6
+TargetPrinter=HP2BEF9F (HP Officejet Pro 6830)
 PrinterOptions=Record=PrinterOptions|Copies=1|Duplex=1|TrueTypeOptions=3|Collate=1|PrintJobKind=1|PrintWhat=1
 OutputType1=CadnetixNetlist
 OutputName1=Cadnetix Netlist
@@ -194,13 +199,15 @@ OutputDefault21=0
 [OutputGroup2]
 Name=Simulator Outputs
 Description=
-TargetPrinter=HP LaserJet P2015 PCL6
+TargetPrinter=HP2BEF9F (HP Officejet Pro 6830)
 PrinterOptions=Record=PrinterOptions|Copies=1|Duplex=1|TrueTypeOptions=3|Collate=1|PrintJobKind=1|PrintWhat=1
 OutputType1=AdvSimNetlist
 OutputName1=Mixed Sim
 OutputDocumentPath1=
 OutputVariantName1=
 OutputDefault1=0
+Configuration1_Name1=OutputConfigurationParameter1
+Configuration1_Item1=Record=AdvSimNetlistView|SimulationName=Mixed Sim|ProfileId=DQJCGIDH|OldCfgLoaded=True
 
 [OutputGroup3]
 Name=Documentation Outputs
@@ -283,7 +290,7 @@ PageOptions12=Record=PageOptions|CenterHorizontal=True|CenterVertical=True|Print
 [OutputGroup4]
 Name=Assembly Outputs
 Description=
-TargetPrinter=HP LaserJet P2015 PCL6
+TargetPrinter=HP2BEF9F (HP Officejet Pro 6830)
 PrinterOptions=Record=PrinterOptions|Copies=1|Duplex=1|TrueTypeOptions=3|Collate=1|PrintJobKind=1|PrintWhat=1
 OutputType1=Assembly
 OutputName1=Assembly Drawings
@@ -305,7 +312,7 @@ OutputDefault3=0
 [OutputGroup5]
 Name=Fabrication Outputs
 Description=
-TargetPrinter=HP LaserJet P2015 PCL6
+TargetPrinter=HP2BEF9F (HP Officejet Pro 6830)
 PrinterOptions=Record=PrinterOptions|Copies=1|Duplex=1|TrueTypeOptions=3|Collate=1|PrintJobKind=1|PrintWhat=1
 OutputType1=Board Stack Report
 OutputName1=Report Board Stack
@@ -377,7 +384,7 @@ OutputDefault12=0
 [OutputGroup6]
 Name=Report Outputs
 Description=
-TargetPrinter=HP LaserJet P2015 PCL6
+TargetPrinter=HP2BEF9F (HP Officejet Pro 6830)
 PrinterOptions=Record=PrinterOptions|Copies=1|Duplex=1|TrueTypeOptions=3|Collate=1|PrintJobKind=1|PrintWhat=1
 OutputType1=BOM_PartType
 OutputName1=Bill of Materials
@@ -414,7 +421,7 @@ OutputDefault6=0
 [OutputGroup7]
 Name=Other Outputs
 Description=
-TargetPrinter=HP LaserJet P2015 PCL6
+TargetPrinter=HP2BEF9F (HP Officejet Pro 6830)
 PrinterOptions=Record=PrinterOptions|Copies=1|Duplex=1|TrueTypeOptions=3|Collate=1|PrintJobKind=1|PrintWhat=1
 OutputType1=Text Print
 OutputName1=Text Print
@@ -594,7 +601,7 @@ PageOptions29=Record=PageOptions|CenterHorizontal=True|CenterVertical=True|Print
 [OutputGroup8]
 Name=Validation Outputs
 Description=
-TargetPrinter=HP LaserJet P2015 PCL6
+TargetPrinter=HP2BEF9F (HP Officejet Pro 6830)
 PrinterOptions=Record=PrinterOptions|Copies=1|Duplex=1|TrueTypeOptions=3|Collate=1|PrintJobKind=1|PrintWhat=1
 OutputType1=Component states check
 OutputName1=Vault's components states check
@@ -633,7 +640,7 @@ OutputDefault6=0
 [OutputGroup9]
 Name=Export Outputs
 Description=
-TargetPrinter=HP LaserJet P2015 PCL6
+TargetPrinter=HP2BEF9F (HP Officejet Pro 6830)
 PrinterOptions=Record=PrinterOptions|Copies=1|Duplex=1|TrueTypeOptions=3|Collate=1|PrintJobKind=1|PrintWhat=1
 OutputType1=AutoCAD dwg/dxf PCB
 OutputName1=AutoCAD dwg/dxf File PCB
@@ -684,7 +691,7 @@ OutputDefault9=0
 [OutputGroup10]
 Name=PostProcess Outputs
 Description=
-TargetPrinter=HP LaserJet P2015 PCL6
+TargetPrinter=HP2BEF9F (HP Officejet Pro 6830)
 PrinterOptions=Record=PrinterOptions|Copies=1|Duplex=1|TrueTypeOptions=3|Collate=1|PrintJobKind=1|PrintWhat=1
 OutputType1=Copy Files
 OutputName1=Copy Files
@@ -993,6 +1000,54 @@ NetClassSeparateForBusSections=0
 SelectedOnly=0
 UpdateVariants=1
 PartTypes=0
+ComponentLibIdentifierKind0=Library Name And Type
+ComponentLibraryIdentifier0=Header.SchLib
+ComponentDesignItemID0=Male Pin Head 1x1
+ComponentSymbolReference0=Male Pin Head 1x1
+ComponentUpdate0=1
+ComponentIsDeviceSheet0=0
+ComponentLibIdentifierKind1=Library Name And Type
+ComponentLibraryIdentifier1=Header.SchLib
+ComponentDesignItemID1=XT90
+ComponentSymbolReference1=XT90
+ComponentUpdate1=1
+ComponentIsDeviceSheet1=0
+ComponentLibIdentifierKind2=Library Name And Type
+ComponentLibraryIdentifier2=KK Conectors.SchLib
+ComponentDesignItemID2=KK2
+ComponentSymbolReference2=KK2
+ComponentUpdate2=1
+ComponentIsDeviceSheet2=0
+ComponentLibIdentifierKind3=Library Name And Type
+ComponentLibraryIdentifier3=LM7812CT_NOPB.SCHLIB
+ComponentDesignItemID3=LM7812CT/NOPB
+ComponentSymbolReference3=LM7812CT/NOPB
+ComponentUpdate3=1
+ComponentIsDeviceSheet3=0
+ComponentLibIdentifierKind4=Library Name And Type
+ComponentLibraryIdentifier4=Miscellaneous Devices.IntLib
+ComponentDesignItemID4=2N3906
+ComponentSymbolReference4=2N3906
+ComponentUpdate4=1
+ComponentIsDeviceSheet4=0
+ComponentLibIdentifierKind5=Library Name And Type
+ComponentLibraryIdentifier5=Miscellaneous Devices.IntLib
+ComponentDesignItemID5=Cap
+ComponentSymbolReference5=Cap
+ComponentUpdate5=1
+ComponentIsDeviceSheet5=0
+ComponentLibIdentifierKind6=Library Name And Type
+ComponentLibraryIdentifier6=Miscellaneous Devices.IntLib
+ComponentDesignItemID6=MOSFET-P
+ComponentSymbolReference6=MOSFET-P
+ComponentUpdate6=1
+ComponentIsDeviceSheet6=0
+ComponentLibIdentifierKind7=Library Name And Type
+ComponentLibraryIdentifier7=Miscellaneous Devices.IntLib
+ComponentDesignItemID7=Res1
+ComponentSymbolReference7=Res1
+ComponentUpdate7=1
+ComponentIsDeviceSheet7=0
 FullReplace=1
 UpdateDesignatorLock=1
 UpdatePartIDLock=1
@@ -1006,6 +1061,101 @@ RemoveParameters=0
 AddModels=1
 RemoveModels=1
 UpdateCurrentModels=1
+ParameterName0=Availability
+ParameterUpdate0=1
+ParameterName1=Comment
+ParameterUpdate1=1
+ParameterName2=Component Kind
+ParameterUpdate2=1
+ParameterName3=ComponentLink1Description
+ParameterUpdate3=1
+ParameterName4=ComponentLink1URL
+ParameterUpdate4=1
+ParameterName5=ComponentLink2Description
+ParameterUpdate5=1
+ParameterName6=ComponentLink2URL
+ParameterUpdate6=1
+ParameterName7=DatasheetVersion
+ParameterUpdate7=1
+ParameterName8=Description
+ParameterUpdate8=1
+ParameterName9=LatestRevisionDate
+ParameterUpdate9=1
+ParameterName10=LatestRevisionNote
+ParameterUpdate10=1
+ParameterName11=Library Reference
+ParameterUpdate11=1
+ParameterName12=MF
+ParameterUpdate12=1
+ParameterName13=MP
+ParameterUpdate13=1
+ParameterName14=Package
+ParameterUpdate14=1
+ParameterName15=PackageDescription
+ParameterUpdate15=1
+ParameterName16=PackageReference
+ParameterUpdate16=1
+ParameterName17=PackageVersion
+ParameterUpdate17=1
+ParameterName18=Price
+ParameterUpdate18=1
+ParameterName19=Published
+ParameterUpdate19=1
+ParameterName20=Publisher
+ParameterUpdate20=1
+ParameterName21=Value
+ParameterUpdate21=1
+ModelTypeGroup0=PCBLIB
+ModelTypeUpdate0=1
+ModelType0=PCBLIB
+ModelName0=AXIAL-0.3
+ModelUpdate0=1
+ModelType1=PCBLIB
+ModelName1=E3
+ModelUpdate1=1
+ModelType2=PCBLIB
+ModelName2=HEADER 1X1 8.5MM
+ModelUpdate2=1
+ModelType3=PCBLIB
+ModelName3=KK2
+ModelUpdate3=1
+ModelType4=PCBLIB
+ModelName4=RAD-0.3
+ModelUpdate4=1
+ModelType5=PCBLIB
+ModelName5=TO254P1054X470X2934-3
+ModelUpdate5=1
+ModelType6=PCBLIB
+ModelName6=TO-92A
+ModelUpdate6=1
+ModelType7=PCBLIB
+ModelName7=XT90
+ModelUpdate7=1
+ModelTypeGroup1=SI
+ModelTypeUpdate1=1
+ModelType8=SI
+ModelName8=2N3906
+ModelUpdate8=1
+ModelType9=SI
+ModelName9=Cap
+ModelUpdate9=1
+ModelType10=SI
+ModelName10=Res
+ModelUpdate10=1
+ModelTypeGroup2=SIM
+ModelTypeUpdate2=1
+ModelType11=SIM
+ModelName11=2N3906
+ModelUpdate11=1
+ModelType12=SIM
+ModelName12=CAP
+ModelUpdate12=1
+ModelType13=SIM
+ModelName13=PMOS
+ModelUpdate13=1
+ModelType14=SIM
+ModelName14=RESISTOR
+ModelUpdate14=1
 
 [DatabaseUpdateOptions]
 SelectedOnly=0
