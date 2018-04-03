@@ -38,40 +38,6 @@ PrefsVaultGUID=
 PrefsRevisionGUID=
 
 [Document1]
-DocumentPath=Header.PcbLib
-AnnotationEnabled=1
-AnnotateStartValue=1
-AnnotationIndexControlEnabled=0
-AnnotateSuffix=
-AnnotateScope=All
-AnnotateOrder=-1
-DoLibraryUpdate=1
-DoDatabaseUpdate=1
-ClassGenCCAutoEnabled=1
-ClassGenCCAutoRoomEnabled=1
-ClassGenNCAutoScope=None
-DItemRevisionGUID=
-GenerateClassCluster=0
-DocumentUniqueId=NSQCUOAI
-
-[Document2]
-DocumentPath=Header.SchLib
-AnnotationEnabled=1
-AnnotateStartValue=1
-AnnotationIndexControlEnabled=0
-AnnotateSuffix=
-AnnotateScope=All
-AnnotateOrder=-1
-DoLibraryUpdate=1
-DoDatabaseUpdate=1
-ClassGenCCAutoEnabled=1
-ClassGenCCAutoRoomEnabled=1
-ClassGenNCAutoScope=None
-DItemRevisionGUID=
-GenerateClassCluster=0
-DocumentUniqueId=
-
-[Document3]
 DocumentPath=Arduino MEGA blank shield.pcbdoc
 AnnotationEnabled=1
 AnnotateStartValue=1
@@ -88,41 +54,7 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=TITPXTSG
 
-[Document4]
-DocumentPath=KK Conectors.SchLib
-AnnotationEnabled=1
-AnnotateStartValue=1
-AnnotationIndexControlEnabled=0
-AnnotateSuffix=
-AnnotateScope=All
-AnnotateOrder=-1
-DoLibraryUpdate=1
-DoDatabaseUpdate=1
-ClassGenCCAutoEnabled=1
-ClassGenCCAutoRoomEnabled=1
-ClassGenNCAutoScope=None
-DItemRevisionGUID=
-GenerateClassCluster=0
-DocumentUniqueId=
-
-[Document5]
-DocumentPath=KK Connectors.PcbLib
-AnnotationEnabled=1
-AnnotateStartValue=1
-AnnotationIndexControlEnabled=0
-AnnotateSuffix=
-AnnotateScope=All
-AnnotateOrder=-1
-DoLibraryUpdate=1
-DoDatabaseUpdate=1
-ClassGenCCAutoEnabled=1
-ClassGenCCAutoRoomEnabled=1
-ClassGenNCAutoScope=None
-DItemRevisionGUID=
-GenerateClassCluster=0
-DocumentUniqueId=XTKOGFLG
-
-[Document6]
+[Document2]
 DocumentPath=Shield Arduino.SchDoc
 AnnotationEnabled=1
 AnnotateStartValue=1
@@ -139,81 +71,73 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=XFKYEDQJ
 
-[GeneratedDocument1]
-DocumentPath=Project Outputs for ArduinoMegaSheild\Arduino MEGA blank shield.DRR
+[Document3]
+DocumentPath=..\libraries\Header.PcbLib
+AnnotationEnabled=1
+AnnotateStartValue=1
+AnnotationIndexControlEnabled=0
+AnnotateSuffix=
+AnnotateScope=All
+AnnotateOrder=-1
+DoLibraryUpdate=1
+DoDatabaseUpdate=1
+ClassGenCCAutoEnabled=1
+ClassGenCCAutoRoomEnabled=1
+ClassGenNCAutoScope=None
 DItemRevisionGUID=
+GenerateClassCluster=0
+DocumentUniqueId=
 
-[GeneratedDocument2]
-DocumentPath=Project Outputs for ArduinoMegaSheild\Arduino MEGA blank shield.EXTREP
+[Document4]
+DocumentPath=..\libraries\Header.SchLib
+AnnotationEnabled=1
+AnnotateStartValue=1
+AnnotationIndexControlEnabled=0
+AnnotateSuffix=
+AnnotateScope=All
+AnnotateOrder=-1
+DoLibraryUpdate=1
+DoDatabaseUpdate=1
+ClassGenCCAutoEnabled=1
+ClassGenCCAutoRoomEnabled=1
+ClassGenNCAutoScope=None
 DItemRevisionGUID=
+GenerateClassCluster=0
+DocumentUniqueId=
 
-[GeneratedDocument3]
-DocumentPath=Project Outputs for ArduinoMegaSheild\Arduino MEGA blank shield.GBL
+[Document5]
+DocumentPath=..\libraries\KK Conectors.SchLib
+AnnotationEnabled=1
+AnnotateStartValue=1
+AnnotationIndexControlEnabled=0
+AnnotateSuffix=
+AnnotateScope=All
+AnnotateOrder=-1
+DoLibraryUpdate=1
+DoDatabaseUpdate=1
+ClassGenCCAutoEnabled=1
+ClassGenCCAutoRoomEnabled=1
+ClassGenNCAutoScope=None
 DItemRevisionGUID=
+GenerateClassCluster=0
+DocumentUniqueId=
 
-[GeneratedDocument4]
-DocumentPath=Project Outputs for ArduinoMegaSheild\Arduino MEGA blank shield.GBO
+[Document6]
+DocumentPath=..\libraries\KK Connectors.PcbLib
+AnnotationEnabled=1
+AnnotateStartValue=1
+AnnotationIndexControlEnabled=0
+AnnotateSuffix=
+AnnotateScope=All
+AnnotateOrder=-1
+DoLibraryUpdate=1
+DoDatabaseUpdate=1
+ClassGenCCAutoEnabled=1
+ClassGenCCAutoRoomEnabled=1
+ClassGenNCAutoScope=None
 DItemRevisionGUID=
-
-[GeneratedDocument5]
-DocumentPath=Project Outputs for ArduinoMegaSheild\Arduino MEGA blank shield.GBP
-DItemRevisionGUID=
-
-[GeneratedDocument6]
-DocumentPath=Project Outputs for ArduinoMegaSheild\Arduino MEGA blank shield.GBS
-DItemRevisionGUID=
-
-[GeneratedDocument7]
-DocumentPath=Project Outputs for ArduinoMegaSheild\Arduino MEGA blank shield.GD1
-DItemRevisionGUID=
-
-[GeneratedDocument8]
-DocumentPath=Project Outputs for ArduinoMegaSheild\Arduino MEGA blank shield.GG1
-DItemRevisionGUID=
-
-[GeneratedDocument9]
-DocumentPath=Project Outputs for ArduinoMegaSheild\Arduino MEGA blank shield.GKO
-DItemRevisionGUID=
-
-[GeneratedDocument10]
-DocumentPath=Project Outputs for ArduinoMegaSheild\Arduino MEGA blank shield.GPB
-DItemRevisionGUID=
-
-[GeneratedDocument11]
-DocumentPath=Project Outputs for ArduinoMegaSheild\Arduino MEGA blank shield.GPT
-DItemRevisionGUID=
-
-[GeneratedDocument12]
-DocumentPath=Project Outputs for ArduinoMegaSheild\Arduino MEGA blank shield.GTL
-DItemRevisionGUID=
-
-[GeneratedDocument13]
-DocumentPath=Project Outputs for ArduinoMegaSheild\Arduino MEGA blank shield.GTO
-DItemRevisionGUID=
-
-[GeneratedDocument14]
-DocumentPath=Project Outputs for ArduinoMegaSheild\Arduino MEGA blank shield.GTP
-DItemRevisionGUID=
-
-[GeneratedDocument15]
-DocumentPath=Project Outputs for ArduinoMegaSheild\Arduino MEGA blank shield.GTS
-DItemRevisionGUID=
-
-[GeneratedDocument16]
-DocumentPath=Project Outputs for ArduinoMegaSheild\Arduino MEGA blank shield.LDP
-DItemRevisionGUID=
-
-[GeneratedDocument17]
-DocumentPath=Project Outputs for ArduinoMegaSheild\Arduino MEGA blank shield.REP
-DItemRevisionGUID=
-
-[GeneratedDocument18]
-DocumentPath=Project Outputs for ArduinoMegaSheild\Arduino MEGA blank shield.RUL
-DItemRevisionGUID=
-
-[GeneratedDocument19]
-DocumentPath=Project Outputs for ArduinoMegaSheild\Arduino MEGA blank shield.TXT
-DItemRevisionGUID=
+GenerateClassCluster=0
+DocumentUniqueId=
 
 [Configuration1]
 Name=Default Configuration
@@ -223,12 +147,11 @@ ReleaseItemId=
 Variant=[No Variations]
 OutputJobsCount=0
 ContentTypeGUID=
-ConfigurationType=
 
 [OutputGroup1]
 Name=Netlist Outputs
 Description=
-TargetPrinter=HP2BEF9F (HP Officejet Pro 6830)
+TargetPrinter=PDFCreator
 PrinterOptions=Record=PrinterOptions|Copies=1|Duplex=1|TrueTypeOptions=3|Collate=1|PrintJobKind=1|PrintWhat=1
 OutputType1=CadnetixNetlist
 OutputName1=Cadnetix Netlist
@@ -339,7 +262,7 @@ OutputDefault21=0
 [OutputGroup2]
 Name=Simulator Outputs
 Description=
-TargetPrinter=HP2BEF9F (HP Officejet Pro 6830)
+TargetPrinter=PDFCreator
 PrinterOptions=Record=PrinterOptions|Copies=1|Duplex=1|TrueTypeOptions=3|Collate=1|PrintJobKind=1|PrintWhat=1
 OutputType1=AdvSimNetlist
 OutputName1=Mixed Sim
@@ -442,11 +365,17 @@ OutputDocumentPath12=
 OutputVariantName12=[No Variations]
 OutputDefault12=0
 PageOptions12=Record=PageOptions|CenterHorizontal=True|CenterVertical=True|PrintScale=1.00|XCorrection=1.00|YCorrection=1.00|PrintKind=1|BorderSize=5000000|LeftOffset=0|BottomOffset=0|Orientation=2|PaperLength=1000|PaperWidth=1000|Scale=100|PaperSource=7|PrintQuality=-3|MediaType=1|DitherType=10|PrintScaleMode=1|PaperKind=A4|PaperIndex=9
+OutputType13=Software Platform Print
+OutputName13=Software Platform Prints
+OutputDocumentPath13=
+OutputVariantName13=
+OutputDefault13=0
+PageOptions13=Record=PageOptions|CenterHorizontal=True|CenterVertical=True|PrintScale=1.00|XCorrection=1.00|YCorrection=1.00|PrintKind=1|BorderSize=5000000|LeftOffset=0|BottomOffset=0|Orientation=2|PaperLength=1000|PaperWidth=1000|Scale=100|PaperSource=7|PrintQuality=-3|MediaType=1|DitherType=10|PrintScaleMode=1|PaperKind=A4|PaperIndex=9
 
 [OutputGroup4]
 Name=Assembly Outputs
 Description=
-TargetPrinter=HP2BEF9F (HP Officejet Pro 6830)
+TargetPrinter=PDFCreator
 PrinterOptions=Record=PrinterOptions|Copies=1|Duplex=1|TrueTypeOptions=3|Collate=1|PrintJobKind=1|PrintWhat=1
 OutputType1=Assembly
 OutputName1=Assembly Drawings
@@ -468,7 +397,7 @@ OutputDefault3=0
 [OutputGroup5]
 Name=Fabrication Outputs
 Description=
-TargetPrinter=HP2BEF9F (HP Officejet Pro 6830)
+TargetPrinter=PDFCreator
 PrinterOptions=Record=PrinterOptions|Copies=1|Duplex=1|TrueTypeOptions=3|Collate=1|PrintJobKind=1|PrintWhat=1
 OutputType1=Test Points
 OutputName1=Test Point Report
@@ -544,7 +473,7 @@ Configuration12_Item1=AddToAllLayerClasses.Set= |AddToAllPlots.Set=SerializeLaye
 [OutputGroup6]
 Name=Report Outputs
 Description=
-TargetPrinter=HP2BEF9F (HP Officejet Pro 6830)
+TargetPrinter=PDFCreator
 PrinterOptions=Record=PrinterOptions|Copies=1|Duplex=1|TrueTypeOptions=3|Collate=1|PrintJobKind=1|PrintWhat=1
 OutputType1=BOM_PartType
 OutputName1=Bill of Materials
@@ -581,7 +510,7 @@ OutputDefault6=0
 [OutputGroup7]
 Name=Other Outputs
 Description=
-TargetPrinter=HP2BEF9F (HP Officejet Pro 6830)
+TargetPrinter=PDFCreator
 PrinterOptions=Record=PrinterOptions|Copies=1|Duplex=1|TrueTypeOptions=3|Collate=1|PrintJobKind=1|PrintWhat=1
 OutputType1=Text Print
 OutputName1=Text Print
@@ -761,7 +690,7 @@ PageOptions29=Record=PageOptions|CenterHorizontal=True|CenterVertical=True|Print
 [OutputGroup8]
 Name=Validation Outputs
 Description=
-TargetPrinter=HP2BEF9F (HP Officejet Pro 6830)
+TargetPrinter=PDFCreator
 PrinterOptions=Record=PrinterOptions|Copies=1|Duplex=1|TrueTypeOptions=3|Collate=1|PrintJobKind=1|PrintWhat=1
 OutputType1=Design Rules Check
 OutputName1=Design Rules Check
@@ -800,7 +729,7 @@ OutputDefault6=0
 [OutputGroup9]
 Name=Export Outputs
 Description=
-TargetPrinter=HP2BEF9F (HP Officejet Pro 6830)
+TargetPrinter=PDFCreator
 PrinterOptions=Record=PrinterOptions|Copies=1|Duplex=1|TrueTypeOptions=3|Collate=1|PrintJobKind=1|PrintWhat=1
 OutputType1=AutoCAD dwg/dxf PCB
 OutputName1=AutoCAD dwg/dxf File PCB
@@ -851,7 +780,7 @@ OutputDefault9=0
 [OutputGroup10]
 Name=PostProcess Outputs
 Description=
-TargetPrinter=HP2BEF9F (HP Officejet Pro 6830)
+TargetPrinter=PDFCreator
 PrinterOptions=Record=PrinterOptions|Copies=1|Duplex=1|TrueTypeOptions=3|Collate=1|PrintJobKind=1|PrintWhat=1
 OutputType1=Copy Files
 OutputName1=Copy Files
@@ -1180,14 +1109,14 @@ ComponentUpdate2=1
 ComponentIsDeviceSheet2=0
 ComponentLibIdentifierKind3=Library Name And Type
 ComponentLibraryIdentifier3=Header.SchLib
-ComponentDesignItemID3=ICSP
-ComponentSymbolReference3=ICSP
+ComponentDesignItemID3=IO_36
+ComponentSymbolReference3=IO_36
 ComponentUpdate3=1
 ComponentIsDeviceSheet3=0
 ComponentLibIdentifierKind4=Library Name And Type
 ComponentLibraryIdentifier4=Header.SchLib
-ComponentDesignItemID4=IO_36
-ComponentSymbolReference4=IO_36
+ComponentDesignItemID4=Male Pin Head 1x1
+ComponentSymbolReference4=Male Pin Head 1x1
 ComponentUpdate4=1
 ComponentIsDeviceSheet4=0
 ComponentLibIdentifierKind5=Library Name And Type
@@ -1208,6 +1137,42 @@ ComponentDesignItemID7=PWM_L
 ComponentSymbolReference7=PWM_L
 ComponentUpdate7=1
 ComponentIsDeviceSheet7=0
+ComponentLibIdentifierKind8=Library Name And Type
+ComponentLibraryIdentifier8=KK Conectors.SchLib
+ComponentDesignItemID8=Component_1
+ComponentSymbolReference8=Component_1
+ComponentUpdate8=1
+ComponentIsDeviceSheet8=0
+ComponentLibIdentifierKind9=Library Name And Type
+ComponentLibraryIdentifier9=KK Conectors.SchLib
+ComponentDesignItemID9=KK2
+ComponentSymbolReference9=KK2
+ComponentUpdate9=1
+ComponentIsDeviceSheet9=0
+ComponentLibIdentifierKind10=Library Name And Type
+ComponentLibraryIdentifier10=KK Conectors.SchLib
+ComponentDesignItemID10=KK5
+ComponentSymbolReference10=KK5
+ComponentUpdate10=1
+ComponentIsDeviceSheet10=0
+ComponentLibIdentifierKind11=Library Name And Type
+ComponentLibraryIdentifier11=Miscellaneous Connectors.IntLib
+ComponentDesignItemID11=Header 4
+ComponentSymbolReference11=Header 4
+ComponentUpdate11=1
+ComponentIsDeviceSheet11=0
+ComponentLibIdentifierKind12=Library Name And Type
+ComponentLibraryIdentifier12=Miscellaneous Devices.IntLib
+ComponentDesignItemID12=LED2
+ComponentSymbolReference12=LED2
+ComponentUpdate12=1
+ComponentIsDeviceSheet12=0
+ComponentLibIdentifierKind13=Library Name And Type
+ComponentLibraryIdentifier13=Miscellaneous Devices.IntLib
+ComponentDesignItemID13=Res3
+ComponentSymbolReference13=Res3
+ComponentUpdate13=1
+ComponentIsDeviceSheet13=0
 FullReplace=1
 UpdateDesignatorLock=1
 UpdatePartIDLock=1
@@ -1227,13 +1192,98 @@ ParameterName1=Component Kind
 ParameterUpdate1=1
 ParameterName2=Description
 ParameterUpdate2=1
-ParameterName3=Library Reference
+ParameterName3=LatestRevisionDate
 ParameterUpdate3=1
+ParameterName4=LatestRevisionNote
+ParameterUpdate4=1
+ParameterName5=Library Reference
+ParameterUpdate5=1
+ParameterName6=PackageDescription
+ParameterUpdate6=1
+ParameterName7=PackageReference
+ParameterUpdate7=1
+ParameterName8=PackageVersion
+ParameterUpdate8=1
+ParameterName9=Published
+ParameterUpdate9=1
+ParameterName10=Publisher
+ParameterUpdate10=1
+ParameterName11=Supplier 1
+ParameterUpdate11=1
+ParameterName12=Supplier 2
+ParameterUpdate12=1
+ParameterName13=Supplier 3
+ParameterUpdate13=1
+ParameterName14=Supplier 4
+ParameterUpdate14=1
+ParameterName15=Supplier 5
+ParameterUpdate15=1
+ParameterName16=Supplier Part Number 1
+ParameterUpdate16=1
+ParameterName17=Supplier Part Number 2
+ParameterUpdate17=1
+ParameterName18=Supplier Part Number 3
+ParameterUpdate18=1
+ParameterName19=Supplier Part Number 4
+ParameterUpdate19=1
+ParameterName20=Supplier Part Number 5
+ParameterUpdate20=1
+ParameterName21=Value
+ParameterUpdate21=1
 ModelTypeGroup0=PCBLIB
 ModelTypeUpdate0=1
 ModelType0=PCBLIB
-ModelName0=Header 8x1 8.5mm
+ModelName0=12Z-2010
 ModelUpdate0=1
+ModelType1=PCBLIB
+ModelName1=14-1210
+ModelUpdate1=1
+ModelType2=PCBLIB
+ModelName2=3.2X1.6X1.1
+ModelUpdate2=1
+ModelType3=PCBLIB
+ModelName3=HDR1X4
+ModelUpdate3=1
+ModelType4=PCBLIB
+ModelName4=HEADER 1X1 8.5MM
+ModelUpdate4=1
+ModelType5=PCBLIB
+ModelName5=HEADER 36X 8MM
+ModelUpdate5=1
+ModelType6=PCBLIB
+ModelName6=Header 6x1 8.5mm
+ModelUpdate6=1
+ModelType7=PCBLIB
+ModelName7=Header 8x1 8.5mm
+ModelUpdate7=1
+ModelType8=PCBLIB
+ModelName8=J1-0603
+ModelUpdate8=1
+ModelType9=PCBLIB
+ModelName9=KK2
+ModelUpdate9=1
+ModelType10=PCBLIB
+ModelName10=KK4
+ModelUpdate10=1
+ModelType11=PCBLIB
+ModelName11=RESC6332
+ModelUpdate11=1
+ModelTypeGroup1=SI
+ModelTypeUpdate1=1
+ModelType12=SI
+ModelName12=Connector
+ModelUpdate12=1
+ModelType13=SI
+ModelName13=Res
+ModelUpdate13=1
+ModelTypeGroup2=SIM
+ModelTypeUpdate2=1
+ModelType14=SIM
+ModelName14=LED2
+ModelUpdate14=1
+ModelType15=SIM
+ModelName15=RESISTOR
+ModelUpdate15=1
 
 [DatabaseUpdateOptions]
 SelectedOnly=0
