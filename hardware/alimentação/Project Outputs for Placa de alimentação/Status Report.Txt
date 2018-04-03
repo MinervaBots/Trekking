@@ -1,0 +1,10 @@
+Output: Mixed Sim
+Type  : AdvSimNetlist
+From  : Project [Placa de alimentação.PrjPcb]
+   Generated File[Placa de alimentação.nsx]
+
+
+Files Generated   : 1
+Documents Printed : 0
+
+Finished Output Generation At 18:19:34 On 02/04/2018
