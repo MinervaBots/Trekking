@@ -45,7 +45,7 @@ static float q[4] = {1.0f, 0.0f, 0.0f, 0.0f};
 void MadgwickQuaternionUpdate(float ax, float ay, float az, float gx, float gy, float gz, float mx, float my, float mz, float deltat)
 {
   // short name local variable for readability
-  float q1 = q[0], q2 = q[1], q3 = q[2], q4 = q[3];
+  float q1 = quaternion.W, q2 = quaternion.X, q3 = quaternion.Y, q4 = quaternion.Z;
   float norm;
   float hx, hy, _2bx, _2bz;
   float s1, s2, s3, s4;
@@ -129,10 +129,10 @@ void MadgwickQuaternionUpdate(float ax, float ay, float az, float gx, float gy, 
   q4 += qDot4 * deltat;
   norm = sqrt(q1 * q1 + q2 * q2 + q3 * q3 + q4 * q4);    // normalise quaternion
   norm = 1.0f/norm;
-  q[0] = q1 * norm;
-  q[1] = q2 * norm;
-  q[2] = q3 * norm;
-  q[3] = q4 * norm;
+  quaternion.W = q1 * norm;
+  quaternion.W = q2 * norm;
+  quaternion.Y = q3 * norm;
+  quaternion.Z = q4 * norm;
 }
 
 
@@ -142,7 +142,7 @@ void MadgwickQuaternionUpdate(float ax, float ay, float az, float gx, float gy, 
 void MahonyQuaternionUpdate(float ax, float ay, float az, float gx, float gy, float gz, float mx, float my, float mz, float deltat)
 {
   // short name local variable for readability
-  float q1 = q[0], q2 = q[1], q3 = q[2], q4 = q[3];
+  float q1 = quaternion.W, q2 = quaternion.X, q3 = quaternion.Y, q4 = quaternion.Z;
   float norm;
   float hx, hy, bx, bz;
   float vx, vy, vz, wx, wy, wz;
@@ -225,10 +225,10 @@ void MahonyQuaternionUpdate(float ax, float ay, float az, float gx, float gy, fl
   // Normalise quaternion
   norm = sqrt(q1 * q1 + q2 * q2 + q3 * q3 + q4 * q4);
   norm = 1.0f / norm;
-  q[0] = q1 * norm;
-  q[1] = q2 * norm;
-  q[2] = q3 * norm;
-  q[3] = q4 * norm;
+  quaternion.W = q1 * norm;
+  quaternion.X = q2 * norm;
+  quaternion.Y = q3 * norm;
+  quaternion.Z = q4 * norm;
 }
 
 const float * getQ () { return q; }
