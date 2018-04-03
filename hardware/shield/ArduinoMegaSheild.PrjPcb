@@ -72,7 +72,7 @@ GenerateClassCluster=0
 DocumentUniqueId=XFKYEDQJ
 
 [Document3]
-DocumentPath=..\libraries\Header.PcbLib
+DocumentPath=..\libraries\Connectors.SchLib
 AnnotationEnabled=1
 AnnotateStartValue=1
 AnnotationIndexControlEnabled=0
@@ -86,10 +86,10 @@ ClassGenCCAutoRoomEnabled=1
 ClassGenNCAutoScope=None
 DItemRevisionGUID=
 GenerateClassCluster=0
-DocumentUniqueId=
+DocumentUniqueId=LCKBHJDF
 
 [Document4]
-DocumentPath=..\libraries\Header.SchLib
+DocumentPath=..\libraries\Connectors.PcbLib
 AnnotationEnabled=1
 AnnotateStartValue=1
 AnnotationIndexControlEnabled=0
@@ -103,10 +103,10 @@ ClassGenCCAutoRoomEnabled=1
 ClassGenNCAutoScope=None
 DItemRevisionGUID=
 GenerateClassCluster=0
-DocumentUniqueId=
+DocumentUniqueId=XTKOGFLG
 
 [Document5]
-DocumentPath=..\libraries\KK Conectors.SchLib
+DocumentPath=libraries\Arduino Shield.PcbLib
 AnnotationEnabled=1
 AnnotateStartValue=1
 AnnotationIndexControlEnabled=0
@@ -123,7 +123,7 @@ GenerateClassCluster=0
 DocumentUniqueId=
 
 [Document6]
-DocumentPath=..\libraries\KK Connectors.PcbLib
+DocumentPath=libraries\Arduino Shield.SchLib
 AnnotationEnabled=1
 AnnotateStartValue=1
 AnnotationIndexControlEnabled=0
@@ -1216,20 +1216,16 @@ ParameterName13=Supplier 3
 ParameterUpdate13=1
 ParameterName14=Supplier 4
 ParameterUpdate14=1
-ParameterName15=Supplier 5
+ParameterName15=Supplier Part Number 1
 ParameterUpdate15=1
-ParameterName16=Supplier Part Number 1
+ParameterName16=Supplier Part Number 2
 ParameterUpdate16=1
-ParameterName17=Supplier Part Number 2
+ParameterName17=Supplier Part Number 3
 ParameterUpdate17=1
-ParameterName18=Supplier Part Number 3
+ParameterName18=Supplier Part Number 4
 ParameterUpdate18=1
-ParameterName19=Supplier Part Number 4
+ParameterName19=Value
 ParameterUpdate19=1
-ParameterName20=Supplier Part Number 5
-ParameterUpdate20=1
-ParameterName21=Value
-ParameterUpdate21=1
 ModelTypeGroup0=PCBLIB
 ModelTypeUpdate0=1
 ModelType0=PCBLIB
