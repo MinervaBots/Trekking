@@ -30,13 +30,25 @@ void SonicArray::update()
         triggerSensors();
         interrupts(); // End critical section
 
+        //
+        memset(&obstacleGrid_, 0, sizeof(obstacleGrid_));
+
         // Now that we are certain that our measurements are consistent
         // time-wise, calculate the distance.
         for (int i = 0; i < NUM_OF_SENSORS; i++)
         {
             // Calculate distance for each sensor.
             // Will also timeout any pending measurements
-            sensors_[i].calculateDistance();
+            auto distance = sensors_[i].calculateDistance();
+            if(distance > 0)
+            {
+                auto adjustedDistance = distance / GRID_RESOLUTION_RATIO;
+                auto direction = sensors_[i].getDirection();
+                int x = round(distance * cos(direction));
+                int y = round(distance * sin(direction));
+
+                obstacleGrid_[x][y] = true;
+            }
         }
     }
 }

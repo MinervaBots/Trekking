@@ -11,13 +11,19 @@ class SonicSensor
      * @param triggerPin The trigger pin of the ultrasonic sensor
      * @param echoPin    The echo pin of the ultrasonic sensor
      */
-    SonicSensor(uint8_t echoPin);
+    SonicSensor(uint8_t echoPin, float direction);
 
     /**
      * Gets the echo pin of the ultrasonic sensor
      * @return The echo pin of the ultrasonic sensor
      */
     uint8_t getEchoPin();
+
+    /**
+     * Gets the direction of the ultrasonic sensor
+     * @return The direction of the ultrasonic sensor
+     */
+    float getDirection();
 
     /**
      * Sets the time that a beginning of an echo pulse was received.
@@ -85,6 +91,7 @@ class SonicSensor
     uint8_t getDistance();
 
   private:
+    float direction_;
     uint8_t mEchoPin, mDistance;
     unsigned long mStartOfPulseNonVolatile, mEndOfPulseNonVolatile;
     volatile unsigned long mStartOfPulse, mEndOfPulse;

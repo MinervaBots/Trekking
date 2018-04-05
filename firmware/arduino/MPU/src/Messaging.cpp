@@ -1,23 +1,14 @@
 #include "Messaging.h"
+#include "Constants.h"
+#include "Variables.h"
 
-void writeCmdStart(int cmdId)
+void attachCallbacks(CmdMessenger *messenger)
 {
-  Serial.print(cmdId);
+  messenger->attach(MessageCodes::kSetPosition, setPosition);
 }
 
-void writeCmdArg(int arg)
+void setPosition(CmdMessenger *messenger)
 {
-  Serial.print(",");
-  Serial.print(arg);
-}
-
-void writeCmdArg(const String &s)
-{
-  Serial.print(",");
-  Serial.print(s);
-}
-
-void writeCmdEnd()
-{
-  Serial.print(";");
+  transform.position.set(messenger->readFloatArg(), messenger->readFloatArg(), 0);
+  transform.heading = messenger->readFloatArg();
 }
