@@ -2,23 +2,25 @@
 #define MESSAGING_H
 
 #include <Arduino.h>
+#include <CmdMessenger.h>
 
 enum MessageCodes
 {
-  Log,
-  UpdateTransform
+  kLog,
+  kUpdateTransform,
+  kSetPosition,
 };
 
 enum LogMessageSubCodes
 {
-  Info,
-  Warning,
-  Error
+  kInfo,
+  kWarning,
+  kError
 };
 
-void writeCmdStart(int cmdId);
-void writeCmdArg(int arg);
-void writeCmdArg(const String &s);
-void writeCmdEnd();
+void attachCallbacks(CmdMessenger *messenger);
+
+
+void setPosition(CmdMessenger *messenger);
 
 #endif //MESSAGING_H

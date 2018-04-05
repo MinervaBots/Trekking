@@ -1,32 +1,14 @@
 #include <QuaternionFilters.h>
+#include <CmdMessenger.h>
 #include <MPU9250.h>
 #include <EEPROM.h>
 #include "Messaging.h"
-#include "Vector.h"
-#include "Transform.h"
-
-// Pin definitions
-#define CALIBRATION_LED_PIN 13
-#define CALIBRATION_BUTTON_PIN 5
-#define PI_180 PI/180.0f
-// Declinação magnética do CT (22.86047496° S, 43.2307488° W)
-// No dia 04/03/2018
-// http://www.ngdc.noaa.gov/geomag-web/#declination
-#define MAGNETIC_DECLINATION 22.79 // 	22.79° W
-
+#include "Constants.h"
+#include "Pins.h"
+#include "Variables.h"
 
 MPU9250 IMU(Wire, 0x68);
-
-Transform transform;
-Vector3 acceleration, lastAcceleration;
-Vector3 velocity, lastVelocity;
-Vector3 angularVelocity;
-Vector3 magneticField;
-Quaternion quaternion;
-
-unsigned long deltaTimeMicro, lastUpdate;
-float deltaTimeSec;
-
+CmdMessenger messenger(Serial);
 
 void setupIMU();
 void retrieveReadings();
@@ -36,7 +18,6 @@ void sendData();
 void readMagCalibration();
 void calibrateMagnetometer();
 
-
 void setup()
 {
   Serial.begin(115200);
@@ -44,6 +25,7 @@ void setup()
 
   pinMode(CALIBRATION_LED_PIN, OUTPUT);
   pinMode(CALIBRATION_BUTTON_PIN, INPUT);
+  attachCallbacks(&messenger);
 }
 
 void setupIMU()
@@ -53,11 +35,11 @@ void setupIMU()
   {
     while (1)
     {
-      writeCmdStart(MessageCodes::Log);
-      writeCmdArg(LogMessageSubCodes::Error);
-      writeCmdArg("Inicialização do MPU falhou");
-      writeCmdArg(status);
-      writeCmdEnd();
+      messenger.sendCmdStart(MessageCodes::kLog);
+      messenger.sendCmdArg(LogMessageSubCodes::kError);
+      messenger.sendCmdArg("Inicialização do MPU falhou");
+      messenger.sendCmdArg(status);
+      messenger.sendCmdEnd();
       delay(5000);
     }
   }
@@ -97,6 +79,7 @@ void loop()
 
   processReadings();
   sendData();
+  messenger.feedinSerialData();
 }
 
 void retrieveReadings()
@@ -143,10 +126,10 @@ void processReadings()
 
 void sendData()
 {
-  writeCmdStart(MessageCodes::UpdateTransform);
-  writeCmdArg(transform.position.X);
-  writeCmdArg(transform.position.Y);
-  writeCmdArg(transform.heading);
+  messenger.sendCmdStart(MessageCodes::kUpdateTransform);
+  messenger.sendCmdArg(transform.position.X);
+  messenger.sendCmdArg(transform.position.Y);
+  messenger.sendCmdArg(transform.heading);
 }
 
 void readMagCalibration()
