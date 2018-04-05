@@ -1,11 +1,12 @@
 #include "SonicSensor.h"
 
-SonicSensor::SonicSensor(uint8_t echoPin)
+SonicSensor::SonicSensor(uint8_t echoPin, float direction)
 {
     mEchoPin = echoPin;
     mStartOfPulse = 0;
     mEndOfPulse = 0;
     mDistance = 0;
+    direction_ = direction;
     mStartOfPulseNonVolatile = 0;
     mEndOfPulseNonVolatile = 0;
 }
@@ -13,6 +14,11 @@ SonicSensor::SonicSensor(uint8_t echoPin)
 uint8_t SonicSensor::getEchoPin()
 {
     return mEchoPin;
+}
+
+float SonicSensor::getDirection()
+{
+    return direction_;
 }
 
 unsigned long SonicSensor::setStartOfPulse(unsigned long microseconds)

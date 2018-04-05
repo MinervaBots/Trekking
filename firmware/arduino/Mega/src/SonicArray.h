@@ -4,7 +4,11 @@
 #include <SonicSensor.h>
 #include <Arduino.h>
 
-#define NUM_OF_SENSORS 8
+#define NUM_OF_SENSORS 7
+#define MAX_DETECTION_DISTANCE 200
+#define GRID_RESOLUTION_RATIO 10
+#define GRID_SIZE_X MAX_DETECTION_DISTANCE / GRID_RESOLUTION_RATIO
+#define GRID_SIZE_Y MAX_DETECTION_DISTANCE / GRID_RESOLUTION_RATIO
 
 class SonicArray
 {
@@ -27,16 +31,18 @@ class SonicArray
     bool isTimeToMeasure();
 
     SonicSensor sensors_[NUM_OF_SENSORS] = {
-        SonicSensor(12),  // Ultrasonic_0 on the Sonic Disc
-        SonicSensor(A8),  // Ultrasonic_1
-        SonicSensor(A9),  // Ultrasonic_2
-        SonicSensor(A10), // Ultrasonic_3
-        SonicSensor(A11), // Ultrasonic_4
-        SonicSensor(A12), // Ultrasonic_5
-        SonicSensor(A13), // Ultrasonic_6
-        SonicSensor(A14)  // Ultrasonic_7
+        SonicSensor(12, 0),  // Ultrasonic_0 on the Sonic Disc
+        SonicSensor(A8, 0),  // Ultrasonic_1
+        SonicSensor(A9, 0),  // Ultrasonic_2
+        SonicSensor(A10, 0), // Ultrasonic_3
+        SonicSensor(A11, 0), // Ultrasonic_4
+        SonicSensor(A12, 0), // Ultrasonic_5
+        SonicSensor(A13, 0), // Ultrasonic_6
+        //SonicSensor(A14)  // Ultrasonic_7
         //SonicSensor(A15)  // Ultrasonic_8
     };
+
+    bool obstacleGrid_[GRID_SIZE_X][GRID_SIZE_Y];
 };
 
 #endif //SONIC_ARRAY_H
