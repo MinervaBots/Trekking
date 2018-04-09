@@ -71,10 +71,12 @@ void loop()
 
 void attachHandlers()
 {
-  rPiCmdMessenger.attach(targetData, onRecvTargetData);
+  rPiCmdMessenger.attach(MessageCodesRPi::kTargetFound, onRecvTargetFound);
+  rPiCmdMessenger.attach(MessageCodesRPi::kTargetLost, onRecvTargetLost);
   rPiCmdMessenger.attach(onRecvUnknownCommand);
 
-  mpuCmdMessenger.attach(mpuData, onRecvMpuData);
+  mpuCmdMessenger.attach(MessageCodesMPU::kMpuData, onRecvMpuData);
+  mpuCmdMessenger.attach(MessageCodesMPU::kMpuLog, onRecvMpuLog);
   mpuCmdMessenger.attach(onRecvUnknownCommand);
 }
 

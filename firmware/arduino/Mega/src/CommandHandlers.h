@@ -3,18 +3,26 @@
 
 #include <CmdMessenger.h>
 
-enum
+enum MessageCodesRPi
 {
-  info,
-  error,
-  mpuData,
-  targetData,
-  startDetection,
-  pauseDetection
+  kRPiLog,
+  kTargetFound,
+  kTargetLost,
+  kStartDetection,
+  kPauseDetection,
+};
+
+enum MessageCodesMPU
+{
+  kMpuData,
+  kMpuLog,
+  kSetPosition
 };
 
 void onRecvMpuData(CmdMessenger *cmdMesseger);
-void onRecvTargetData(CmdMessenger *cmdMesseger);
+void onRecvMpuLog(CmdMessenger *cmdMesseger);
+void onRecvTargetFound(CmdMessenger *cmdMesseger);
+void onRecvTargetLost(CmdMessenger *cmdMesseger);
 void onRecvUnknownCommand(CmdMessenger *cmdMesseger);
 
 #endif //COMMAND_HANDLERS_H
