@@ -51,14 +51,14 @@ void loop()
   targetDirection = targetDirectionFiltered.getAverage();
   targetDistance = targetDistanceFiltered.getAverage();
 
+  cameraPid.Compute();
+  steeringPid.Compute();
+  speedPid.Compute();
+
   if (isRunning)
   {
     state(millis() - lastRun);
   }
-
-  cameraPid.Compute();
-  steeringPid.Compute();
-  speedPid.Compute();
 
   cameraServo.write(cameraServoPosition);
   steeringServo.write(steeringServoPosition);
