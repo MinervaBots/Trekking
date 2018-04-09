@@ -3,6 +3,7 @@
 #include "Constants.h"
 #include "CommandHandlers.h"
 #include "Macros.h"
+#include "Pins.h"
 
 void idle(unsigned long deltaTime)
 {
@@ -72,7 +73,9 @@ void targetFound(unsigned long deltaTime)
   esc.write(ESC_ZERO);
 
   // Sinaliza
+  digitalWrite(LED_SIGNAL_PIN, HIGH);
   delay(1000);
+  digitalWrite(LED_SIGNAL_PIN, LOW);
   // Desliga o sinal
 
   // Vira a direção totalmente para a esquerda anda de ré.
@@ -92,4 +95,3 @@ void targetFound(unsigned long deltaTime)
     state = search;
   }
 }
-
