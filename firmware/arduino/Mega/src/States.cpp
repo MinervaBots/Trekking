@@ -20,8 +20,8 @@ void search(unsigned long deltaTime)
   //
   // Pra isso precisamos sobreescrever os valores que estamos
   // recebendo do Raspberry Pi via porta serial.
-  targetDistance = currentTransform.position.distance(currentTarget->x, currentTarget->y);
-  targetDirection = DIRECTION((*currentTarget), currentTransform.position);
+  targetDistance = currentTransform.position.distance(currentTarget.x, currentTarget.y);
+  targetDirection = DIRECTION(currentTarget, currentTransform.position);
 
   // Usa atan2 para obter valores sempre entre [-π ; +π] radianos.
   targetDirection = CORRECT_DIRECTION(targetDirection);
@@ -71,10 +71,12 @@ void targetFound(unsigned long deltaTime)
   targetCount++;
   esc.write(ESC_ZERO);
 
+  if(currentTarget.signal)
+  {
   // Sinaliza
   delay(1000);
   // Desliga o sinal
-
+  }
   // Vira a direção totalmente para a esquerda anda de ré.
   // Idealmente isso vai colocar o robô mais ou menos na direção
   // do proximo objetivo
@@ -89,7 +91,7 @@ void targetFound(unsigned long deltaTime)
   }
   else
   {
+    currentTarget = targets.get(targetCount);
     state = search;
   }
 }
-

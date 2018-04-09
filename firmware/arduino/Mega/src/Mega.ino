@@ -3,6 +3,7 @@
 #include <PID_v1.h>
 
 #include "Pins.h"
+#include "Target.h"
 #include "Variables.h"
 #include "Constants.h"
 #include "States.h"
@@ -33,10 +34,11 @@ void setup()
   steeringPid.SetOutputLimits(0, degrees(STEERING_SERVO_LIMIT));
   speedPid.SetOutputLimits(ESC_MAX_BACKWARD, ESC_MAX_FORWARD);
 
-  targets.add(Vector2(40, 20));
-  targets.add(Vector2(30, 2));
-  targets.add(Vector2(6, 18));
-  currentTarget = &targets.get(0);
+  targets.add(Target(40, 20, true));
+  targets.add(Target(30, 2, true));
+  targets.add(Target(6, 20, false));
+  targets.add(Target(6, 18, true));
+  currentTarget = targets.get(0);
 
   state = idle;
 }
