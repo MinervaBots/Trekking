@@ -35,6 +35,7 @@ class PID
 										                      //   it's likely the user will want to change this depending on
 										                      //   the application
 	
+	void Initialize(bool resetSum = false);
 
 
   //available but not commonly used functions ********************************************************
@@ -61,7 +62,6 @@ class PID
 	int GetDirection();					  //
 
   private:
-	void Initialize();
 	
 	double dispKp;				// * we'll hold on to the tuning parameters in user-entered 
 	double dispKi;				//   format for display purposes

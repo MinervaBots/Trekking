@@ -2,6 +2,8 @@
 #define STATES_H
 
 
+void changeState(void (*nextState)(unsigned long));
+
 void reset(unsigned long deltaTime);
 void idle(unsigned long deltaTime);
 void search(unsigned long deltaTime);

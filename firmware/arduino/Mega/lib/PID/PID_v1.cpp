@@ -186,9 +186,17 @@ void PID::SetMode(int Mode)
  *	does all the things that need to happen to ensure a bumpless transfer
  *  from manual to automatic mode.
  ******************************************************************************/
-void PID::Initialize()
+void PID::Initialize(bool resetSum)
 {
-   outputSum = *myOutput;
+    if(resetSum)
+    {
+        outputSum = 0;     
+    }
+    else
+    {
+        outputSum = *myOutput;
+    }
+
    lastInput = *myInput;
    if(outputSum > outMax) outputSum = outMax;
    else if(outputSum < outMin) outputSum = outMin;
@@ -221,4 +229,3 @@ double PID::GetKi(){ return  dispKi;}
 double PID::GetKd(){ return  dispKd;}
 int PID::GetMode(){ return  inAuto ? AUTOMATIC : MANUAL;}
 int PID::GetDirection(){ return controllerDirection;}
-

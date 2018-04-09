@@ -5,12 +5,19 @@
 #include "Macros.h"
 #include "Pins.h"
 
+
+void changeState(void (*nextState)(unsigned long))
+{
+  previusState = state;
+  state = nextState;
+}
+
 void reset(unsigned long deltaTime)
 {
   linearSpeed = 0;
   steeringServoPosition = 0;
   cameraServoPosition = 0;
-  state = &idle;
+  changeState(idle);
 }
 
 void idle(unsigned long deltaTime)
@@ -37,7 +44,7 @@ void search(unsigned long deltaTime)
   // troca pra o estado refinedSearch.
   if (targetDistance < REFINED_SEARCH_DISTANCE)
   {
-    state = refinedSearch;
+    changeState(refinedSearch);
     rPiCmdMessenger.sendCmd(startDetection);
   }
 }
@@ -46,7 +53,7 @@ void refinedSearch(unsigned long deltaTime)
 {
   if (targetDistance < GOAL_THRESHOLD)
   {
-    state = targetFound;
+    changeState(targetFound);
     rPiCmdMessenger.sendCmd(pauseDetection);
     return;
   }
@@ -94,10 +101,10 @@ void targetFound(unsigned long deltaTime)
 
   if (targetCount == targets.size())
   {
-    state = idle;
+    changeState(idle);
   }
   else
   {
-    state = search;
+    changeState(search);
   }
 }

@@ -86,11 +86,24 @@ void proccessButtonPress()
 {
   if(buttonNextAction == 1)
   {
-    state = &idle;
+    changeState(idle);
+    cameraPid.SetMode(0);
+    steeringPid.SetMode(0);
+    speedPid.SetMode(0);
   }
   else if(buttonNextAction == -1)
   {
-    state = &reset;
+    changeState(reset);
+    cameraPid.Initialize(true);
+    steeringPid.Initialize(true);
+    speedPid.Initialize(true);
+  }
+  else
+  {
+    changeState(previusState);
+    cameraPid.SetMode(1);
+    steeringPid.SetMode(1);
+    speedPid.SetMode(1);
   }
   buttonNextAction = 0;
 }
