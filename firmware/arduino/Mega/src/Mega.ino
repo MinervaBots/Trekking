@@ -13,9 +13,11 @@ PID steeringPid(&targetDirection, &steeringServoPosition, &setPointZero, steerin
 PID speedPid(&targetDistance, &linearSpeed, &setPointZero, speedKp, speedKi, speedKd, P_ON_M, DIRECT);
 
 void attachHandlers();
+void buttonISR();
 
 unsigned long lastRun;
-
+volatile unsigned long buttonPressStart;
+volatile char buttonNextAction; // -1 (stop), 0 (nothing), 1 (pause)
 SonicArray sonicArray(PIN_ULTRASSONIC_TRIGGER);
 
 void setup()
@@ -38,11 +40,15 @@ void setup()
   targets.add(Vector2(6, 18));
   currentTarget = &targets.get(0);
 
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), buttonISR, CHANGE);
+
   state = idle;
 }
 
 void loop()
 {
+  proccessButtonPress();
   rPiCmdMessenger.feedinSerialData();
   mpuCmdMessenger.feedinSerialData();
 
@@ -76,6 +82,19 @@ void attachHandlers()
   mpuCmdMessenger.attach(onRecvUnknownCommand);
 }
 
+void proccessButtonPress()
+{
+  if(buttonNextAction == 1)
+  {
+    state = &idle;
+  }
+  else if(buttonNextAction == -1)
+  {
+    state = &reset;
+  }
+  buttonNextAction = 0;
+}
+
 ISR(PCINT0_vect)
 {
   sonicArray.handleEcho(SonicArray::Vector::VECTOR_0);
@@ -84,4 +103,22 @@ ISR(PCINT0_vect)
 ISR(PCINT2_vect)
 {
   sonicArray.handleEcho(SonicArray::Vector::VECTOR_2);
+}
+
+void buttonISR()
+{
+  if (digitalRead(BUTTON_PIN) == LOW) // Pressionado
+  {
+    buttonPressStart = millis();
+    return;
+  }
+
+
+  if (millis() - buttonPressStart > BUTTON_STOP_TIME)
+  {
+    buttonNextAction = -1;
+    return;
+  }
+  // Se já estiver pausado, resume a execução
+  buttonNextAction = (buttonNextAction == 1) ? 0 : 1;
 }

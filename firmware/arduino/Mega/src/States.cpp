@@ -5,11 +5,17 @@
 #include "Macros.h"
 #include "Pins.h"
 
-void idle(unsigned long deltaTime)
+void reset(unsigned long deltaTime)
 {
   linearSpeed = 0;
   steeringServoPosition = 0;
   cameraServoPosition = 0;
+  state = &idle;
+}
+
+void idle(unsigned long deltaTime)
+{
+  linearSpeed = 0;
 }
 
 void search(unsigned long deltaTime)
