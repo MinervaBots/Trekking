@@ -23,6 +23,7 @@ class SonicArray
     void update();
     void handleEcho(Vector intVector);
     void setupChangeInterrupt();
+    float obstacleAvoidance();
 
   private:
     unsigned int triggerPin_;

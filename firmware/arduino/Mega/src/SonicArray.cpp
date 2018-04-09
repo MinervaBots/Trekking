@@ -1,5 +1,7 @@
-#include "SonicArray.h"
 #include <Arduino.h>
+#include "SonicArray.h"
+#include "Constants.h"
+#include "Variables.h"
 
 SonicArray::SonicArray(unsigned int triggerPin)
 {
@@ -30,9 +32,6 @@ void SonicArray::update()
         triggerSensors();
         interrupts(); // End critical section
 
-        //
-        memset(&obstacleGrid_, 0, sizeof(obstacleGrid_));
-
         // Now that we are certain that our measurements are consistent
         // time-wise, calculate the distance.
         for (int i = 0; i < NUM_OF_SENSORS; i++)
@@ -40,17 +39,51 @@ void SonicArray::update()
             // Calculate distance for each sensor.
             // Will also timeout any pending measurements
             auto distance = sensors_[i].calculateDistance();
-            if(distance > 0)
-            {
-                auto adjustedDistance = distance / GRID_RESOLUTION_RATIO;
-                auto direction = sensors_[i].getDirection();
-                int x = round(distance * cos(direction));
-                int y = round(distance * sin(direction));
-
-                obstacleGrid_[x][y] = true;
-            }
         }
     }
+}
+
+float SonicArray::obstacleAvoidance()
+{
+    float meanDirection = 0;
+    float weightedMeanDirection = 0;
+
+    int detections = 0;
+    int detectedSensorsId[NUM_OF_SENSORS] = {-1};
+    float possibleDirections[NUM_OF_SENSORS] = {0};
+
+    for (int i = 0; i < NUM_OF_SENSORS; i++)
+    {
+        auto distance = sensors_[i].getDistance();
+        auto direction = sensors_[i].getDirection();
+
+        // Considera apenas os obstáculos detectados que estão em rota de colisão com a direção atual
+        // e estão mais próximos
+        if (abs(targetDirectionFiltered.getAverage() - direction) < PI/4 && distance > 0 && distance < 150)
+        {
+            detectedSensorsId[detections] = i;
+            detections++;
+
+            meanDirection += direction;
+            weightedMeanDirection += direction * OBSTACLE_AVOIDANCE_CONSTANT / distance;
+        }
+    }
+    if(detections < 0)
+    {
+        return 0;
+    }
+
+    meanDirection /= detections;
+    weightedMeanDirection /= detections;
+
+
+    if(weightedMeanDirection != 0)
+    {
+        return -weightedMeanDirection;
+    }
+
+    // Daqui pra baixo assume-se que o robô se encontra exatamente entre 2 obstáculos
+    
 }
 
 /**
