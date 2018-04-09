@@ -3,6 +3,7 @@
 #include <PID_v1.h>
 
 #include "Pins.h"
+#include "Target.h"
 #include "Variables.h"
 #include "Constants.h"
 #include "States.h"
@@ -35,10 +36,11 @@ void setup()
   steeringPid.SetOutputLimits(0, degrees(STEERING_SERVO_LIMIT));
   speedPid.SetOutputLimits(ESC_MAX_BACKWARD, ESC_MAX_FORWARD);
 
-  targets.add(Vector2(40, 20));
-  targets.add(Vector2(30, 2));
-  targets.add(Vector2(6, 18));
-  currentTarget = &targets.get(0);
+  targets.add(Target(40, 20, true));
+  targets.add(Target(30, 2, true));
+  targets.add(Target(6, 20, false));
+  targets.add(Target(6, 18, true));
+  currentTarget = targets.get(0);
 
   pinMode(BUTTON_PIN, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), buttonISR, CHANGE);
@@ -55,19 +57,19 @@ void loop()
   targetDirection = targetDirectionFiltered.getAverage();
   targetDistance = targetDistanceFiltered.getAverage();
 
+  cameraPid.Compute();
+  steeringPid.Compute();
+  speedPid.Compute();
+
   if (isRunning)
   {
     state(millis() - lastRun);
   }
 
-  cameraPid.Compute();
-  steeringPid.Compute();
-  speedPid.Compute();
-
   cameraServo.write(cameraServoPosition);
   steeringServo.write(steeringServoPosition);
 
-  linearSpeed = constrain(linearSpeed, ESC_MAX_BACKWARD, ESC_MAX_FORWARD);
+  linearSpeed = constrain(linearSpeed * linearSpeedLock, ESC_MAX_BACKWARD, ESC_MAX_FORWARD);
   esc.write(map(linearSpeed, -1, 1, 0, 180));
 
   lastRun = millis();
@@ -75,10 +77,12 @@ void loop()
 
 void attachHandlers()
 {
-  rPiCmdMessenger.attach(targetData, onRecvTargetData);
+  rPiCmdMessenger.attach(MessageCodesRPi::kTargetFound, onRecvTargetFound);
+  rPiCmdMessenger.attach(MessageCodesRPi::kTargetLost, onRecvTargetLost);
   rPiCmdMessenger.attach(onRecvUnknownCommand);
 
-  mpuCmdMessenger.attach(mpuData, onRecvMpuData);
+  mpuCmdMessenger.attach(MessageCodesMPU::kMpuData, onRecvMpuData);
+  mpuCmdMessenger.attach(MessageCodesMPU::kMpuLog, onRecvMpuLog);
   mpuCmdMessenger.attach(onRecvUnknownCommand);
 }
 

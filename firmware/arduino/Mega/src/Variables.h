@@ -8,6 +8,7 @@
 
 #include "Transform.h"
 #include "SonicArray.h"
+#include "Target.h"
 
 extern bool isRunning;
 extern void (*state)(unsigned long);
@@ -27,13 +28,13 @@ extern double cameraServoKp, cameraServoKi, cameraServoKd;
 extern double steeringServoPosition;
 extern double steeringServoKp, steeringServoKi, steeringServoKd;
 
-extern double linearSpeed;
+extern double linearSpeed, linearSpeedLock;
 extern double speedKp, speedKi, speedKd;
 
 extern Vector2 currentVelocity;
 extern Transform currentTransform;
-extern LinkedList<Vector2> targets;
-extern Vector2* currentTarget;
+extern LinkedList<Target> targets;
+extern Target currentTarget;
 
 extern SonicArray sonicArray;
 

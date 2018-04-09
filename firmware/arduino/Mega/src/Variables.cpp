@@ -22,11 +22,11 @@ double cameraServoKp = 1, cameraServoKi = 0, cameraServoKd = 2;
 double steeringServoPosition;
 double steeringServoKp = 1, steeringServoKi = 0, steeringServoKd = 2;
 
-double linearSpeed;
+double linearSpeed, linearSpeedLock;
 double speedKp = 2, speedKi = 0.4, speedKd = 1;
 
 Vector2 currentVelocity;
 Transform currentTransform(3, 3, 0);
 
-LinkedList<Vector2> targets;
-Vector2* currentTarget;
+LinkedList<Target> targets;
+Target currentTarget;

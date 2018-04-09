@@ -34,8 +34,8 @@ void search(unsigned long deltaTime)
   //
   // Pra isso precisamos sobreescrever os valores que estamos
   // recebendo do Raspberry Pi via porta serial.
-  targetDistance = currentTransform.position.distance(currentTarget->x, currentTarget->y);
-  targetDirection = DIRECTION((*currentTarget), currentTransform.position);
+  targetDistance = currentTransform.position.distance(currentTarget.x, currentTarget.y);
+  targetDirection = DIRECTION(currentTarget, currentTransform.position);
 
   // Usa atan2 para obter valores sempre entre [-π ; +π] radianos.
   targetDirection = CORRECT_DIRECTION(targetDirection);
@@ -45,7 +45,7 @@ void search(unsigned long deltaTime)
   if (targetDistance < REFINED_SEARCH_DISTANCE)
   {
     changeState(refinedSearch);
-    rPiCmdMessenger.sendCmd(startDetection);
+    rPiCmdMessenger.sendCmd(MessageCodesRPi::kStartDetection);
   }
 }
 
@@ -54,29 +54,20 @@ void refinedSearch(unsigned long deltaTime)
   if (targetDistance < GOAL_THRESHOLD)
   {
     changeState(targetFound);
-    rPiCmdMessenger.sendCmd(pauseDetection);
+    rPiCmdMessenger.sendCmd(MessageCodesRPi::kPauseDetection);
     return;
   }
 
-  sonicArray.update();
-  /*
-  float avoidMultiplyer;
-  if (ultrassonicArray.evaluate(&avoidMultiplyer))
+  int detectedCount = 0;
+  sonicArray.update(&detectedCount);
+
+  if(detectedCount == 0)
   {
-    if (avoidMultiplyer != 0)
-    {
-      targetDirection = STEERING_SERVO_LIMIT * avoidMultiplyer;
-      targetDirection = CORRECT_DIRECTION(targetDirection);
-    }
-    else
-    {
-      // Caso tenha um obstáculo detectado, mas não conseguimos calcular uma direção
-      // Volta um pouco e tenta novamente
-      targetDirection = 0;
-      linearSpeed = ESC_MAX_BACKWARD;
-    }
+    return;
   }
-  */
+
+  float preferrableDirection = sonicArray.obstacleAvoidance();
+  targetDirection = preferrableDirection;
 }
 
 int targetCount = 0;
@@ -85,12 +76,14 @@ void targetFound(unsigned long deltaTime)
   targetCount++;
   esc.write(ESC_ZERO);
 
+  if(currentTarget.signal)
+  {
   // Sinaliza
   digitalWrite(LED_SIGNAL_PIN, HIGH);
   delay(1000);
   digitalWrite(LED_SIGNAL_PIN, LOW);
   // Desliga o sinal
-
+  }
   // Vira a direção totalmente para a esquerda anda de ré.
   // Idealmente isso vai colocar o robô mais ou menos na direção
   // do proximo objetivo
@@ -106,5 +99,6 @@ void targetFound(unsigned long deltaTime)
   else
   {
     changeState(search);
+    currentTarget = targets.get(targetCount);
   }
 }

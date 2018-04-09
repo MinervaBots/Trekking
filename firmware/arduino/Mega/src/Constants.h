@@ -27,5 +27,6 @@
 #define GOAL_THRESHOLD          0.5             // Distância aceitável de um objetivo pra dizer que chagou (m)
 
 #define BUTTON_STOP_TIME        5000
+#define OBSTACLE_AVOIDANCE_CONSTANT 100.0
 
 #endif

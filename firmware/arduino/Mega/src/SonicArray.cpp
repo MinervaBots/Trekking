@@ -1,12 +1,14 @@
-#include "SonicArray.h"
 #include <Arduino.h>
+#include "SonicArray.h"
+#include "Constants.h"
+#include "Variables.h"
 
 SonicArray::SonicArray(unsigned int triggerPin)
 {
     triggerPin_ = triggerPin;
 }
 
-void SonicArray::update()
+void SonicArray::update(int *detectedCount)
 {
     if (isTimeToMeasure())
     {
@@ -30,27 +32,58 @@ void SonicArray::update()
         triggerSensors();
         interrupts(); // End critical section
 
-        //
-        memset(&obstacleGrid_, 0, sizeof(obstacleGrid_));
-
         // Now that we are certain that our measurements are consistent
         // time-wise, calculate the distance.
         for (int i = 0; i < NUM_OF_SENSORS; i++)
         {
             // Calculate distance for each sensor.
             // Will also timeout any pending measurements
-            auto distance = sensors_[i].calculateDistance();
-            if(distance > 0)
+            if(sensors_[i].calculateDistance() > 0)
             {
-                auto adjustedDistance = distance / GRID_RESOLUTION_RATIO;
-                auto direction = sensors_[i].getDirection();
-                int x = round(distance * cos(direction));
-                int y = round(distance * sin(direction));
-
-                obstacleGrid_[x][y] = true;
+                *detectedCount++;
             }
         }
     }
+}
+
+/**
+ * Retorna uma direção mista entre a evasão do obstáculo e a direção do alvo
+*/
+float SonicArray::obstacleAvoidance()
+{
+    int closestDetectionId = -1;
+    float targetDirection = targetDirectionFiltered.getAverage();
+
+    for (int i = 0; i < NUM_OF_SENSORS; i++)
+    {
+        auto distance = sensors_[i].getDistance();
+        auto direction = sensors_[i].getDirection();
+
+        // Nada foi detectado
+        if(distance == 0)
+        {
+            continue;
+        }
+        // Diferença muito grande entre a direção do obstáculo e do alvo
+        if (abs(targetDirection - direction) > 0.5)
+        {
+            continue;
+        }
+
+        // Vamos sempre tratar o obstáculo mais próximo
+        if(closestDetectionId == -1 || sensors_[i].getDistance() < sensors_[closestDetectionId].getDistance())
+        {
+            closestDetectionId = i;
+            continue;
+        }
+    }
+    
+    if(closestDetectionId == -1)
+    {
+        return targetDirection;
+    }
+
+    return (OBSTACLE_AVOIDANCE_CONSTANT / sensors_[closestDetectionId].getDistance()) * sensors_[closestDetectionId].getDirection();
 }
 
 /**
