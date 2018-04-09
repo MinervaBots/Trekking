@@ -43,47 +43,44 @@ void SonicArray::update()
     }
 }
 
+/**
+ * Retorna uma direção mista entre a evasão do obstáculo e a direção do alvo
+*/
 float SonicArray::obstacleAvoidance()
 {
-    float meanDirection = 0;
-    float weightedMeanDirection = 0;
-
-    int detections = 0;
-    int detectedSensorsId[NUM_OF_SENSORS] = {-1};
-    float possibleDirections[NUM_OF_SENSORS] = {0};
+    int closestDetectionId = -1;
+    float targetDirection = targetDirectionFiltered.getAverage();
 
     for (int i = 0; i < NUM_OF_SENSORS; i++)
     {
         auto distance = sensors_[i].getDistance();
         auto direction = sensors_[i].getDirection();
 
-        // Considera apenas os obstáculos detectados que estão em rota de colisão com a direção atual
-        // e estão mais próximos
-        if (abs(targetDirectionFiltered.getAverage() - direction) < PI/4 && distance > 0 && distance < 150)
+        // Nada foi detectado
+        if(distance == 0)
         {
-            detectedSensorsId[detections] = i;
-            detections++;
+            continue;
+        }
+        // Diferença muito grande entre a direção do obstáculo e do alvo
+        if (abs(targetDirection - direction) > 0.5)
+        {
+            continue;
+        }
 
-            meanDirection += direction;
-            weightedMeanDirection += direction * OBSTACLE_AVOIDANCE_CONSTANT / distance;
+        // Vamos sempre tratar o obstáculo mais próximo
+        if(closestDetectionId == -1 || sensors_[i].getDistance() < sensors_[closestDetectionId].getDistance())
+        {
+            closestDetectionId = i;
+            continue;
         }
     }
-    if(detections < 0)
-    {
-        return 0;
-    }
-
-    meanDirection /= detections;
-    weightedMeanDirection /= detections;
-
-
-    if(weightedMeanDirection != 0)
-    {
-        return -weightedMeanDirection;
-    }
-
-    // Daqui pra baixo assume-se que o robô se encontra exatamente entre 2 obstáculos
     
+    if(closestDetectionId == -1)
+    {
+        return targetDirection;
+    }
+
+    return (OBSTACLE_AVOIDANCE_CONSTANT / sensors_[closestDetectionId].getDistance()) * sensors_[closestDetectionId].getDirection();
 }
 
 /**

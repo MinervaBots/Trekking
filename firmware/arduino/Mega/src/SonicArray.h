@@ -32,13 +32,13 @@ class SonicArray
     bool isTimeToMeasure();
 
     SonicSensor sensors_[NUM_OF_SENSORS] = {
-        SonicSensor(12, 0),  // Ultrasonic_0 on the Sonic Disc
-        SonicSensor(A8, 0),  // Ultrasonic_1
-        SonicSensor(A9, 0),  // Ultrasonic_2
+        SonicSensor(12, -0.75),  // Ultrasonic_0 on the Sonic Disc
+        SonicSensor(A8, -0.5),  // Ultrasonic_1
+        SonicSensor(A9, -0.25),  // Ultrasonic_2
         SonicSensor(A10, 0), // Ultrasonic_3
-        SonicSensor(A11, 0), // Ultrasonic_4
-        SonicSensor(A12, 0), // Ultrasonic_5
-        SonicSensor(A13, 0), // Ultrasonic_6
+        SonicSensor(A11, 0.25), // Ultrasonic_4
+        SonicSensor(A12, 0.5), // Ultrasonic_5
+        SonicSensor(A13, 0.75), // Ultrasonic_6
         //SonicSensor(A14)  // Ultrasonic_7
         //SonicSensor(A15)  // Ultrasonic_8
     };

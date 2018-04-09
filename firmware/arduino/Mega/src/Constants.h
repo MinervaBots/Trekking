@@ -26,6 +26,6 @@
                                                 // Precisa ser maior que 5 pra já estar em refinedSearch quando chegar perto dos obstáculos
 #define GOAL_THRESHOLD          0.5             // Distância aceitável de um objetivo pra dizer que chagou (m)
 
-#define OBSTACLE_AVOIDANCE_CONSTANT 5.0
+#define OBSTACLE_AVOIDANCE_CONSTANT 100.0
 
 #endif
