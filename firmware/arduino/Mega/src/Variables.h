@@ -27,7 +27,7 @@ extern double cameraServoKp, cameraServoKi, cameraServoKd;
 extern double steeringServoPosition;
 extern double steeringServoKp, steeringServoKi, steeringServoKd;
 
-extern double linearSpeed;
+extern double linearSpeed, linearSpeedLock;
 extern double speedKp, speedKi, speedKd;
 
 extern Vector2 currentVelocity;

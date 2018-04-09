@@ -21,6 +21,7 @@ void onRecvMpuLog(CmdMessenger *cmdMesseger)
 
 void onRecvTargetFound(CmdMessenger *cmdMesseger)
 {
+  linearSpeedLock = 1;
   targetDirection = cmdMesseger->readBinArg<double>();
   targetDirectionFiltered.add(targetDirection);
   
@@ -34,6 +35,14 @@ void onRecvTargetFound(CmdMessenger *cmdMesseger)
 
 void onRecvTargetLost(CmdMessenger *cmdMesseger)
 {
+  // Considera que o alvo foi perdido por problemas da deteção
+  // mas ele ainda está no campo de visão, logo apenas diminui
+  // a velocidade aos poucos
+
+  linearSpeedLock *= 0.99;
+
+  // TODO - Isso ainda não funciona pois a velocidade é sobrescrita
+  // pelo PID
 }
 
 void onRecvUnknownCommand(CmdMessenger *cmdMesseger)

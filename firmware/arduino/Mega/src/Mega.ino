@@ -63,7 +63,7 @@ void loop()
   cameraServo.write(cameraServoPosition);
   steeringServo.write(steeringServoPosition);
 
-  linearSpeed = constrain(linearSpeed, ESC_MAX_BACKWARD, ESC_MAX_FORWARD);
+  linearSpeed = constrain(linearSpeed * linearSpeedLock, ESC_MAX_BACKWARD, ESC_MAX_FORWARD);
   esc.write(map(linearSpeed, -1, 1, 0, 180));
 
   lastRun = millis();
