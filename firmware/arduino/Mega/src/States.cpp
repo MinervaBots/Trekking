@@ -44,25 +44,16 @@ void refinedSearch(unsigned long deltaTime)
     return;
   }
 
-  sonicArray.update();
-  /*
-  float avoidMultiplyer;
-  if (ultrassonicArray.evaluate(&avoidMultiplyer))
+  int detectedCount = 0;
+  sonicArray.update(&detectedCount);
+
+  if(detectedCount == 0)
   {
-    if (avoidMultiplyer != 0)
-    {
-      targetDirection = STEERING_SERVO_LIMIT * avoidMultiplyer;
-      targetDirection = CORRECT_DIRECTION(targetDirection);
-    }
-    else
-    {
-      // Caso tenha um obstáculo detectado, mas não conseguimos calcular uma direção
-      // Volta um pouco e tenta novamente
-      targetDirection = 0;
-      linearSpeed = ESC_MAX_BACKWARD;
-    }
+    return;
   }
-  */
+
+  float preferrableDirection = sonicArray.obstacleAvoidance();
+  targetDirection = preferrableDirection;
 }
 
 int targetCount = 0;

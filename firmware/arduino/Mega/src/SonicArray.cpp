@@ -8,7 +8,7 @@ SonicArray::SonicArray(unsigned int triggerPin)
     triggerPin_ = triggerPin;
 }
 
-void SonicArray::update()
+void SonicArray::update(int *detectedCount)
 {
     if (isTimeToMeasure())
     {
@@ -38,7 +38,10 @@ void SonicArray::update()
         {
             // Calculate distance for each sensor.
             // Will also timeout any pending measurements
-            auto distance = sensors_[i].calculateDistance();
+            if(sensors_[i].calculateDistance() > 0)
+            {
+                *detectedCount++;
+            }
         }
     }
 }
