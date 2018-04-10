@@ -4,6 +4,7 @@
 
 bool isRunning = false;
 void (*state)(unsigned long);
+void (*previousState)(unsigned long);
 
 Servo cameraServo, steeringServo, esc;
 

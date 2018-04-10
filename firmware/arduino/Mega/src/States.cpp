@@ -8,7 +8,7 @@
 
 void changeState(void (*nextState)(unsigned long))
 {
-  previusState = state;
+  previousState = state;
   state = nextState;
 }
 
@@ -59,9 +59,7 @@ void refinedSearch(unsigned long deltaTime)
   }
 
   int detectedCount = 0;
-  sonicArray.update(&detectedCount);
-
-  if(detectedCount == 0)
+  if(!sonicArray.update(&detectedCount))
   {
     return;
   }

@@ -12,7 +12,7 @@
 
 extern bool isRunning;
 extern void (*state)(unsigned long);
-extern void (*previusState)(unsigned long);
+extern void (*previousState)(unsigned long);
 
 extern Servo cameraServo, steeringServo, esc;
 extern CmdMessenger rPiCmdMessenger, mpuCmdMessenger;

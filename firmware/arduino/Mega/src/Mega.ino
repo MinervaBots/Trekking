@@ -104,7 +104,7 @@ void proccessButtonPress()
   }
   else
   {
-    changeState(previusState);
+    changeState(previousState);
     cameraPid.SetMode(1);
     steeringPid.SetMode(1);
     speedPid.SetMode(1);
