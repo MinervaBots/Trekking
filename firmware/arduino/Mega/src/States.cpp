@@ -23,6 +23,8 @@ void reset(unsigned long deltaTime)
 void idle(unsigned long deltaTime)
 {
   linearSpeed = 0;
+  computePid = ExecutionFlags::kNone;
+  actuatorsWrite = ExecutionFlags::kAll;
 }
 
 void search(unsigned long deltaTime)
@@ -47,6 +49,8 @@ void search(unsigned long deltaTime)
     changeState(refinedSearch);
     rPiCmdMessenger.sendCmd(MessageCodesRPi::kStartDetection);
   }
+  computePid = ExecutionFlags::kAll;
+  actuatorsWrite = ExecutionFlags::kAll;
 }
 
 void refinedSearch(unsigned long deltaTime)
@@ -66,6 +70,9 @@ void refinedSearch(unsigned long deltaTime)
 
   float preferrableDirection = sonicArray.obstacleAvoidance();
   targetDirection = preferrableDirection;
+
+  computePid = ExecutionFlags::kAll;
+  actuatorsWrite = ExecutionFlags::kAll;
 }
 
 int targetCount = 0;
@@ -76,11 +83,9 @@ void targetFound(unsigned long deltaTime)
 
   if(currentTarget.signal)
   {
-  // Sinaliza
-  digitalWrite(LED_SIGNAL_PIN, HIGH);
-  delay(1000);
-  digitalWrite(LED_SIGNAL_PIN, LOW);
-  // Desliga o sinal
+    digitalWrite(LED_SIGNAL_PIN, HIGH);
+    delay(1000);
+    digitalWrite(LED_SIGNAL_PIN, LOW);
   }
   // Vira a direção totalmente para a esquerda anda de ré.
   // Idealmente isso vai colocar o robô mais ou menos na direção
@@ -99,9 +104,21 @@ void targetFound(unsigned long deltaTime)
     changeState(search);
     currentTarget = targets.get(targetCount);
   }
+  
+  computePid = ExecutionFlags::kNone;
+  actuatorsWrite = ExecutionFlags::kNone;
 }
 
 void rotateCamera(unsigned long deltaTime)
 {
-  
+  esc.write(ESC_ZERO);
+  steeringServoPosition += 1;
+  if(steeringServoPosition > 180)
+  {
+    steeringServoPosition = 0;
+  }
+  delay(20);
+
+  computePid = ExecutionFlags::kNone;
+  actuatorsWrite = ExecutionFlags::kCamera;
 }
