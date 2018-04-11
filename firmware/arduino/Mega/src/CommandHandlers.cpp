@@ -39,7 +39,7 @@ void onRecvTargetFound(CmdMessenger *cmdMesseger)
   //int w = cmdMesseger->readBinArg<int>();
   int h = cmdMesseger->readBinArg<int>();
 
-  targetDirectionFiltered.add((FOCAL_LENGHT * CONE_REAL_HEIGHT * IMAGE_PIXEL_HEIGHT) / (h * SENSOR_HEIGHT));
+  targetDistanceFiltered.add((FOCAL_LENGHT * CONE_REAL_HEIGHT * IMAGE_PIXEL_HEIGHT) / (h * SENSOR_HEIGHT));
 }
 
 void onRecvTargetLost(CmdMessenger *cmdMesseger)
