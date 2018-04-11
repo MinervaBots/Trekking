@@ -22,6 +22,7 @@ extern double setPointZero;
 extern double targetDirection, targetDistance;
 extern RunningMedian targetDirectionFiltered, targetDistanceFiltered;   
 
+extern double cameraDirection;
 extern double cameraServoPosition;
 extern double cameraServoKp, cameraServoKi, cameraServoKd;
 
@@ -37,5 +38,16 @@ extern LinkedList<Target> targets;
 extern Target currentTarget;
 
 extern SonicArray sonicArray;
+
+enum ExecutionFlags
+{
+    kNone = 0,
+    kSpeed = 1,
+    kCamera = 2,
+    kSteering = 4,
+    kAll = 7
+};
+extern ExecutionFlags computePid;
+extern ExecutionFlags actuatorsWrite;
 
 #endif //VARIABLES_H

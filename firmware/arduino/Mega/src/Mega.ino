@@ -9,7 +9,7 @@
 #include "States.h"
 #include "CommandHandlers.h"
 
-PID cameraPid(&targetDirection, &cameraServoPosition, &setPointZero, cameraServoKp, cameraServoKi, cameraServoKd, P_ON_M, DIRECT);
+PID cameraPid(&cameraDirection, &cameraServoPosition, &setPointZero, cameraServoKp, cameraServoKi, cameraServoKd, P_ON_M, DIRECT);
 PID steeringPid(&targetDirection, &steeringServoPosition, &setPointZero, steeringServoKp, steeringServoKi, steeringServoKd, P_ON_M, DIRECT);
 PID speedPid(&targetDistance, &linearSpeed, &setPointZero, speedKp, speedKi, speedKd, P_ON_M, DIRECT);
 
@@ -57,20 +57,15 @@ void loop()
   targetDirection = targetDirectionFiltered.getAverage();
   targetDistance = targetDistanceFiltered.getAverage();
 
-  cameraPid.Compute();
-  steeringPid.Compute();
-  speedPid.Compute();
-
   if (isRunning)
   {
+    computePid = ExecutionFlags::kAll;
+    actuatorsWrite = ExecutionFlags::kAll;
     state(millis() - lastRun);
   }
 
-  cameraServo.write(cameraServoPosition);
-  steeringServo.write(steeringServoPosition);
-
-  linearSpeed = constrain(linearSpeed * linearSpeedLock, ESC_MAX_BACKWARD, ESC_MAX_FORWARD);
-  esc.write(map(linearSpeed, -1, 1, 0, 180));
+  pidCompute();
+  writeInActuators();
 
   lastRun = millis();
 }
@@ -138,4 +133,37 @@ void buttonISR()
   }
   // Se já estiver pausado, resume a execução
   buttonNextAction = (buttonNextAction == 1) ? 0 : 1;
+}
+
+void pidCompute()
+{
+  if(computePid & ExecutionFlags::kSpeed)
+  {
+    speedPid.Compute();
+  }
+  if(computePid & ExecutionFlags::kCamera)
+  {
+    cameraPid.Compute();
+  }
+  if(computePid & ExecutionFlags::kSteering)
+  {
+    steeringPid.Compute();
+  }
+}
+
+void writeInActuators()
+{
+  if(actuatorsWrite & ExecutionFlags::kSpeed)
+  {
+    linearSpeed = constrain(linearSpeed * linearSpeedLock, ESC_MAX_BACKWARD, ESC_MAX_FORWARD);
+    esc.write(map(linearSpeed, -1, 1, 0, 180));
+  }
+  if(actuatorsWrite & ExecutionFlags::kCamera)
+  {
+    cameraServo.write(cameraServoPosition);
+  }
+  if(actuatorsWrite & ExecutionFlags::kSteering)
+  {
+    steeringServo.write(steeringServoPosition);
+  }
 }

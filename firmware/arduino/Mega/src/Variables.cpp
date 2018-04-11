@@ -17,6 +17,7 @@ RunningMedian targetDirectionFiltered = RunningMedian(5);
 RunningMedian targetDistanceFiltered = RunningMedian(5);
 double targetDirection, targetDistance;
 
+double cameraDirection;
 double cameraServoPosition;
 double cameraServoKp = 1, cameraServoKi = 0, cameraServoKd = 2;
 
@@ -31,3 +32,6 @@ Transform currentTransform(3, 3, 0);
 
 LinkedList<Target> targets;
 Target currentTarget;
+
+ExecutionFlags computePid;
+ExecutionFlags actuatorsWrite;
