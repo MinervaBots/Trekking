@@ -1,6 +1,9 @@
 #include "CommandHandlers.h"
 #include "Variables.h"
 #include "Constants.h"
+#include "States.h"
+
+unsigned long targetLostStart;
 
 void onRecvMpuData(CmdMessenger *cmdMesseger)
 {
@@ -41,8 +44,14 @@ void onRecvTargetLost(CmdMessenger *cmdMesseger)
 
   linearSpeedLock *= 0.99;
 
-  // TODO - Isso ainda não funciona pois a velocidade é sobrescrita
-  // pelo PID
+  if(targetLostStart == 0)
+  {
+    targetLostStart = millis();
+  }
+  else if(millis() - targetLostStart > TARGET_LOST_THRESHOLD)
+  {
+    changeState(rotateCamera);
+  }
 }
 
 void onRecvUnknownCommand(CmdMessenger *cmdMesseger)
@@ -51,4 +60,3 @@ void onRecvUnknownCommand(CmdMessenger *cmdMesseger)
   rPiCmdMessenger.sendCmdArg("Mensagem desconhecida");
   rPiCmdMessenger.sendCmdEnd();
 }
-

@@ -100,3 +100,8 @@ void targetFound(unsigned long deltaTime)
     currentTarget = targets.get(targetCount);
   }
 }
+
+void rotateCamera(unsigned long deltaTime)
+{
+  
+}
