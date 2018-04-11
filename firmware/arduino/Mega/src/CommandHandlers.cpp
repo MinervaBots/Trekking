@@ -24,6 +24,12 @@ void onRecvMpuLog(CmdMessenger *cmdMesseger)
 
 void onRecvTargetFound(CmdMessenger *cmdMesseger)
 {
+  if(targetLostStart != 0)
+  {
+    targetLostStart = 0;
+    changeState(refinedSearch);
+  }
+
   linearSpeedLock = 1;
   targetDirection = cmdMesseger->readBinArg<double>();
   targetDirectionFiltered.add(targetDirection);
