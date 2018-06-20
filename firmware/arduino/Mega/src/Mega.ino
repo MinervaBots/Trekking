@@ -25,7 +25,7 @@ void setup()
 {
   attachHandlers();
   Serial.begin(RPI_BAUD_RATE);
-  Serial1.begin(MPU_BAUD_RATE);
+  Serial3.begin(MPU_BAUD_RATE);
   sonicArray.setupChangeInterrupt();
 
   cameraServo.attach(CAMERA_SERVO_PIN);
