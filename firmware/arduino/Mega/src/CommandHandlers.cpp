@@ -3,7 +3,7 @@
 #include "Constants.h"
 #include "States.h"
 
-unsigned long targetLostStart;
+unsigned long targetLostStartTime;
 
 
 void onStopEvent(CmdMessenger *cmdMesseger)
@@ -37,9 +37,9 @@ void onRecvTargetFound(CmdMessenger *cmdMesseger)
   cmdMesseger->sendCmdArg("Alvo localizado");
   cmdMesseger->sendCmdEnd();
 /*
-  if(targetLostStart != 0)
+  if(targetLostStartTime != 0)
   {
-    targetLostStart = 0;
+    targetLostStartTime = 0;
     changeState(refinedSearch);
   }
 */
@@ -62,11 +62,11 @@ void onRecvTargetLost(CmdMessenger *cmdMesseger)
 
   linearSpeedLock *= 0.99;
 
-  if(targetLostStart == 0)
+  if(targetLostStartTime == 0)
   {
-    targetLostStart = millis();
+    targetLostStartTime = millis();
   }
-  else if(millis() - targetLostStart > TARGET_LOST_THRESHOLD)
+  else if(millis() - targetLostStartTime > TARGET_LOST_THRESHOLD)
   {
     changeState(rotateCamera);
   }
