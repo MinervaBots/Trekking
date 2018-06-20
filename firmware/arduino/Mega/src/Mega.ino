@@ -45,28 +45,28 @@ void setup()
   pinMode(BUTTON_PIN, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), buttonISR, CHANGE);
 
-  state = idle;
+  state = &search;
+  lastRun = 0;
+  isRunning = true;
 }
 
 void loop()
 {
-  proccessButtonPress();
   rPiCmdMessenger.feedinSerialData();
   mpuCmdMessenger.feedinSerialData();
-
   targetDirection = targetDirectionFiltered.getAverage();
   targetDistance = targetDistanceFiltered.getAverage();
+  //proccessButtonPress();
 
   if (isRunning)
   {
     computePid = ExecutionFlags::kAll;
     actuatorsWrite = ExecutionFlags::kAll;
-    state(millis() - lastRun);
+    (*state)(millis() - lastRun);
   }
 
   pidCompute();
   writeInActuators();
-
   lastRun = millis();
 }
 
@@ -161,6 +161,8 @@ void writeInActuators()
   }
   if(actuatorsWrite & ExecutionFlags::kCamera)
   {
+    //Serial.print("Camera Servo: \t");
+    //Serial.println(cameraServoPosition);
     cameraServo.write(cameraServoPosition);
   }
   if(actuatorsWrite & ExecutionFlags::kSteering)

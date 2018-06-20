@@ -29,6 +29,7 @@ void idle(unsigned long deltaTime)
 
 void search(unsigned long deltaTime)
 {
+ //Serial.println("search");
   // Como sempre vamos começar muito longe dos objetivos
   // seria muito difícil a câmera detectar o cone.
   // Então inicialmente vamos avaliar a distancia e direção
@@ -55,6 +56,7 @@ void search(unsigned long deltaTime)
 
 void refinedSearch(unsigned long deltaTime)
 {
+  //Serial.println("refinedSearch");
   if (targetDistance < GOAL_THRESHOLD)
   {
     changeState(targetFound);
