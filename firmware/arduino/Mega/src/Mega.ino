@@ -42,15 +42,15 @@ void setup()
   currentTarget = targets.get(0);
 
   pinMode(BUTTON_PIN, INPUT_PULLUP);
-  attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), buttonISR, CHANGE);
-
   state = &search;
+  previousState = &search;
   lastRun = 0;
   isRunning = true;
 }
 
 void loop()
 {
+  handleButton();
   rPiCmdMessenger.feedinSerialData();
   mpuCmdMessenger.feedinSerialData();
   targetDirection = targetDirectionFiltered.getAverage();
@@ -80,35 +80,42 @@ void attachHandlers()
   mpuCmdMessenger.attach(onRecvUnknownCommand);
 }
 
-void buttonISR()
+void handleButton()
 {
-  if (digitalRead(BUTTON_PIN) == LOW) // Pressionado
+  if (digitalRead(BUTTON_PIN) == LOW && buttonPressStart == 0) // Pressionado
   {
+    delay(200);
     buttonPressStart = millis();
     return;
   }
+  if(buttonPressStart == 0) return;
+
+  while(digitalRead(BUTTON_PIN) == LOW) {  }
 
   if (millis() - buttonPressStart > BUTTON_STOP_TIME)
   {
+    Serial.println("Parar");
     buttonPressStart = 0;
     changeState(reset);
     return;
   }
-
   if(state == idle)
   {
-    changeState(search);
+    Serial.println("Resumir");
+    changeState(previousState);
     cameraPid.SetMode(0);
     steeringPid.SetMode(0);
     speedPid.SetMode(0);
   }
   else
   {
+    Serial.println("Pausar");
     changeState(idle);
     cameraPid.SetMode(1);
     steeringPid.SetMode(1);
     speedPid.SetMode(1);
   }
+  buttonPressStart = 0;
 }
 
 ISR(PCINT0_vect)
