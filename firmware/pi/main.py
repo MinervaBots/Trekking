@@ -32,8 +32,8 @@ temp = TemperatureControl(1)
 builder = dic.container.ContainerBuilder()
 
 # Registra as threads de comunicação. Os Handlers vão ser resolvidos automaticamente
-builder.register_class(ArduinoMessagingThread)
-builder.register_class(BluetoothMessagingThread)
+builder.register_class(ArduinoMessagingThread, component_scope=dic.scope.SingleInstance)
+builder.register_class(BluetoothMessagingThread, component_scope=dic.scope.SingleInstance)
 # Registra os handlers
 builder.register_module(ArduinoMessageHandlersModule())
 builder.register_module(BluetoothMessageHandlersModule())
@@ -52,7 +52,7 @@ builder.register_instance(TemperatureControl, temp)
 # Constroi o container
 container = builder.build()
 
-# E extrai as instancias com as dependencias já resolvidas
+# Extrai as instancias com as dependencias já resolvidas
 arduinoMessagingThread = container.resolve(ArduinoMessagingThread)
 bluetoothMessagingThread = container.resolve(BluetoothMessagingThread)
 
@@ -61,7 +61,7 @@ def setup():
     arduinoMessagingThread.setPort(systemInfo.arduinoPort)
     bluetoothMessagingThread.setPort(systemInfo.bluetoothPort)
 
-    #arduinoMessagingThread.start()
+    arduinoMessagingThread.start()
     bluetoothMessagingThread.start()
     
     while not systemInfo.isRunning:
@@ -85,6 +85,7 @@ def loop():
         (systemInfo.isTracking, systemInfo.trackedRect, systemInfo.trackedDirection) = tracker.update(frame)
 
         if systemInfo.trackedRect is None:
+            arduinoMessagingThread.send(ArduinoMessageCodes.TARGET_LOST)
             window.putTextError(frame, "Falha detectada no rastreamento", (20, 80), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
         else:    
             systemInfo.trackedRect = [int(i) for i in systemInfo.trackedRect]
@@ -92,7 +93,7 @@ def loop():
             window.rectangle(frame, p1, p2, (255, 255, 0), 2, 1)
             
             # Mapeia a posição em pixels na tela para uma direção entre -1 e 1
-            #arduinoMessagingThread.send(ArduinoMessageCodes.TARGET_DATA, direction, *systemInfo.trackedRect)
+            arduinoMessagingThread.send(ArduinoMessageCodes.TARGET_FOUND, systemInfo.trackedDirection, systemInfo.trackedRect[2])
             window.putTextInfo(frame, tracker.methodName + ": " + str(systemInfo.trackedRect), (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
 
     window.putTextInfo(frame, "FPS : " + str(int(fps.update())) + " - Temp: " + str(temp.update()) + " 'C", (20, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
@@ -104,7 +105,7 @@ def loop():
 def stop():
     fps.stop(True)
     
-    #arduinoMessagingThread.close()
+    arduinoMessagingThread.close()
     bluetoothMessagingThread.close()
     window.close()
     video.stop()

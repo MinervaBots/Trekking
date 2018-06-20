@@ -3,7 +3,16 @@
 #include "Constants.h"
 #include "States.h"
 
-unsigned long targetLostStart;
+unsigned long targetLostStartTime;
+
+
+void onStopEvent(CmdMessenger *cmdMesseger)
+{
+  changeState(idle);
+  rPiCmdMessenger.sendCmdStart(MessageCodesRPi::kRPiLog);
+  rPiCmdMessenger.sendCmdBinArg("Parou");
+  rPiCmdMessenger.sendCmdEnd();
+}
 
 void onRecvMpuData(CmdMessenger *cmdMesseger)
 {
@@ -24,12 +33,16 @@ void onRecvMpuLog(CmdMessenger *cmdMesseger)
 
 void onRecvTargetFound(CmdMessenger *cmdMesseger)
 {
-  if(targetLostStart != 0)
+  cmdMesseger->sendCmdStart(MessageCodesRPi::kRPiLog);
+  cmdMesseger->sendCmdArg("Alvo localizado");
+  cmdMesseger->sendCmdEnd();
+/*
+  if(targetLostStartTime != 0)
   {
-    targetLostStart = 0;
+    targetLostStartTime = 0;
     changeState(refinedSearch);
   }
-
+*/
   linearSpeedLock = 1;
   targetDirection = cmdMesseger->readBinArg<double>();
   targetDirectionFiltered.add(targetDirection);
@@ -38,7 +51,6 @@ void onRecvTargetFound(CmdMessenger *cmdMesseger)
   //int y = cmdMesseger->readBinArg<int>();
   //int w = cmdMesseger->readBinArg<int>();
   int h = cmdMesseger->readBinArg<int>();
-
   targetDistanceFiltered.add((FOCAL_LENGHT * CONE_REAL_HEIGHT * IMAGE_PIXEL_HEIGHT) / (h * SENSOR_HEIGHT));
 }
 
@@ -50,11 +62,11 @@ void onRecvTargetLost(CmdMessenger *cmdMesseger)
 
   linearSpeedLock *= 0.99;
 
-  if(targetLostStart == 0)
+  if(targetLostStartTime == 0)
   {
-    targetLostStart = millis();
+    targetLostStartTime = millis();
   }
-  else if(millis() - targetLostStart > TARGET_LOST_THRESHOLD)
+  else if(millis() - targetLostStartTime > TARGET_LOST_THRESHOLD)
   {
     changeState(rotateCamera);
   }

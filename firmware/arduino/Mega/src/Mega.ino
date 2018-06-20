@@ -18,14 +18,13 @@ void buttonISR();
 
 unsigned long lastRun;
 volatile unsigned long buttonPressStart;
-volatile char buttonNextAction; // -1 (stop), 0 (nothing), 1 (pause)
 SonicArray sonicArray(PIN_ULTRASSONIC_TRIGGER);
 
 void setup()
 {
   attachHandlers();
   Serial.begin(RPI_BAUD_RATE);
-  Serial1.begin(MPU_BAUD_RATE);
+  Serial3.begin(MPU_BAUD_RATE);
   sonicArray.setupChangeInterrupt();
 
   cameraServo.attach(CAMERA_SERVO_PIN);
@@ -43,17 +42,17 @@ void setup()
   currentTarget = targets.get(0);
 
   pinMode(BUTTON_PIN, INPUT_PULLUP);
-  attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), buttonISR, CHANGE);
-
-  state = idle;
+  state = &search;
+  previousState = &search;
+  lastRun = 0;
+  isRunning = true;
 }
 
 void loop()
 {
-  proccessButtonPress();
+  handleButton();
   rPiCmdMessenger.feedinSerialData();
   mpuCmdMessenger.feedinSerialData();
-
   targetDirection = targetDirectionFiltered.getAverage();
   targetDistance = targetDistanceFiltered.getAverage();
 
@@ -61,18 +60,18 @@ void loop()
   {
     computePid = ExecutionFlags::kAll;
     actuatorsWrite = ExecutionFlags::kAll;
-    state(millis() - lastRun);
+    (*state)(millis() - lastRun);
   }
 
   pidCompute();
   writeInActuators();
-
   lastRun = millis();
 }
 
 void attachHandlers()
 {
   rPiCmdMessenger.attach(MessageCodesRPi::kTargetFound, onRecvTargetFound);
+  rPiCmdMessenger.attach(MessageCodesRPi::kStopEvent, onStopEvent);
   rPiCmdMessenger.attach(MessageCodesRPi::kTargetLost, onRecvTargetLost);
   rPiCmdMessenger.attach(onRecvUnknownCommand);
 
@@ -81,30 +80,42 @@ void attachHandlers()
   mpuCmdMessenger.attach(onRecvUnknownCommand);
 }
 
-void proccessButtonPress()
+void handleButton()
 {
-  if(buttonNextAction == 1)
+  if (digitalRead(BUTTON_PIN) == LOW && buttonPressStart == 0) // Pressionado
   {
-    changeState(idle);
+    delay(200);
+    buttonPressStart = millis();
+    return;
+  }
+  if(buttonPressStart == 0) return;
+
+  while(digitalRead(BUTTON_PIN) == LOW) {  }
+
+  if (millis() - buttonPressStart > BUTTON_STOP_TIME)
+  {
+    Serial.println("Parar");
+    buttonPressStart = 0;
+    changeState(reset);
+    return;
+  }
+  if(state == idle)
+  {
+    Serial.println("Resumir");
+    changeState(previousState);
     cameraPid.SetMode(0);
     steeringPid.SetMode(0);
     speedPid.SetMode(0);
   }
-  else if(buttonNextAction == -1)
-  {
-    changeState(reset);
-    cameraPid.Initialize(true);
-    steeringPid.Initialize(true);
-    speedPid.Initialize(true);
-  }
   else
   {
-    changeState(previousState);
+    Serial.println("Pausar");
+    changeState(idle);
     cameraPid.SetMode(1);
     steeringPid.SetMode(1);
     speedPid.SetMode(1);
   }
-  buttonNextAction = 0;
+  buttonPressStart = 0;
 }
 
 ISR(PCINT0_vect)
@@ -115,24 +126,6 @@ ISR(PCINT0_vect)
 ISR(PCINT2_vect)
 {
   sonicArray.handleEcho(SonicArray::Vector::VECTOR_2);
-}
-
-void buttonISR()
-{
-  if (digitalRead(BUTTON_PIN) == LOW) // Pressionado
-  {
-    buttonPressStart = millis();
-    return;
-  }
-
-
-  if (millis() - buttonPressStart > BUTTON_STOP_TIME)
-  {
-    buttonNextAction = -1;
-    return;
-  }
-  // Se já estiver pausado, resume a execução
-  buttonNextAction = (buttonNextAction == 1) ? 0 : 1;
 }
 
 void pidCompute()
@@ -160,6 +153,8 @@ void writeInActuators()
   }
   if(actuatorsWrite & ExecutionFlags::kCamera)
   {
+    //Serial.print("Camera Servo: \t");
+    //Serial.println(cameraServoPosition);
     cameraServo.write(cameraServoPosition);
   }
   if(actuatorsWrite & ExecutionFlags::kSteering)

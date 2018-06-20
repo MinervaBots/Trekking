@@ -7,5 +7,5 @@ from .MessagingThread import MessagingThread
 from .BluetoothMessageHandlers import BluetoothMessageHandler
 
 class BluetoothMessagingThread(MessagingThread):
-    def __init__(self, 	handlers : List[BluetoothMessageHandler]):
-        super(BluetoothMessagingThread, self).__init__(handlers)
+  def __init__(self, 	handlers : List[BluetoothMessageHandler]):
+    super(BluetoothMessagingThread, self).__init__(handlers)
