@@ -57,7 +57,7 @@ class MessagingThread(Thread):
         # Primeiro envia as mensagens
         if not self.__sendQueue.empty():
           message = self.__sendQueue.get()
-          print(message)
+          #print(message)
           self.stream.write(message)
         
         if(self.stream.inWaiting() == 0):
