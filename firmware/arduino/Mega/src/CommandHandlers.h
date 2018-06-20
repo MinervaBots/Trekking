@@ -10,6 +10,7 @@ enum MessageCodesRPi
   kTargetLost,
   kStartDetection,
   kPauseDetection,
+  kStopEvent,
 };
 
 enum MessageCodesMPU
@@ -24,5 +25,6 @@ void onRecvMpuLog(CmdMessenger *cmdMesseger);
 void onRecvTargetFound(CmdMessenger *cmdMesseger);
 void onRecvTargetLost(CmdMessenger *cmdMesseger);
 void onRecvUnknownCommand(CmdMessenger *cmdMesseger);
+void onStopEvent(CmdMessenger *cmdMesseger);
 
 #endif //COMMAND_HANDLERS_H

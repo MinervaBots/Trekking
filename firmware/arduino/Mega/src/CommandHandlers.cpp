@@ -5,6 +5,15 @@
 
 unsigned long targetLostStart;
 
+
+void onStopEvent(CmdMessenger *cmdMesseger)
+{
+  changeState(idle);
+  rPiCmdMessenger.sendCmdStart(MessageCodesRPi::kRPiLog);
+  rPiCmdMessenger.sendCmdBinArg("Parou");
+  rPiCmdMessenger.sendCmdEnd();
+}
+
 void onRecvMpuData(CmdMessenger *cmdMesseger)
 {
   currentTransform.position.x = cmdMesseger->readBinArg<float>();

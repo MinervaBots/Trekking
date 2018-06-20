@@ -73,6 +73,7 @@ void loop()
 void attachHandlers()
 {
   rPiCmdMessenger.attach(MessageCodesRPi::kTargetFound, onRecvTargetFound);
+  rPiCmdMessenger.attach(MessageCodesRPi::kStopEvent, onStopEvent);
   rPiCmdMessenger.attach(MessageCodesRPi::kTargetLost, onRecvTargetLost);
   rPiCmdMessenger.attach(onRecvUnknownCommand);
 
