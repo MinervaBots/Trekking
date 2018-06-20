@@ -18,7 +18,7 @@ void buttonISR();
 
 unsigned long lastRun;
 volatile unsigned long buttonPressStart;
-volatile char buttonNextAction; // -1 (stop), 0 (nothing), 1 (pause)
+volatile char buttonNextAction; // 0 (nothing), 1 (pause), 2 (resume), 3 (stop)
 SonicArray sonicArray(PIN_ULTRASSONIC_TRIGGER);
 
 void setup()
@@ -56,7 +56,7 @@ void loop()
   mpuCmdMessenger.feedinSerialData();
   targetDirection = targetDirectionFiltered.getAverage();
   targetDistance = targetDistanceFiltered.getAverage();
-  //proccessButtonPress();
+  proccessButtonPress();
 
   if (isRunning)
   {
@@ -91,31 +91,21 @@ void proccessButtonPress()
     steeringPid.SetMode(0);
     speedPid.SetMode(0);
   }
-  else if(buttonNextAction == -1)
-  {
-    changeState(reset);
-    cameraPid.Initialize(true);
-    steeringPid.Initialize(true);
-    speedPid.Initialize(true);
-  }
-  else
+  else if(buttonNextAction == 2)
   {
     changeState(previousState);
     cameraPid.SetMode(1);
     steeringPid.SetMode(1);
     speedPid.SetMode(1);
   }
+  else if(buttonNextAction == 3)
+  {
+    changeState(reset);
+    cameraPid.Initialize(true);
+    steeringPid.Initialize(true);
+    speedPid.Initialize(true);
+  }
   buttonNextAction = 0;
-}
-
-ISR(PCINT0_vect)
-{
-  sonicArray.handleEcho(SonicArray::Vector::VECTOR_0);
-}
-
-ISR(PCINT2_vect)
-{
-  sonicArray.handleEcho(SonicArray::Vector::VECTOR_2);
 }
 
 void buttonISR()
@@ -129,11 +119,21 @@ void buttonISR()
 
   if (millis() - buttonPressStart > BUTTON_STOP_TIME)
   {
-    buttonNextAction = -1;
+    buttonNextAction = 3;
     return;
   }
   // Se já estiver pausado, resume a execução
-  buttonNextAction = (buttonNextAction == 1) ? 0 : 1;
+  buttonNextAction = (buttonNextAction == 1) ? 2 : 1;
+}
+
+ISR(PCINT0_vect)
+{
+  sonicArray.handleEcho(SonicArray::Vector::VECTOR_0);
+}
+
+ISR(PCINT2_vect)
+{
+  sonicArray.handleEcho(SonicArray::Vector::VECTOR_2);
 }
 
 void pidCompute()
