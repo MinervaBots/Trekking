@@ -33,12 +33,16 @@ void onRecvMpuLog(CmdMessenger *cmdMesseger)
 
 void onRecvTargetFound(CmdMessenger *cmdMesseger)
 {
+  cmdMesseger->sendCmdStart(MessageCodesRPi::kRPiLog);
+  cmdMesseger->sendCmdArg("Alvo localizado");
+  cmdMesseger->sendCmdEnd();
+/*
   if(targetLostStart != 0)
   {
     targetLostStart = 0;
     changeState(refinedSearch);
   }
-
+*/
   linearSpeedLock = 1;
   targetDirection = cmdMesseger->readBinArg<double>();
   targetDirectionFiltered.add(targetDirection);
@@ -47,7 +51,6 @@ void onRecvTargetFound(CmdMessenger *cmdMesseger)
   //int y = cmdMesseger->readBinArg<int>();
   //int w = cmdMesseger->readBinArg<int>();
   int h = cmdMesseger->readBinArg<int>();
-
   targetDistanceFiltered.add((FOCAL_LENGHT * CONE_REAL_HEIGHT * IMAGE_PIXEL_HEIGHT) / (h * SENSOR_HEIGHT));
 }
 

@@ -5,7 +5,7 @@
 
 enum MessageCodesRPi
 {
-  kRPiLog,
+  kRPiLog = 0,
   kTargetFound,
   kTargetLost,
   kStartDetection,
