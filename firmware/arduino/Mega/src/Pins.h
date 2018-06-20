@@ -2,8 +2,8 @@
 #define PINS_H
 
 #define ESC_PIN 4
-#define CAMERA_SERVO_PIN 5
-#define STEERING_SERVO_PIN 6
+#define CAMERA_SERVO_PIN 6
+#define STEERING_SERVO_PIN 5
 
 #define PIN_ULTRASSONIC_TRIGGER 48
 

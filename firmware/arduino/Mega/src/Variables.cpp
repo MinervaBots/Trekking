@@ -9,13 +9,13 @@ void (*previousState)(unsigned long);
 Servo cameraServo, steeringServo, esc;
 
 CmdMessenger rPiCmdMessenger = CmdMessenger(Serial,',',';','/');
-CmdMessenger mpuCmdMessenger = CmdMessenger(Serial1,',',';','/');
+CmdMessenger mpuCmdMessenger = CmdMessenger(Serial2,',',';','/');
 
 double setPointZero = 0;
 
 RunningMedian targetDirectionFiltered = RunningMedian(5);
 RunningMedian targetDistanceFiltered = RunningMedian(5);
-double targetDirection, targetDistance;
+double targetDirection, targetDistance = 999999;
 
 double cameraDirection;
 double cameraServoPosition;
