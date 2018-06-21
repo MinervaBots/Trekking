@@ -85,7 +85,8 @@ class MessagingThread(Thread):
         
         # Remove bytes inválidos da mensagem e separa cada campo em uma lista
         message = decodedBuffer.strip('').strip('\n\r').split(self.fieldSeparator)
-        if(len(message) == 0):
+        if(len(message) == 0 or not message[0].isdigit()):
+          print(message)
           continue
         
         opCode = int((message[0]))
