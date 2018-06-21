@@ -1,9 +1,9 @@
 #ifndef TYPE_UTILS_H
 #define TYPE_UTILS_H
 
-float mapf(float value, float istart, float istop, float ostart, float ostop)
+float mapf(float x, float in_min, float in_max, float out_min, float out_max)
 {
-  return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
+ return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
 #endif
