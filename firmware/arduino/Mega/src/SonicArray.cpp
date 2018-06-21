@@ -53,7 +53,6 @@ bool SonicArray::update(int *detectedCount)
 float SonicArray::obstacleAvoidance()
 {
     int closestDetectionId = -1;
-    float targetDirection = targetDirectionFiltered.getAverage();
 
     for (int i = 0; i < NUM_OF_SENSORS; i++)
     {
