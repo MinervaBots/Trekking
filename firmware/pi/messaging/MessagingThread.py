@@ -53,6 +53,7 @@ class MessagingThread(Thread):
       self.__sendQueue.put(message.encode())
 
     def run(self):
+      receivedFirstFullMessage = False
       while self.isRunning and self.stream.isOpen():
         # Primeiro envia as mensagens
         if not self.__sendQueue.empty():
@@ -63,17 +64,27 @@ class MessagingThread(Thread):
         if(self.stream.inWaiting() == 0):
           continue
 
-        hasMessage = False
-        decodedBuffer : str = ""
-        
-        while not hasMessage:
+        # Ignora a primeira mesagem pois muito provavelmente não vamos receber ela completa
+        while not(receivedFirstFullMessage):
           for c in self.stream.read().decode():
             if c == self.messageSeparator:
-              hasMessage = True
-              break
-            decodedBuffer += c.strip('\n\r')
+              receivedFirstFullMessage = True
+              break;
+
+        hasFullMessage = False
+        decodedBuffer : str = ""
         
-        message = decodedBuffer.split(self.fieldSeparator)
+        # Espera receber o byte indicador de fim de mensagem para processar
+        # a mensagem completa
+        while not hasFullMessage:
+          for c in self.stream.read().decode():
+            if c == self.messageSeparator:
+              hasFullMessage = True
+              break
+            decodedBuffer += c
+        
+        # Remove bytes inválidos da mensagem e separa cada campo em uma lista
+        message = decodedBuffer.strip('').strip('\n\r').split(self.fieldSeparator)
         if(len(message) == 0):
           continue
         
