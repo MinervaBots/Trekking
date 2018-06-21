@@ -44,14 +44,12 @@ void onRecvTargetFound(CmdMessenger *cmdMesseger)
   }
 */
   linearSpeedLock = 1;
-  targetDirection = cmdMesseger->readBinArg<double>();
-  targetDirectionFiltered.add(targetDirection);
-  
+  targetDirection = cmdMesseger->readFloatArg();
   //int x = cmdMesseger->readBinArg<int>();
   //int y = cmdMesseger->readBinArg<int>();
   //int w = cmdMesseger->readBinArg<int>();
-  int h = cmdMesseger->readBinArg<int>();
-  targetDistanceFiltered.add((FOCAL_LENGHT * CONE_REAL_HEIGHT * IMAGE_PIXEL_HEIGHT) / (h * SENSOR_HEIGHT));
+  int h = cmdMesseger->readInt16Arg();
+  targetDistance = (FOCAL_LENGHT * CONE_REAL_HEIGHT * IMAGE_PIXEL_HEIGHT) / (h * SENSOR_HEIGHT);
 }
 
 void onRecvTargetLost(CmdMessenger *cmdMesseger)

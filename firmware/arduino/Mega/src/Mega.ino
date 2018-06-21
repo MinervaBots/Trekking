@@ -53,8 +53,6 @@ void loop()
   handleButton();
   rPiCmdMessenger.feedinSerialData();
   mpuCmdMessenger.feedinSerialData();
-  targetDirection = targetDirectionFiltered.getAverage();
-  targetDistance = targetDistanceFiltered.getAverage();
 
   if (isRunning)
   {
