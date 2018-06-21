@@ -47,7 +47,10 @@ class MessagingThread(Thread):
         
     def close(self):
       self.isRunning = False
-        
+    
+    def clearSendQueue(self):
+      self.__sendQueue.queue.clear()
+      
     def send(self, opCode, *args):
       message = str(int(opCode)) + self.fieldSeparator + self.fieldSeparator.join(str(field) for field in args) + self.messageSeparator
       self.__sendQueue.put(message.encode())

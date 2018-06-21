@@ -102,25 +102,29 @@ def loop():
     window.putTextInfo(frame, "FPS : " + str(int(fps.update())) + " - Temp: " + str(temp.update()) + " 'C", (20, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
 
     # ESC pressionado
-    if window.update(frame) == 27:
-        systemInfo.isRunning = False
+    return window.update(frame) == 27
 
 def stop():
-    fps.stop(True)
+    arduinoMessagingThread.clearSendQueue()
+    arduinoMessagingThread.send(ArduinoMessageCodes.STOP_EVENT)
+    cv2.waitKey(2000);
     
+    fps.stop(True)
     arduinoMessagingThread.close()
     #bluetoothMessagingThread.close()
     window.close()
     video.stop()
+    systemInfo.isRunning = False
     
 def main():
     setup()
     
     while systemInfo.isRunning:
         try:
-            loop()
+            if(loop() == True):
+                break
+            
         except KeyboardInterrupt:
             break
     stop()
-
 main()

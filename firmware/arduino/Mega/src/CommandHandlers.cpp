@@ -8,10 +8,9 @@ unsigned long targetLostStartTime;
 
 void onStopEvent(CmdMessenger *cmdMesseger)
 {
-  changeState(idle);
-  rPiCmdMessenger.sendCmdStart(MessageCodesRPi::kRPiLog);
-  rPiCmdMessenger.sendCmdBinArg("Parou");
-  rPiCmdMessenger.sendCmdEnd();
+  linearSpeed = 0;
+  esc.write(ESC_ZERO);
+  changeState(reset);
 }
 
 void onRecvMpuData(CmdMessenger *cmdMesseger)
@@ -40,12 +39,15 @@ void onRecvTargetFound(CmdMessenger *cmdMesseger)
   }
 
   linearSpeedLock = 1;
-  targetDirection = cmdMesseger->readFloatArg();
+  float newDirection = cmdMesseger->readFloatArg();
+  targetDirection = (1.0 - 0.7) * targetDirection + newDirection * 0.7;
+
   int h = cmdMesseger->readInt16Arg();
-  
+
   if(h != 0)
   {
-    targetDistance = (FOCAL_LENGHT * CONE_REAL_HEIGHT * IMAGE_PIXEL_HEIGHT) / (h * SENSOR_HEIGHT);
+    float newDistance = (FOCAL_LENGHT * CONE_REAL_HEIGHT * IMAGE_PIXEL_HEIGHT) / (h * SENSOR_HEIGHT);
+    targetDistance = (1.0 - 0.9) * targetDistance + newDistance * 0.9;
   }
   else
   {
@@ -71,6 +73,12 @@ void onRecvTargetLost(CmdMessenger *cmdMesseger)
 void onRecvUnknownCommand(CmdMessenger *cmdMesseger)
 {
   rPiCmdMessenger.sendCmdStart(MessageCodesRPi::kRPiLog);
-  rPiCmdMessenger.sendCmdArg("Mensagem desconhecida");
+  rPiCmdMessenger.sendCmdArg("Nenhum handler registrado para essa mensagem");
   rPiCmdMessenger.sendCmdEnd();
+  /*
+  while(1)
+  {
+  esc.write(ESC_ZERO);
+  }
+  */
 }

@@ -1,6 +1,6 @@
-
 #include <Servo.h>
 #include <PID_v1.h>
+#include <math.h>
 
 #include "TypeUtils.h"
 #include "Pins.h"
@@ -32,6 +32,7 @@ void setup()
   cameraServo.attach(CAMERA_SERVO_PIN);
   steeringServo.attach(STEERING_SERVO_PIN);
   esc.attach(ESC_PIN);
+  esc.write(ESC_ZERO);
 
   cameraPid.SetOutputLimits(-1, 1);
   steeringPid.SetOutputLimits(-1, 1);
@@ -73,8 +74,8 @@ void loop()
 void attachHandlers()
 {
   rPiCmdMessenger.attach(MessageCodesRPi::kTargetFound, onRecvTargetFound);
-  rPiCmdMessenger.attach(MessageCodesRPi::kStopEvent, onStopEvent);
   rPiCmdMessenger.attach(MessageCodesRPi::kTargetLost, onRecvTargetLost);
+  rPiCmdMessenger.attach(MessageCodesRPi::kStopEvent, onStopEvent);
   rPiCmdMessenger.attach(onRecvUnknownCommand);
 
   mpuCmdMessenger.attach(MessageCodesMPU::kMpuData, onRecvMpuData);
@@ -156,22 +157,24 @@ void writeInActuators()
 
   if(actuatorsWrite & ExecutionFlags::kSpeed)
   {
-    value = (int)mapf(linearSpeed, -1, 1, ESC_MAX_BACKWARD, ESC_MAX_FORWARD);
+    value = round(mapf(linearSpeed, -1, 1, ESC_MAX_BACKWARD, ESC_MAX_FORWARD));
     esc.write(value);
     rPiCmdMessenger.sendCmdArg(linearSpeed);
+    rPiCmdMessenger.sendCmdArg(value);
+    //rPiCmdMessenger.sendCmdArg(value);
   }
   if(actuatorsWrite & ExecutionFlags::kCamera)
   {
-    value =(int)mapf(cameraServoPosition, -1, 1, 0, CAMERA_SERVO_LIMIT);
+    value = round(mapf(cameraServoPosition, -1, 1, 0, CAMERA_SERVO_LIMIT));
     cameraServo.write(value);
-    rPiCmdMessenger.sendCmdArg(cameraServoPosition);
+    //rPiCmdMessenger.sendCmdArg(cameraServoPosition);
   }
   if(actuatorsWrite & ExecutionFlags::kSteering)
   {
-    value = (int)mapf(steeringServoPosition, -1, 1, 0, STEERING_SERVO_LIMIT);
+    value = round(mapf(steeringServoPosition, -1, 1, STEERING_SERVO_MIN_LIMIT, STEERING_SERVO_MAX_LIMIT));
     steeringServo.write(value);
-    rPiCmdMessenger.sendCmdArg(steeringServoPosition);
+    //rPiCmdMessenger.sendCmdArg(steeringServoPosition);
   }
-
   rPiCmdMessenger.sendCmdEnd();
+  delay(15);
 }

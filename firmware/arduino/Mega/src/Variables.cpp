@@ -13,17 +13,17 @@ CmdMessenger mpuCmdMessenger = CmdMessenger(Serial2,',',';','/');
 
 double setPointZero = 0;
 
-double targetDirection, targetDistance = 999999;
+double targetDirection, targetDistance = 0;
 
 double cameraDirection;
 double cameraServoPosition;
-double cameraServoKp = 1, cameraServoKi = 0, cameraServoKd = 0;
+double cameraServoKp = 0.5, cameraServoKi = 0, cameraServoKd = 0.5;
 
 double steeringServoPosition;
-double steeringServoKp = 0.5, steeringServoKi = 0, steeringServoKd = 0;
+double steeringServoKp = 0.75, steeringServoKi = 0, steeringServoKd = 0.9;
 
-double linearSpeed, linearSpeedLock;
-double speedKp = 1, speedKi = 0, speedKd = 0;
+double linearSpeed = 0, linearSpeedLock;
+double speedKp = 0.3, speedKi = 0, speedKd = 0;
 
 Vector2 currentVelocity;
 Transform currentTransform(3, 3, 0);

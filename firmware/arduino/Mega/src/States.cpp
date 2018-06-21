@@ -5,6 +5,7 @@
 #include "Macros.h"
 #include "Pins.h"
 
+float rotateCameraIncrement = 1/90.0;
 
 void changeState(void (*nextState)(unsigned long))
 {
@@ -14,6 +15,10 @@ void changeState(void (*nextState)(unsigned long))
 
 void reset(unsigned long deltaTime)
 {
+  rPiCmdMessenger.sendCmdStart(MessageCodesRPi::kRPiLog);
+  rPiCmdMessenger.sendCmdArg("reset");
+  rPiCmdMessenger.sendCmdEnd();
+
   linearSpeed = 0;
   steeringServoPosition = 0;
   cameraServoPosition = 0;
@@ -22,13 +27,21 @@ void reset(unsigned long deltaTime)
 
 void idle(unsigned long deltaTime)
 {
-  //linearSpeed = 0;
-  //computePid = ExecutionFlags::kNone;
-  //actuatorsWrite = ExecutionFlags::kAll;
+  rPiCmdMessenger.sendCmdStart(MessageCodesRPi::kRPiLog);
+  rPiCmdMessenger.sendCmdArg("idle");
+  rPiCmdMessenger.sendCmdEnd();
+
+  linearSpeed = 0;
+  computePid = ExecutionFlags::kNone;
+  actuatorsWrite = ExecutionFlags::kAll;
 }
 
 void search(unsigned long deltaTime)
 {
+  rPiCmdMessenger.sendCmdStart(MessageCodesRPi::kRPiLog);
+  rPiCmdMessenger.sendCmdArg("search");
+  rPiCmdMessenger.sendCmdEnd();
+
   //Serial.println("search");
   // Como sempre vamos começar muito longe dos objetivos
   // seria muito difícil a câmera detectar o cone.
@@ -56,6 +69,9 @@ void search(unsigned long deltaTime)
 
 void refinedSearch(unsigned long deltaTime)
 {
+  rPiCmdMessenger.sendCmdStart(MessageCodesRPi::kRPiLog);
+  rPiCmdMessenger.sendCmdArg("refinedSearch");
+  rPiCmdMessenger.sendCmdEnd();
   /*
   //Serial.println("refinedSearch");
   if (targetDistance < GOAL_THRESHOLD)
@@ -74,13 +90,14 @@ void refinedSearch(unsigned long deltaTime)
   float preferrableDirection = sonicArray.obstacleAvoidance();
   targetDirection = preferrableDirection;
   */
-  computePid = ExecutionFlags::kAll;
-  actuatorsWrite = ExecutionFlags::kAll;
 }
 
 int targetCount = 0;
 void targetFound(unsigned long deltaTime)
 {
+  rPiCmdMessenger.sendCmdStart(MessageCodesRPi::kRPiLog);
+  rPiCmdMessenger.sendCmdArg("targetFound");
+  rPiCmdMessenger.sendCmdEnd();
   targetCount++;
   esc.write(ESC_ZERO);
 
@@ -114,14 +131,16 @@ void targetFound(unsigned long deltaTime)
 
 void rotateCamera(unsigned long deltaTime)
 {
+  rPiCmdMessenger.sendCmdStart(MessageCodesRPi::kRPiLog);
+  rPiCmdMessenger.sendCmdArg("rotateCamera");
+  rPiCmdMessenger.sendCmdEnd();
   linearSpeed = 0;
-  cameraServoPosition += 0.05;
-  if(cameraServoPosition > 1)
+  cameraServoPosition += rotateCameraIncrement;
+  if(abs(cameraServoPosition) >= 1)
   {
-    cameraServoPosition = -1;
+    rotateCameraIncrement *= -1;
   }
-  delay(20);
-
+  computePid &= ~ExecutionFlags::kCamera;
   //computePid = ExecutionFlags::kCamera;
   actuatorsWrite = ExecutionFlags::kAll;
 }
