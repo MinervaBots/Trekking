@@ -8,6 +8,7 @@ from utils.DebugWindow import DebugWindow
 from utils.TemperatureControl import TemperatureControl
 from videoStream.VideoStream import VideoStream
 from tracking.Tracker import Tracker
+import time
 
 from messaging.ArduinoMessagingThread import ArduinoMessagingThread
 from messaging.BluetoothMessagingThread import BluetoothMessagingThread
@@ -23,7 +24,7 @@ video = VideoStream(usePiCamera = systemInfo.isRaspberryPi, framerate = 30, reso
 video.start() # Inicializa a câmera aqui pra ter tempo de esquentar se for no Raspberry Pi
 
 tracker = Tracker("cascades/face.xml", video.resolution, "MEDIANFLOW")
-window = DebugWindow(systemInfo.enableWindow, "debug", tracker.resolution, True)
+window = DebugWindow(systemInfo.enableWindow, "debug", tracker.resolution, 20, True)
 
 #Medida de performance
 fps = FPS(False)
@@ -59,11 +60,12 @@ bluetoothMessagingThread = container.resolve(BluetoothMessagingThread)
 
 def setup():
     arduinoMessagingThread.setPort(systemInfo.arduinoPort)
-    bluetoothMessagingThread.setPort(systemInfo.bluetoothPort)
+    #bluetoothMessagingThread.setPort(systemInfo.bluetoothPort)
 
     arduinoMessagingThread.start()
-    bluetoothMessagingThread.start()
-    
+    #bluetoothMessagingThread.start()
+    systemInfo.isRunning = True
+    tracker.isRunning = True
     while not systemInfo.isRunning:
         continue
     
@@ -81,6 +83,7 @@ def loop():
     elif not systemInfo.isTracking:
         (systemInfo.isTracking, systemInfo.trackedRect, systemInfo.trackedDirection) = tracker.init(frame)
         window.putTextWarning(frame, "Tentando detectar...", (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
+        arduinoMessagingThread.send(ArduinoMessageCodes.TARGET_LOST)
     else:   
         (systemInfo.isTracking, systemInfo.trackedRect, systemInfo.trackedDirection) = tracker.update(frame)
 
@@ -106,7 +109,7 @@ def stop():
     fps.stop(True)
     
     arduinoMessagingThread.close()
-    bluetoothMessagingThread.close()
+    #bluetoothMessagingThread.close()
     window.close()
     video.stop()
     

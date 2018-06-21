@@ -1,11 +1,12 @@
 import cv2
 
 class DebugWindow:
-    def __init__(self, enabled : bool, windowName : str, resolution, record : bool):
+    def __init__(self, enabled : bool, windowName : str, resolution, delay : int, record : bool):
         self.enabled = enabled
         self.width = int(resolution[0])
         self.height = int(resolution[1])
         self.windowName = windowName
+        self.delay = delay
         self.record = record
         
         if self.record:
@@ -22,7 +23,7 @@ class DebugWindow:
 
         if self.enabled:
             cv2.imshow(self.windowName, frame)
-            return cv2.waitKey(1)
+            return cv2.waitKey(self.delay)
         return -1
         
     def close(self):

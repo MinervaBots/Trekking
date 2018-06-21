@@ -32,4 +32,6 @@ class ArduinoLogMessageHandler(ArduinoMessageHandler):
     self.__bluetoothMessager = bluetoothMessager
     
   def handle(self, sender : MessagingThread, message : List):
-    self.__bluetoothMessager.send(*message)
+    print("Log: " + str(message))
+    #self.__bluetoothMessager.send(*message)
+    pass
