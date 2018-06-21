@@ -22,14 +22,14 @@ void reset(unsigned long deltaTime)
 
 void idle(unsigned long deltaTime)
 {
-  linearSpeed = 0;
-  computePid = ExecutionFlags::kNone;
-  actuatorsWrite = ExecutionFlags::kAll;
+  //linearSpeed = 0;
+  //computePid = ExecutionFlags::kNone;
+  //actuatorsWrite = ExecutionFlags::kAll;
 }
 
 void search(unsigned long deltaTime)
 {
- //Serial.println("search");
+  //Serial.println("search");
   // Como sempre vamos começar muito longe dos objetivos
   // seria muito difícil a câmera detectar o cone.
   // Então inicialmente vamos avaliar a distancia e direção
@@ -56,6 +56,7 @@ void search(unsigned long deltaTime)
 
 void refinedSearch(unsigned long deltaTime)
 {
+  /*
   //Serial.println("refinedSearch");
   if (targetDistance < GOAL_THRESHOLD)
   {
@@ -72,7 +73,7 @@ void refinedSearch(unsigned long deltaTime)
 
   float preferrableDirection = sonicArray.obstacleAvoidance();
   targetDirection = preferrableDirection;
-
+  */
   computePid = ExecutionFlags::kAll;
   actuatorsWrite = ExecutionFlags::kAll;
 }
@@ -113,14 +114,14 @@ void targetFound(unsigned long deltaTime)
 
 void rotateCamera(unsigned long deltaTime)
 {
-  esc.write(ESC_ZERO);
-  steeringServoPosition += 1;
-  if(steeringServoPosition > 180)
+  linearSpeed = 0;
+  cameraServoPosition += 0.05;
+  if(cameraServoPosition > 1)
   {
-    steeringServoPosition = 0;
+    cameraServoPosition = -1;
   }
   delay(20);
 
-  computePid = ExecutionFlags::kNone;
-  actuatorsWrite = ExecutionFlags::kCamera;
+  //computePid = ExecutionFlags::kCamera;
+  actuatorsWrite = ExecutionFlags::kAll;
 }

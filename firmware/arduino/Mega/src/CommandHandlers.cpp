@@ -33,40 +33,38 @@ void onRecvMpuLog(CmdMessenger *cmdMesseger)
 
 void onRecvTargetFound(CmdMessenger *cmdMesseger)
 {
-  cmdMesseger->sendCmdStart(MessageCodesRPi::kRPiLog);
-  cmdMesseger->sendCmdArg("Alvo localizado");
-  cmdMesseger->sendCmdEnd();
-/*
-  if(targetLostStartTime != 0)
+  if(targetLostStartTime != 0 && state != refinedSearch)
   {
     targetLostStartTime = 0;
     changeState(refinedSearch);
   }
-*/
+
   linearSpeedLock = 1;
   targetDirection = cmdMesseger->readFloatArg();
-  //int x = cmdMesseger->readBinArg<int>();
-  //int y = cmdMesseger->readBinArg<int>();
-  //int w = cmdMesseger->readBinArg<int>();
   int h = cmdMesseger->readInt16Arg();
-  targetDistance = (FOCAL_LENGHT * CONE_REAL_HEIGHT * IMAGE_PIXEL_HEIGHT) / (h * SENSOR_HEIGHT);
+  
+  if(h != 0)
+  {
+    targetDistance = (FOCAL_LENGHT * CONE_REAL_HEIGHT * IMAGE_PIXEL_HEIGHT) / (h * SENSOR_HEIGHT);
+  }
+  else
+  {
+    targetDistance = 0;
+  }
 }
 
 void onRecvTargetLost(CmdMessenger *cmdMesseger)
 {
-  // Considera que o alvo foi perdido por problemas da deteção
-  // mas ele ainda está no campo de visão, logo apenas diminui
-  // a velocidade aos poucos
-
-  linearSpeedLock *= 0.99;
-
   if(targetLostStartTime == 0)
   {
     targetLostStartTime = millis();
   }
-  else if(millis() - targetLostStartTime > TARGET_LOST_THRESHOLD)
+  else if(millis() - targetLostStartTime > TARGET_LOST_THRESHOLD && state != rotateCamera)
   {
     changeState(rotateCamera);
+    rPiCmdMessenger.sendCmdStart(MessageCodesRPi::kRPiLog);
+    rPiCmdMessenger.sendCmdArg("changeState(rotateCamera)");
+    rPiCmdMessenger.sendCmdEnd();
   }
 }
 
