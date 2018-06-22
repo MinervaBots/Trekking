@@ -1,7 +1,8 @@
-
 #include <Servo.h>
 #include <PID_v1.h>
+#include <math.h>
 
+#include "TypeUtils.h"
 #include "Pins.h"
 #include "Target.h"
 #include "Variables.h"
@@ -9,9 +10,9 @@
 #include "States.h"
 #include "CommandHandlers.h"
 
-PID cameraPid(&cameraDirection, &cameraServoPosition, &setPointZero, cameraServoKp, cameraServoKi, cameraServoKd, P_ON_M, DIRECT);
+PID cameraPid(&targetDirection, &cameraServoPosition, &setPointZero, cameraServoKp, cameraServoKi, cameraServoKd, P_ON_M, DIRECT);
 PID steeringPid(&targetDirection, &steeringServoPosition, &setPointZero, steeringServoKp, steeringServoKi, steeringServoKd, P_ON_M, DIRECT);
-PID speedPid(&targetDistance, &linearSpeed, &setPointZero, speedKp, speedKi, speedKd, P_ON_M, DIRECT);
+PID speedPid(&targetDistance, &linearSpeed, &setPointZero, speedKp, speedKi, speedKd, P_ON_M, REVERSE);
 
 void attachHandlers();
 void buttonISR();
@@ -26,14 +27,19 @@ void setup()
   Serial.begin(RPI_BAUD_RATE);
   Serial3.begin(MPU_BAUD_RATE);
   sonicArray.setupChangeInterrupt();
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
 
   cameraServo.attach(CAMERA_SERVO_PIN);
   steeringServo.attach(STEERING_SERVO_PIN);
   esc.attach(ESC_PIN);
+  esc.write(ESC_ZERO);
 
-  cameraPid.SetOutputLimits(0, degrees(CAMERA_SERVO_LIMIT));
-  steeringPid.SetOutputLimits(0, degrees(STEERING_SERVO_LIMIT));
-  speedPid.SetOutputLimits(ESC_MAX_BACKWARD, ESC_MAX_FORWARD);
+  cameraPid.SetOutputLimits(-1, 1);
+  steeringPid.SetOutputLimits(-1, 1);
+  speedPid.SetOutputLimits(-1, 1);
+  cameraPid.SetMode(AUTOMATIC);
+  steeringPid.SetMode(AUTOMATIC);
+  speedPid.SetMode(AUTOMATIC);
 
   targets.add(Target(40, 20, true));
   targets.add(Target(30, 2, true));
@@ -41,9 +47,8 @@ void setup()
   targets.add(Target(6, 18, true));
   currentTarget = targets.get(0);
 
-  pinMode(BUTTON_PIN, INPUT_PULLUP);
-  state = &search;
-  previousState = &search;
+  state = &idle;
+  previousState = &idle;
   lastRun = 0;
   isRunning = true;
 }
@@ -53,8 +58,6 @@ void loop()
   handleButton();
   rPiCmdMessenger.feedinSerialData();
   mpuCmdMessenger.feedinSerialData();
-  targetDirection = targetDirectionFiltered.getAverage();
-  targetDistance = targetDistanceFiltered.getAverage();
 
   if (isRunning)
   {
@@ -71,8 +74,8 @@ void loop()
 void attachHandlers()
 {
   rPiCmdMessenger.attach(MessageCodesRPi::kTargetFound, onRecvTargetFound);
-  rPiCmdMessenger.attach(MessageCodesRPi::kStopEvent, onStopEvent);
   rPiCmdMessenger.attach(MessageCodesRPi::kTargetLost, onRecvTargetLost);
+  rPiCmdMessenger.attach(MessageCodesRPi::kStopEvent, onStopEvent);
   rPiCmdMessenger.attach(onRecvUnknownCommand);
 
   mpuCmdMessenger.attach(MessageCodesMPU::kMpuData, onRecvMpuData);
@@ -94,14 +97,14 @@ void handleButton()
 
   if (millis() - buttonPressStart > BUTTON_STOP_TIME)
   {
-    Serial.println("Parar");
+    //Serial.println("Parar");
     buttonPressStart = 0;
     changeState(reset);
     return;
   }
   if(state == idle)
   {
-    Serial.println("Resumir");
+    //Serial.println("Resumir");
     changeState(previousState);
     cameraPid.SetMode(0);
     steeringPid.SetMode(0);
@@ -109,7 +112,7 @@ void handleButton()
   }
   else
   {
-    Serial.println("Pausar");
+    //Serial.println("Pausar");
     changeState(idle);
     cameraPid.SetMode(1);
     steeringPid.SetMode(1);
@@ -146,19 +149,32 @@ void pidCompute()
 
 void writeInActuators()
 {
+  int value;
+  delay(50);
+
+  rPiCmdMessenger.sendCmdStart(MessageCodesRPi::kRPiLog);
+  rPiCmdMessenger.sendCmdArg("writeInActuators");
+
   if(actuatorsWrite & ExecutionFlags::kSpeed)
   {
-    linearSpeed = constrain(linearSpeed * linearSpeedLock, ESC_MAX_BACKWARD, ESC_MAX_FORWARD);
-    esc.write(map(linearSpeed, -1, 1, 0, 180));
+    value = round(mapf(linearSpeed, -1, 1, ESC_MAX_BACKWARD, ESC_MAX_FORWARD));
+    esc.write(value);
+    rPiCmdMessenger.sendCmdArg(linearSpeed);
+    rPiCmdMessenger.sendCmdArg(value);
+    //rPiCmdMessenger.sendCmdArg(value);
   }
   if(actuatorsWrite & ExecutionFlags::kCamera)
   {
-    //Serial.print("Camera Servo: \t");
-    //Serial.println(cameraServoPosition);
-    cameraServo.write(cameraServoPosition);
+    value = round(mapf(cameraServoPosition, -1, 1, 0, CAMERA_SERVO_LIMIT));
+    cameraServo.write(value);
+    //rPiCmdMessenger.sendCmdArg(cameraServoPosition);
   }
   if(actuatorsWrite & ExecutionFlags::kSteering)
   {
-    steeringServo.write(steeringServoPosition);
+    value = round(mapf(steeringServoPosition, -1, 1, STEERING_SERVO_MIN_LIMIT, STEERING_SERVO_MAX_LIMIT));
+    steeringServo.write(value);
+    //rPiCmdMessenger.sendCmdArg(steeringServoPosition);
   }
+  rPiCmdMessenger.sendCmdEnd();
+  delay(15);
 }

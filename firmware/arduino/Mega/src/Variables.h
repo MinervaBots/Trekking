@@ -1,7 +1,6 @@
 #ifndef VARIABLES_H
 #define VARIABLES_H
 
-#include <RunningMedian.h>
 #include <LinkedList.h>
 #include <CmdMessenger.h>
 #include <Servo.h>
@@ -20,7 +19,6 @@ extern CmdMessenger rPiCmdMessenger, mpuCmdMessenger;
 extern double setPointZero;
 
 extern double targetDirection, targetDistance;
-extern RunningMedian targetDirectionFiltered, targetDistanceFiltered;   
 
 extern double cameraDirection;
 extern double cameraServoPosition;

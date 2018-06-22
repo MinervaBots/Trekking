@@ -13,10 +13,11 @@
 #define SENSOR_HEIGHT           3.68            // Sensor image area: 3.68 x 2.76 mm (4.6 mm diagonal)
 #define IMAGE_PIXEL_HEIGHT      3280            // Height size of the image in sensor: 3280 pixels
 
-#define CAMERA_SERVO_LIMIT      PI
-#define STEERING_SERVO_LIMIT    PI/2
-#define ESC_MAX_FORWARD         1               // Apesar do ESC ser controlado como um servo, é mais fácil 
-#define ESC_MAX_BACKWARD        -1              // pensar as velocidades como valores entre [-1; 1]
+#define CAMERA_SERVO_LIMIT      180
+#define STEERING_SERVO_MIN_LIMIT    30
+#define STEERING_SERVO_MAX_LIMIT    150
+#define ESC_MAX_FORWARD         100             // Apesar do ESC ser controlado como um servo, é mais fácil 
+#define ESC_MAX_BACKWARD        80               // pensar as velocidades como valores entre [-1; 1]
 #define ESC_ZERO                90
 
 #define ULTRASSONIC_MAX_DIST    300               
