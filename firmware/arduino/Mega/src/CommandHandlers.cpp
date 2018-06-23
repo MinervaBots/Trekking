@@ -2,6 +2,7 @@
 #include "Variables.h"
 #include "Constants.h"
 #include "States.h"
+#include "Utils.h"
 
 unsigned long targetLostStartTime;
 
@@ -11,10 +12,11 @@ void attachHandlers()
   rPiCmdMessenger.attach(MessageCodesRPi::kTargetLost, onRecvTargetLost);
   rPiCmdMessenger.attach(MessageCodesRPi::kStopEvent, onStopEvent);
   rPiCmdMessenger.attach(onRecvUnknownCommand);
-
+/*
   mpuCmdMessenger.attach(MessageCodesMPU::kMpuData, onRecvMpuData);
   mpuCmdMessenger.attach(MessageCodesMPU::kMpuLog, onRecvMpuLog);
   mpuCmdMessenger.attach(onRecvUnknownCommand);
+*/
 }
 
 void onStopEvent(CmdMessenger *cmdMesseger)
@@ -51,14 +53,14 @@ void onRecvTargetFound(CmdMessenger *cmdMesseger)
 
   linearSpeedLock = 1;
   float newDirection = cmdMesseger->readFloatArg();
-  targetDirection = (1.0 - 0.7) * targetDirection + newDirection * 0.7;
+  targetDirection = lerp(targetDirection, newDirection, 0.8);
 
   int h = cmdMesseger->readInt16Arg();
 
   if(h != 0)
   {
     float newDistance = (FOCAL_LENGHT * CONE_REAL_HEIGHT * IMAGE_PIXEL_HEIGHT) / (h * SENSOR_HEIGHT);
-    targetDistance = (1.0 - 0.9) * targetDistance + newDistance * 0.9;
+    targetDistance = lerp(targetDistance, newDistance, 0.1);
   }
   else
   {

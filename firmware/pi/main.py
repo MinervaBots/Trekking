@@ -14,6 +14,7 @@ from messaging.ArduinoMessagingThread import ArduinoMessagingThread
 from messaging.BluetoothMessagingThread import BluetoothMessagingThread
 from messaging.CommonMessageHandlers import *
 from messaging.ArduinoMessageHandlers import *
+from messaging.ArduinoCommands import *
 from messaging.BluetoothMessageHandlers import *
 
 
@@ -24,7 +25,7 @@ video = VideoStream(usePiCamera = systemInfo.isRaspberryPi, framerate = 30, reso
 video.start() # Inicializa a câmera aqui pra ter tempo de esquentar se for no Raspberry Pi
 
 tracker = Tracker("cascades/face.xml", video.resolution, "MEDIANFLOW")
-window = DebugWindow(systemInfo.enableWindow, "debug", tracker.resolution, 20, True)
+window = DebugWindow(systemInfo.enableWindow, "debug", tracker.resolution, 10, True)
 
 #Medida de performance
 fps = FPS(False)
@@ -34,6 +35,7 @@ builder = dic.container.ContainerBuilder()
 
 # Registra as threads de comunicação. Os Handlers vão ser resolvidos automaticamente
 builder.register_class(ArduinoMessagingThread, component_scope=dic.scope.SingleInstance)
+builder.register_class(ArduinoCommands, component_scope=dic.scope.SingleInstance)
 builder.register_class(BluetoothMessagingThread, component_scope=dic.scope.SingleInstance)
 # Registra os handlers
 builder.register_module(ArduinoMessageHandlersModule())
@@ -83,12 +85,12 @@ def loop():
     elif not systemInfo.isTracking:
         (systemInfo.isTracking, systemInfo.trackedRect, systemInfo.trackedDirection) = tracker.init(frame)
         window.putTextWarning(frame, "Tentando detectar...", (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
-        arduinoMessagingThread.send(ArduinoMessageCodes.TARGET_LOST)
+        arduinoMessagingThread.send(MessageCodes.TARGET_LOST)
     else:   
         (systemInfo.isTracking, systemInfo.trackedRect, systemInfo.trackedDirection) = tracker.update(frame)
 
         if systemInfo.trackedRect is None:
-            arduinoMessagingThread.send(ArduinoMessageCodes.TARGET_LOST)
+            arduinoMessagingThread.send(MessageCodes.TARGET_LOST)
             window.putTextError(frame, "Falha detectada no rastreamento", (20, 80), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
         else:    
             systemInfo.trackedRect = [int(i) for i in systemInfo.trackedRect]
@@ -96,7 +98,7 @@ def loop():
             window.rectangle(frame, p1, p2, (255, 255, 0), 2, 1)
             
             # Mapeia a posição em pixels na tela para uma direção entre -1 e 1
-            arduinoMessagingThread.send(ArduinoMessageCodes.TARGET_FOUND, systemInfo.trackedDirection, systemInfo.trackedRect[2])
+            arduinoMessagingThread.send(MessageCodes.TARGET_FOUND, systemInfo.trackedDirection, systemInfo.trackedRect[2])
             window.putTextInfo(frame, tracker.methodName + ": " + str(systemInfo.trackedRect), (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
 
     window.putTextInfo(frame, "FPS : " + str(int(fps.update())) + " - Temp: " + str(temp.update()) + " 'C", (20, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
@@ -106,7 +108,7 @@ def loop():
 
 def stop():
     arduinoMessagingThread.clearSendQueue()
-    arduinoMessagingThread.send(ArduinoMessageCodes.STOP_EVENT)
+    arduinoMessagingThread.send(MessageCodes.STOP_EVENT)
     cv2.waitKey(2000);
     
     fps.stop(True)

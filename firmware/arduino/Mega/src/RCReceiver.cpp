@@ -3,6 +3,7 @@
 #include "RCReceiver.h"
 #include "Utils.h"
 
+volatile unsigned long lastSignalTime = 0;
 volatile unsigned long gearRiseTime = 0, gearPulseWidth = 0;
 volatile unsigned long ruddRiseTime = 0, ruddPulseWidth = 0;
 volatile unsigned long elevRiseTime = 0, elevPulseWidth = 0;
@@ -18,6 +19,8 @@ void elevFalling();
 
 void attachRCInterrupts()
 {
+    pinMode(RUDD_PIN, INPUT_PULLUP);
+    pinMode(ELEV_PIN, INPUT_PULLUP);
     attachInterrupt(digitalPinToInterrupt(RUDD_PIN), ruddISR, CHANGE);
     attachInterrupt(digitalPinToInterrupt(ELEV_PIN), elevISR, CHANGE);
     setupChangeInterrupt(GEAR_PIN);
@@ -33,6 +36,7 @@ void gearISR()
     {
         gearFalling();
     }
+    lastSignalTime = millis();
 }
 
 void ruddISR()
@@ -45,6 +49,7 @@ void ruddISR()
     {
         ruddFalling();
     }
+    lastSignalTime = millis();
 }
 
 void elevISR()
@@ -57,6 +62,7 @@ void elevISR()
     {
         elevFalling();
     }
+    lastSignalTime = millis();
 }
 
 void gearRising()

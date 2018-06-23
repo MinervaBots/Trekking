@@ -9,7 +9,7 @@ void (*previousState)(unsigned long);
 Servo cameraServo, steeringServo, esc;
 
 CmdMessenger rPiCmdMessenger = CmdMessenger(Serial,',',';','/');
-CmdMessenger mpuCmdMessenger = CmdMessenger(Serial2,',',';','/');
+//CmdMessenger mpuCmdMessenger = CmdMessenger(Serial2,',',';','/');
 
 double setPointZero = 0;
 
@@ -23,7 +23,7 @@ double steeringServoPosition;
 double steeringServoKp = 0.75, steeringServoKi = 0, steeringServoKd = 0.9;
 
 double linearSpeed = 0, linearSpeedLock;
-double speedKp = 0.3, speedKi = 0, speedKd = 0;
+double speedKp = 0.07, speedKi = 0, speedKd = 0.000;
 
 Vector2 currentVelocity;
 Transform currentTransform(3, 3, 0);

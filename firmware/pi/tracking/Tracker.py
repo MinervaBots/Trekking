@@ -40,7 +40,7 @@ class Tracker:
             
         if self.usingTracker:
             delta = datetime.datetime.now() - self.lastDetectRunTime
-            if delta.seconds > 3:
+            if delta.seconds > 0.5:
                 return self.init(frame, *self.lastDetectionParameters)
 
             found, boundingBox = self.__tracker.update(frame)

@@ -5,23 +5,16 @@
 #include "Variables.h"
 #include "RCReceiver.h"
 
+
 bool lastGearState = LOW;
-ISR(PCINT3_vect)
+ISR(PCINT0_vect)
 {
     bool currentGearState = digitalRead(GEAR_PIN);
-    Serial.print("currentGearState: \t");
-    Serial.println(currentGearState);
-    Serial.print("lastGearState: \t");
-    Serial.println(lastGearState);
     if(lastGearState != currentGearState)
     {
         lastGearState = currentGearState;
         gearISR();
     }
-}
-
-ISR(PCINT0_vect)
-{
     sonicArray.handleEcho(SonicArray::Vector::VECTOR_0);
 }
 

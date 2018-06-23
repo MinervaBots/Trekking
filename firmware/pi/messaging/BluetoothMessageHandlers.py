@@ -3,20 +3,12 @@ from abc import *
 from typing import List
 from enum import IntEnum, auto
 from .MessageHandler import *
-from .CommonMessageCodes import CommonMessageCodes
+from .MessageCodes import MessageCodes
 from tracking.Tracker import Tracker
 from utils.FPS import FPS
 from utils.TemperatureControl import TemperatureControl
 from SystemInfo import SystemInfo
 from .MessagingThread import MessagingThread
-
-class BluetoothMessageCodes(IntEnum):
-  START_SYSTEM = 100
-  STOP_SYSTEM = auto()
-  SET_TRACKING_METHOD = auto()
-  GET_FPS = auto()
-  GET_TEMPERATURE = auto()
-
 	
 class BluetoothMessageHandlersModule(dic.container.Module):
   def load(self, builder):
@@ -38,7 +30,7 @@ class BluetoothMessageHandler(MessageHandler, ABC):
   
 class StartSystemHandler(BluetoothMessageHandler):
   def __init__(self, systemInfo : SystemInfo):
-    self.opCode = BluetoothMessageCodes.START_SYSTEM
+    self.opCode = MessageCodes.START_SYSTEM
     self.__systemInfo = systemInfo
     
   def handle(self, sender : MessagingThread, message : List):
@@ -46,7 +38,7 @@ class StartSystemHandler(BluetoothMessageHandler):
     
 class StopSystemHandler(BluetoothMessageHandler):
   def __init__(self, systemInfo : SystemInfo):
-    self.opCode = BluetoothMessageCodes.STOP_SYSTEM
+    self.opCode = MessageCodes.STOP_SYSTEM
     self.__systemInfo = systemInfo
     
   def handle(self, sender : MessagingThread, message : List):
@@ -54,7 +46,7 @@ class StopSystemHandler(BluetoothMessageHandler):
     
 class SetTrackingMethodHandler(BluetoothMessageHandler):
   def __init__(self, tracker : Tracker):
-    self.opCode = BluetoothMessageCodes.SET_TRACKING_METHOD
+    self.opCode = MessageCodes.SET_TRACKING_METHOD
     self.__tracker = tracker
   
   def handle(self, sender : MessagingThread, message : List):
@@ -62,7 +54,7 @@ class SetTrackingMethodHandler(BluetoothMessageHandler):
     
 class GetFPSHandler(BluetoothMessageHandler):
   def __init__(self, fps : FPS):
-    self.opCode = BluetoothMessageCodes.GET_FPS
+    self.opCode = MessageCodes.GET_FPS
     self.__fps = fps
   
   def handle(self, sender : MessagingThread, message : List):
@@ -70,7 +62,7 @@ class GetFPSHandler(BluetoothMessageHandler):
     
 class GetTemperatureHandler(BluetoothMessageHandler):
   def __init__(self, temp : TemperatureControl):
-    self.opCode = BluetoothMessageCodes.GET_TEMPERATURE
+    self.opCode = MessageCodes.GET_TEMPERATURE
     self.__temp = temp
   
   def handle(self, sender : MessagingThread, message : List):

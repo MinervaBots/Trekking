@@ -19,18 +19,9 @@ PID speedPid(&targetDistance, &linearSpeed, &setPointZero, speedKp, speedKi, spe
 unsigned long lastRun;
 volatile unsigned long buttonPressStart;
 SonicArray sonicArray(PIN_ULTRASSONIC_TRIGGER);
-/*
-void test()
-{
-  Serial.println("test");
-}
-void test2()
-{
-  Serial.println("test2");
-}
-*/
+
 void setup()
-{
+{ 
   attachHandlers();
   attachRCInterrupts();
 
@@ -46,7 +37,7 @@ void setup()
 
   cameraPid.SetOutputLimits(-1, 1);
   steeringPid.SetOutputLimits(-1, 1);
-  speedPid.SetOutputLimits(-1, 1);
+  speedPid.SetOutputLimits(0, 1);
   cameraPid.SetMode(AUTOMATIC);
   steeringPid.SetMode(AUTOMATIC);
   speedPid.SetMode(AUTOMATIC);
@@ -59,30 +50,41 @@ void setup()
 
   state = &idle;
   previousState = &idle;
-  lastRun = 0;
   isRunning = true;
+  lastRun = 0;
 }
 
 void loop()
 {
-  
-  Serial.print("Gear: \t");
-  Serial.println(gearPulseWidth);
-  Serial.print("Rudd: \t");
-  Serial.println(ruddPulseWidth);
-  Serial.print("Elev: \t");
-  Serial.println(elevPulseWidth);
-  delay(500);
-  //digitalWrite(LED_DEBUG_PIN, digitalRead(ELEV_PIN));
-  
-  //int a;
-  //sonicArray.update(&a);
-  /*
-  */
-  /*
-  handleButton();
+  if(millis() - lastSignalTime >= 1000)
+  {
+    esc.write(ESC_ZERO);
+    return;
+  }
+
+  if (gearPulseWidth > 1500)
+  {
+    //Serial.println(gearPulseWidth);
+    // Manual
+    cameraPid.SetMode(MANUAL);
+    steeringPid.SetMode(MANUAL);
+    speedPid.SetMode(MANUAL);
+
+    esc.writeMicroseconds(elevPulseWidth);
+    steeringServo.writeMicroseconds(ruddPulseWidth);
+    return;
+  }
+  else
+  {
+    // Automático
+    cameraPid.SetMode(AUTOMATIC);
+    steeringPid.SetMode(AUTOMATIC);
+    speedPid.SetMode(AUTOMATIC);
+  }
   rPiCmdMessenger.feedinSerialData();
-  mpuCmdMessenger.feedinSerialData();
+  //mpuCmdMessenger.feedinSerialData();
+
+  handleButton();
 
   if (isRunning)
   {
@@ -94,7 +96,6 @@ void loop()
   pidCompute();
   writeInActuators();
   lastRun = millis();
-  */
 }
 
 void handleButton()
@@ -114,14 +115,12 @@ void handleButton()
 
   if (millis() - buttonPressStart > BUTTON_STOP_TIME)
   {
-    //Serial.println("Parar");
     buttonPressStart = 0;
     changeState(reset);
     return;
   }
   if (state == idle)
   {
-    //Serial.println("Resumir");
     changeState(previousState);
     cameraPid.SetMode(0);
     steeringPid.SetMode(0);
@@ -129,7 +128,6 @@ void handleButton()
   }
   else
   {
-    //Serial.println("Pausar");
     changeState(idle);
     cameraPid.SetMode(1);
     steeringPid.SetMode(1);
@@ -157,31 +155,19 @@ void pidCompute()
 void writeInActuators()
 {
   int value;
-  delay(50);
-
-  rPiCmdMessenger.sendCmdStart(MessageCodesRPi::kRPiLog);
-  rPiCmdMessenger.sendCmdArg("writeInActuators");
-
   if (actuatorsWrite & ExecutionFlags::kSpeed)
   {
-    value = round(mapf(linearSpeed, -1, 1, ESC_MAX_BACKWARD, ESC_MAX_FORWARD));
+    value = round(mapf(linearSpeed, 0, 1, ESC_ZERO, ESC_MAX_FORWARD));
     esc.write(value);
-    rPiCmdMessenger.sendCmdArg(linearSpeed);
-    rPiCmdMessenger.sendCmdArg(value);
-    //rPiCmdMessenger.sendCmdArg(value);
   }
   if (actuatorsWrite & ExecutionFlags::kCamera)
   {
     value = round(mapf(cameraServoPosition, -1, 1, 0, CAMERA_SERVO_LIMIT));
     cameraServo.write(value);
-    //rPiCmdMessenger.sendCmdArg(cameraServoPosition);
   }
   if (actuatorsWrite & ExecutionFlags::kSteering)
   {
     value = round(mapf(steeringServoPosition, -1, 1, STEERING_SERVO_MIN_LIMIT, STEERING_SERVO_MAX_LIMIT));
     steeringServo.write(value);
-    //rPiCmdMessenger.sendCmdArg(steeringServoPosition);
   }
-  rPiCmdMessenger.sendCmdEnd();
-  delay(15);
 }
