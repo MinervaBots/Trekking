@@ -1,11 +1,12 @@
-#include <Arduino.h>
 #include "SonicArray.h"
 #include "Constants.h"
 #include "Variables.h"
+#include "Utils.h"
 
 SonicArray::SonicArray(unsigned int triggerPin)
 {
     triggerPin_ = triggerPin;
+    pinMode(triggerPin_, OUTPUT);
 }
 
 bool SonicArray::update(int *detectedCount)
@@ -38,9 +39,15 @@ bool SonicArray::update(int *detectedCount)
         {
             // Calculate distance for each sensor.
             // Will also timeout any pending measurements
-            if(sensors_[i].calculateDistance() > 0)
+            if (sensors_[i].calculateDistance() > 0)
             {
                 *detectedCount = *detectedCount + 1;
+                if (sensors_[i].getDistance() < 255)
+                {
+                    Serial.print(i);
+                    Serial.print(": \t");
+                    Serial.println(sensors_[i].getDistance());
+                }
             }
         }
     }
@@ -60,7 +67,7 @@ float SonicArray::obstacleAvoidance()
         auto direction = sensors_[i].getDirection();
 
         // Nada foi detectado
-        if(distance == 0)
+        if (distance == 0)
         {
             continue;
         }
@@ -71,14 +78,14 @@ float SonicArray::obstacleAvoidance()
         }
 
         // Vamos sempre tratar o obstáculo mais próximo
-        if(closestDetectionId == -1 || sensors_[i].getDistance() < sensors_[closestDetectionId].getDistance())
+        if (closestDetectionId == -1 || sensors_[i].getDistance() < sensors_[closestDetectionId].getDistance())
         {
             closestDetectionId = i;
             continue;
         }
     }
-    
-    if(closestDetectionId == -1)
+
+    if (closestDetectionId == -1)
     {
         return targetDirection;
     }
@@ -96,6 +103,8 @@ float SonicArray::obstacleAvoidance()
  */
 void SonicArray::handleEcho(Vector intVector)
 {
+    int cnt = 0;
+    //Serial.println("handleEcho");
     // Determine which vector the interrupt originated from
     // so we only check signals from those specific sensors
     int sensorsInVector[7] = {0}; // We have up to 7 sensors in each vector
@@ -104,12 +113,7 @@ void SonicArray::handleEcho(Vector intVector)
     case VECTOR_0:
         // Ultrasonic 0 is on PCINT0_vect
         sensorsInVector[0] = 0;
-        sensorsInVector[1] = 0;
-        sensorsInVector[2] = 0;
-        sensorsInVector[3] = 0;
-        sensorsInVector[4] = 0;
-        sensorsInVector[5] = 0;
-        sensorsInVector[6] = 0;
+        cnt = 1;
         break;
 
     case VECTOR_2:
@@ -122,13 +126,14 @@ void SonicArray::handleEcho(Vector intVector)
         sensorsInVector[5] = 6;
         sensorsInVector[6] = 7;
         // sensorsInVector[7] = 8;
+        cnt = 7;
         break;
     default:
         break; // We should not be here
     }
 
     // Iterate through the specific vector's ultrasonic echo pins
-    for (int i : sensorsInVector)
+    for (int i = 0; i < cnt; i++)
     {
         // If a pin is HIGH, it means that a pulse
         // is either just starting or has previously started.
@@ -156,18 +161,11 @@ void SonicArray::handleEcho(Vector intVector)
     }
 }
 
-void SonicArray::setupChangeInterrupt()
+void SonicArray::setupInterrupts()
 {
     for (int i = 0; i < NUM_OF_SENSORS; i++)
     {
-        auto echoPin = sensors_[i].getEchoPin();
-        pinMode(echoPin, INPUT);
-        // Enable interrupt for pin
-        *digitalPinToPCMSK(echoPin) |= bit(digitalPinToPCMSKbit(echoPin));
-        // Clear any outstanding interrupt
-        PCIFR |= bit(digitalPinToPCICRbit(echoPin));
-        // Enable interrupt for the pin's group
-        PCICR |= bit(digitalPinToPCICRbit(echoPin));
+        setupChangeInterrupt(sensors_[i].getEchoPin());
     }
 }
 

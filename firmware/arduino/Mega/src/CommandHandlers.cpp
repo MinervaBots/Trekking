@@ -5,6 +5,17 @@
 
 unsigned long targetLostStartTime;
 
+void attachHandlers()
+{
+  rPiCmdMessenger.attach(MessageCodesRPi::kTargetFound, onRecvTargetFound);
+  rPiCmdMessenger.attach(MessageCodesRPi::kTargetLost, onRecvTargetLost);
+  rPiCmdMessenger.attach(MessageCodesRPi::kStopEvent, onStopEvent);
+  rPiCmdMessenger.attach(onRecvUnknownCommand);
+
+  mpuCmdMessenger.attach(MessageCodesMPU::kMpuData, onRecvMpuData);
+  mpuCmdMessenger.attach(MessageCodesMPU::kMpuLog, onRecvMpuLog);
+  mpuCmdMessenger.attach(onRecvUnknownCommand);
+}
 
 void onStopEvent(CmdMessenger *cmdMesseger)
 {

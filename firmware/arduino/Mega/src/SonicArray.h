@@ -22,7 +22,7 @@ class SonicArray
     SonicArray(unsigned int triggerPin);
     bool update(int *detectedCount);
     void handleEcho(Vector intVector);
-    void setupChangeInterrupt();
+    void setupInterrupts();
     float obstacleAvoidance();
 
   private:

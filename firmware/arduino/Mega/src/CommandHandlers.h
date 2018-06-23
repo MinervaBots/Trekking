@@ -20,6 +20,7 @@ enum MessageCodesMPU
   kSetPosition
 };
 
+void attachHandlers();
 void onRecvMpuData(CmdMessenger *cmdMesseger);
 void onRecvMpuLog(CmdMessenger *cmdMesseger);
 void onRecvTargetFound(CmdMessenger *cmdMesseger);

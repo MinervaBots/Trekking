@@ -12,8 +12,8 @@
 
 #define BUTTON_PIN 17
 
-#define GEAR_PIN 2
-#define RUDD_PIN 3
-#define ELEV_PIN 16
+#define GEAR_PIN 10 // 16 -> 10
+#define RUDD_PIN 2
+#define ELEV_PIN 3
 
 #endif

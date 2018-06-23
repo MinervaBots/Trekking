@@ -32,4 +32,9 @@
 
 #define TARGET_LOST_THRESHOLD 1000
 
+
+
+#define GEAR_MEDIUMM_VALUE 15000
+
+
 #endif
