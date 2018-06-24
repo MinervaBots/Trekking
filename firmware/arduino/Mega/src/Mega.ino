@@ -10,11 +10,8 @@
 #include "CommandHandlers.h"
 #include "RCReceiver.h"
 #include "InterruptServiceRoutines.h"
+#include "PIDHelper.h"
 #include "Utils.h"
-
-PID cameraPid(&targetDirection, &cameraServoPosition, &setPointZero, cameraServoKp, cameraServoKi, cameraServoKd, P_ON_M, DIRECT);
-PID steeringPid(&targetDirection, &steeringServoPosition, &setPointZero, steeringServoKp, steeringServoKi, steeringServoKd, P_ON_M, DIRECT);
-PID speedPid(&targetDistance, &linearSpeed, &setPointZero, speedKp, speedKi, speedKd, P_ON_M, REVERSE);
 
 unsigned long lastRun;
 volatile unsigned long buttonPressStart;
@@ -24,6 +21,7 @@ void setup()
 { 
   attachHandlers();
   attachRCInterrupts();
+  setupPID();
 
   Serial.begin(RPI_BAUD_RATE);
   Serial3.begin(MPU_BAUD_RATE);
@@ -35,12 +33,6 @@ void setup()
   esc.attach(ESC_PIN);
   esc.write(ESC_ZERO);
 
-  cameraPid.SetOutputLimits(-1, 1);
-  steeringPid.SetOutputLimits(-1, 1);
-  speedPid.SetOutputLimits(0, 1);
-  cameraPid.SetMode(AUTOMATIC);
-  steeringPid.SetMode(AUTOMATIC);
-  speedPid.SetMode(AUTOMATIC);
 
   targets.add(Target(40, 20, true));
   targets.add(Target(30, 2, true));
@@ -88,12 +80,12 @@ void loop()
 
   if (isRunning)
   {
-    computePid = ExecutionFlags::kAll;
+    setAuto();
     actuatorsWrite = ExecutionFlags::kAll;
     (*state)(millis() - lastRun);
   }
 
-  pidCompute();
+  computePID();
   writeInActuators();
   lastRun = millis();
 }
@@ -122,35 +114,16 @@ void handleButton()
   if (state == idle)
   {
     changeState(previousState);
-    cameraPid.SetMode(0);
-    steeringPid.SetMode(0);
-    speedPid.SetMode(0);
+    setManual();
   }
   else
   {
     changeState(idle);
-    cameraPid.SetMode(1);
-    steeringPid.SetMode(1);
-    speedPid.SetMode(1);
+    setAuto();
   }
   buttonPressStart = 0;
 }
 
-void pidCompute()
-{
-  if (computePid & ExecutionFlags::kSpeed)
-  {
-    speedPid.Compute();
-  }
-  if (computePid & ExecutionFlags::kCamera)
-  {
-    cameraPid.Compute();
-  }
-  if (computePid & ExecutionFlags::kSteering)
-  {
-    steeringPid.Compute();
-  }
-}
 
 void writeInActuators()
 {

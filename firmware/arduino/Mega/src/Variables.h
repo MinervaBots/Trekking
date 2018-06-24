@@ -22,13 +22,10 @@ extern double targetDirection, targetDistance;
 
 extern double cameraDirection;
 extern double cameraServoPosition;
-extern double cameraServoKp, cameraServoKi, cameraServoKd;
 
 extern double steeringServoPosition;
-extern double steeringServoKp, steeringServoKi, steeringServoKd;
 
 extern double linearSpeed, linearSpeedLock;
-extern double speedKp, speedKi, speedKd;
 
 extern Vector2 currentVelocity;
 extern Transform currentTransform;
@@ -45,7 +42,7 @@ enum ExecutionFlags
     kSteering = 4,
     kAll = 7
 };
-extern ExecutionFlags computePid;
+
 extern ExecutionFlags actuatorsWrite;
 
 #endif //VARIABLES_H

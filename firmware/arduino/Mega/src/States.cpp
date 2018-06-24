@@ -4,6 +4,7 @@
 #include "CommandHandlers.h"
 #include "Macros.h"
 #include "Pins.h"
+#include "PIDHelper.h"
 
 float rotateCameraIncrement = 1/90.0;
 
@@ -32,7 +33,8 @@ void idle(unsigned long deltaTime)
   rPiCmdMessenger.sendCmdEnd();
 
   linearSpeed = 0;
-  computePid = ExecutionFlags::kNone;
+
+  setManual();
   actuatorsWrite = ExecutionFlags::kAll;
 }
 
@@ -63,7 +65,6 @@ void search(unsigned long deltaTime)
     changeState(refinedSearch);
     rPiCmdMessenger.sendCmd(MessageCodesRPi::kStartDetection);
   }
-  computePid = ExecutionFlags::kAll;
   actuatorsWrite = ExecutionFlags::kAll;
 }
 
@@ -125,7 +126,6 @@ void targetFound(unsigned long deltaTime)
     currentTarget = targets.get(targetCount);
   }
   
-  computePid = ExecutionFlags::kNone;
   actuatorsWrite = ExecutionFlags::kNone;
 }
 
@@ -140,7 +140,5 @@ void rotateCamera(unsigned long deltaTime)
   {
     rotateCameraIncrement *= -1;
   }
-  computePid &= ~ExecutionFlags::kCamera;
-  //computePid = ExecutionFlags::kCamera;
   actuatorsWrite = ExecutionFlags::kAll;
 }
