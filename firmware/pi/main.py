@@ -6,6 +6,7 @@ from SystemInfo import SystemInfo
 from utils.FPS import FPS
 from utils.DebugWindow import DebugWindow
 from utils.TemperatureControl import TemperatureControl
+from utils.Filters import *
 from videoStream.VideoStream import VideoStream
 from tracking.Tracker import Tracker
 import time
@@ -17,6 +18,9 @@ from messaging.ArduinoMessageHandlers import *
 from messaging.ArduinoCommands import *
 from messaging.BluetoothMessageHandlers import *
 
+
+directionFilter = ResponsiveExponentialFilter(True)
+distanceFilter = ResponsiveExponentialFilter(True)
 
 systemInfo = SystemInfo()
 
@@ -99,8 +103,11 @@ def loop():
             window.rectangle(frame, p1, p2, (255, 255, 0), 2, 1)
 
             distance = video.calculateDistance(systemInfo.trackedRect[2], 0.5)
+            
+            filteredDirection = directionFilter.calculate(systemInfo.trackedDirection)
+            filteredDistance = distanceFilter.calculate(distance)
             # Mapeia a posição em pixels na tela para uma direção entre -1 e 1
-            arduinoMessagingThread.send(MessageCodes.TARGET_FOUND, systemInfo.trackedDirection, distance)
+            arduinoMessagingThread.send(MessageCodes.TARGET_FOUND, filteredDirection, filteredDistance)
             window.putTextInfo(frame, tracker.methodName + ": " + str(systemInfo.trackedRect), (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
 
     window.putTextInfo(frame, "FPS : " + str(int(fps.update())) + " - Temp: " + str(temp.update()) + " 'C", (20, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
