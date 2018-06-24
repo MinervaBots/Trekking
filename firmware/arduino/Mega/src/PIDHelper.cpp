@@ -50,7 +50,7 @@ void setManual(ExecutionFlags flags)
 
 void computePID()
 {
-  speedPid.Compute();
-  cameraPid.Compute();
-  steeringPid.Compute();
+    speedPid.Compute();
+    cameraPid.Compute();
+    steeringPid.Compute();
 }
