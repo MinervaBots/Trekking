@@ -12,7 +12,7 @@ void attachHandlers()
   rPiCmdMessenger.attach(MessageCodesRPi::kTargetLost, onRecvTargetLost);
   rPiCmdMessenger.attach(MessageCodesRPi::kStopEvent, onStopEvent);
   rPiCmdMessenger.attach(onRecvUnknownCommand);
-/*
+  /*
   mpuCmdMessenger.attach(MessageCodesMPU::kMpuData, onRecvMpuData);
   mpuCmdMessenger.attach(MessageCodesMPU::kMpuLog, onRecvMpuLog);
   mpuCmdMessenger.attach(onRecvUnknownCommand);
@@ -36,7 +36,7 @@ void onRecvMpuData(CmdMessenger *cmdMesseger)
 void onRecvMpuLog(CmdMessenger *cmdMesseger)
 {
   rPiCmdMessenger.sendCmdStart(MessageCodesRPi::kRPiLog);
-  while(cmdMesseger->available())
+  while (cmdMesseger->available())
   {
     rPiCmdMessenger.sendCmdBinArg(cmdMesseger->readStringArg());
   }
@@ -45,7 +45,7 @@ void onRecvMpuLog(CmdMessenger *cmdMesseger)
 
 void onRecvTargetFound(CmdMessenger *cmdMesseger)
 {
-  if(targetLostStartTime != 0 && state != refinedSearch)
+  if (targetLostStartTime != 0 && state != refinedSearch)
   {
     targetLostStartTime = 0;
     changeState(refinedSearch);
@@ -55,26 +55,17 @@ void onRecvTargetFound(CmdMessenger *cmdMesseger)
   float newDirection = cmdMesseger->readFloatArg();
   targetDirection = lerp(targetDirection, newDirection, 0.8);
 
-  int h = cmdMesseger->readInt16Arg();
-
-  if(h != 0)
-  {
-    float newDistance = (FOCAL_LENGHT * CONE_REAL_HEIGHT * IMAGE_PIXEL_HEIGHT) / (h * SENSOR_HEIGHT);
-    targetDistance = lerp(targetDistance, newDistance, 0.1);
-  }
-  else
-  {
-    targetDistance = 0;
-  }
+  float newDistance = cmdMesseger->readFloatArg();
+  targetDistance = lerp(targetDistance, newDistance, 0.1);
 }
 
 void onRecvTargetLost(CmdMessenger *cmdMesseger)
 {
-  if(targetLostStartTime == 0)
+  if (targetLostStartTime == 0)
   {
     targetLostStartTime = millis();
   }
-  else if(millis() - targetLostStartTime > TARGET_LOST_THRESHOLD && state != rotateCamera)
+  else if (millis() - targetLostStartTime > TARGET_LOST_THRESHOLD && state != rotateCamera)
   {
     changeState(rotateCamera);
     rPiCmdMessenger.sendCmdStart(MessageCodesRPi::kRPiLog);

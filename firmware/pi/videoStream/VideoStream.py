@@ -7,7 +7,7 @@ class VideoStream:
             # requirement of `picamera[array]` from desktops or
             # laptops that still want to use the `imutils` package
             from .PiVideoStream import PiVideoStream
-         
+            
             # initialize the picamera stream and allow the camera
             # sensor to warmup
             self.stream = PiVideoStream(resolution=resolution, framerate=framerate)
@@ -18,6 +18,14 @@ class VideoStream:
         else:
             from .WebcamVideoStream import WebcamVideoStream
             self.stream = WebcamVideoStream(src=src,resolution=resolution,framerate=framerate)
+      
+    def setCameraFocalLenght(self, focalLenght):
+        self.focalLenght = focalLenght
+    
+    def calculateDistance(self, dimensionInPixels, dimensionInMeters):
+        "Retorna a distancia do objeto em metros"
+        distance = (((dimensionInMeters * 1000) * self.focalLenght) / dimensionInPixels)
+        return distance
     
     @property
     def resolution(self):

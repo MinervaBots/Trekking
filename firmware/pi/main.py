@@ -61,6 +61,7 @@ bluetoothMessagingThread = container.resolve(BluetoothMessagingThread)
 
 
 def setup():
+    video.setCameraFocalLenght(3.04) # Padrão do raspberry pi
     arduinoMessagingThread.setPort(systemInfo.arduinoPort)
     #bluetoothMessagingThread.setPort(systemInfo.bluetoothPort)
 
@@ -96,9 +97,10 @@ def loop():
             systemInfo.trackedRect = [int(i) for i in systemInfo.trackedRect]
             p1, p2 = Tracker.rectToPoints(systemInfo.trackedRect)
             window.rectangle(frame, p1, p2, (255, 255, 0), 2, 1)
-            
+
+            distance = video.calculateDistance(systemInfo.trackedRect[2], 0.5)
             # Mapeia a posição em pixels na tela para uma direção entre -1 e 1
-            arduinoMessagingThread.send(MessageCodes.TARGET_FOUND, systemInfo.trackedDirection, systemInfo.trackedRect[2])
+            arduinoMessagingThread.send(MessageCodes.TARGET_FOUND, systemInfo.trackedDirection, distance)
             window.putTextInfo(frame, tracker.methodName + ": " + str(systemInfo.trackedRect), (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
 
     window.putTextInfo(frame, "FPS : " + str(int(fps.update())) + " - Temp: " + str(temp.update()) + " 'C", (20, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
