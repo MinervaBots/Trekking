@@ -95,8 +95,8 @@ void retrieveReadings()
 
 void filterReadings()
 {
-  // Filtro simples de passa-baixo pra aceleração
-  // acceleration = Vector3::lerp(lastAcceleration, acceleration, 0.995);
+  // Simples filtro exponencial para tentar diminuir a oscilação do acelerômetro 
+  acceleration = Vector3::lerp(lastAcceleration, acceleration, 0.995);
 }
 
 void processReadings()
