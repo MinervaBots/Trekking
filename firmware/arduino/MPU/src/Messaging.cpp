@@ -4,11 +4,11 @@
 
 void attachCallbacks(CmdMessenger *messenger)
 {
-  messenger->attach(MessageCodes::kSetPosition, setPosition);
+    messenger->attach(MessageCodes::kSetPosition, setPosition);
 }
 
 void setPosition(CmdMessenger *messenger)
 {
-  transform.position.set(messenger->readFloatArg(), messenger->readFloatArg(), 0);
-  transform.heading = messenger->readFloatArg();
+    transform.position.set(messenger->readFloatArg(), messenger->readFloatArg(), 0);
+    transform.heading = messenger->readFloatArg();
 }

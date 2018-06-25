@@ -6,21 +6,19 @@
 
 enum MessageCodes
 {
-  kLog,
-  kUpdateTransform,
-  kSetPosition,
+    kLog,
+    kUpdateTransform,
+    kSetPosition,
 };
 
 enum LogMessageSubCodes
 {
-  kInfo,
-  kWarning,
-  kError
+    kInfo,
+    kWarning,
+    kError
 };
 
 void attachCallbacks(CmdMessenger *messenger);
-
-
 void setPosition(CmdMessenger *messenger);
 
 #endif //MESSAGING_H

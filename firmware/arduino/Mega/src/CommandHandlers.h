@@ -5,12 +5,12 @@
 
 enum MessageCodesRPi
 {
-  kRPiLog = 0,
-  kStartDetection,
-  kPauseDetection,
-  kTargetFound,
-  kTargetLost,
-  kStopEvent,
+    kRPiLog = 0,
+    kStartDetection,
+    kPauseDetection,
+    kTargetFound,
+    kTargetLost,
+    kStopEvent,
 };
 
 enum MessageCodesMPU
