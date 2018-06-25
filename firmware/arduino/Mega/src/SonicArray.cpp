@@ -135,16 +135,17 @@ void SonicArray::handleEcho(Vector intVector)
     // Iterate through the specific vector's ultrasonic echo pins
     for (int i = 0; i < cnt; i++)
     {
+        int sensorId = sensorsInVector[i];
         // If a pin is HIGH, it means that a pulse
         // is either just starting or has previously started.
         // We only care about the former.
-        if (digitalRead(sensors_[i].getEchoPin()) == HIGH)
+        if (digitalRead(sensors_[sensorId].getEchoPin()) == HIGH)
         {
             // We only care for newly generated pulses and not ones
             // we have handled before.
-            if (sensors_[i].getStartOfPulse() == 0)
+            if (sensors_[sensorId].getStartOfPulse() == 0)
             {
-                sensors_[i].setStartOfPulse(micros());
+                sensors_[sensorId].setStartOfPulse(micros());
             }
         }
         else
