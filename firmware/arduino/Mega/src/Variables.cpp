@@ -9,7 +9,7 @@ void (*previousState)(unsigned long);
 Servo cameraServo, steeringServo, esc;
 
 CmdMessenger rPiCmdMessenger = CmdMessenger(Serial,',',';','/');
-//CmdMessenger mpuCmdMessenger = CmdMessenger(Serial2,',',';','/');
+CmdMessenger mpuCmdMessenger = CmdMessenger(Serial2,',',';','/');
 
 double setPointZero = 0;
 

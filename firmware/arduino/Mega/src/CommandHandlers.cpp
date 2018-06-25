@@ -12,11 +12,10 @@ void attachHandlers()
     rPiCmdMessenger.attach(MessageCodesRPi::kTargetLost, onRecvTargetLost);
     rPiCmdMessenger.attach(MessageCodesRPi::kStopEvent, onStopEvent);
     rPiCmdMessenger.attach(onRecvUnknownCommand);
-    /*
-  mpuCmdMessenger.attach(MessageCodesMPU::kMpuData, onRecvMpuData);
-  mpuCmdMessenger.attach(MessageCodesMPU::kMpuLog, onRecvMpuLog);
-  mpuCmdMessenger.attach(onRecvUnknownCommand);
-*/
+
+    mpuCmdMessenger.attach(MessageCodesMPU::kUpdateTransform, onUpdateTransform);
+    mpuCmdMessenger.attach(MessageCodesMPU::kMpuLog, onRecvMpuLog);
+    mpuCmdMessenger.attach(onRecvUnknownCommand);
 }
 
 void onStopEvent(CmdMessenger *cmdMesseger)
@@ -24,23 +23,6 @@ void onStopEvent(CmdMessenger *cmdMesseger)
     linearSpeed = 0;
     esc.write(ESC_ZERO);
     changeState(reset);
-}
-
-void onRecvMpuData(CmdMessenger *cmdMesseger)
-{
-    currentTransform.position.x = cmdMesseger->readBinArg<float>();
-    currentTransform.position.y = cmdMesseger->readBinArg<float>();
-    currentTransform.heading = cmdMesseger->readBinArg<float>();
-}
-
-void onRecvMpuLog(CmdMessenger *cmdMesseger)
-{
-    rPiCmdMessenger.sendCmdStart(MessageCodesRPi::kRPiLog);
-    while (cmdMesseger->available())
-    {
-        rPiCmdMessenger.sendCmdBinArg(cmdMesseger->readStringArg());
-    }
-    rPiCmdMessenger.sendCmdEnd();
 }
 
 void onRecvTargetFound(CmdMessenger *cmdMesseger)
@@ -79,10 +61,21 @@ void onRecvUnknownCommand(CmdMessenger *cmdMesseger)
     rPiCmdMessenger.sendCmdStart(MessageCodesRPi::kRPiLog);
     rPiCmdMessenger.sendCmdArg("Nenhum handler registrado para essa mensagem");
     rPiCmdMessenger.sendCmdEnd();
-    /*
-  while(1)
-  {
-  esc.write(ESC_ZERO);
-  }
-  */
+}
+
+void onUpdateTransform(CmdMessenger *cmdMesseger)
+{
+    currentTransform.position.x = cmdMesseger->readBinArg<float>();
+    currentTransform.position.y = cmdMesseger->readBinArg<float>();
+    currentTransform.heading = cmdMesseger->readBinArg<float>();
+}
+
+void onRecvMpuLog(CmdMessenger *cmdMesseger)
+{
+    rPiCmdMessenger.sendCmdStart(MessageCodesRPi::kRPiLog);
+    while (cmdMesseger->available())
+    {
+        rPiCmdMessenger.sendCmdBinArg(cmdMesseger->readStringArg());
+    }
+    rPiCmdMessenger.sendCmdEnd();
 }
