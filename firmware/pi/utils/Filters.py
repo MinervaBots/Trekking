@@ -1,3 +1,11 @@
+class SimpleLowPassFilter:
+    def __init__(self, alpha):
+        self.alpha = alpha
+        
+    def calculate(input : float):
+        self.output = input + (self.alpha * self.output)
+        return self.output
+        
 class RunningAverageFilter:
     def __init__(self, samplesCount = 16):
         self.samplesCount = 16
