@@ -19,8 +19,8 @@ from messaging.ArduinoCommands import *
 from messaging.BluetoothMessageHandlers import *
 
 
-directionFilter = ResponsiveExponentialFilter(True)
-distanceFilter = ResponsiveExponentialFilter(True)
+directionFilter = RunningAverageFilter()
+distanceFilter = RunningAverageFilter(10)
 
 systemInfo = SystemInfo()
 
@@ -29,7 +29,7 @@ video = VideoStream(usePiCamera = systemInfo.isRaspberryPi, framerate = 30, reso
 video.start() # Inicializa a câmera aqui pra ter tempo de esquentar se for no Raspberry Pi
 
 tracker = Tracker("cascades/face.xml", video.resolution, "MEDIANFLOW")
-window = DebugWindow(systemInfo.enableWindow, "debug", tracker.resolution, 10, True)
+window = DebugWindow(systemInfo.enableWindow, "debug", tracker.resolution, 40, True)
 
 #Medida de performance
 fps = FPS(False)
@@ -94,7 +94,7 @@ def loop():
     else:   
         (systemInfo.isTracking, systemInfo.trackedRect, systemInfo.trackedDirection) = tracker.update(frame)
 
-        if systemInfo.trackedRect is None:
+        if systemInfo.trackedRect is None or systemInfo.trackedDirection == -1:
             arduinoMessagingThread.send(MessageCodes.TARGET_LOST)
             window.putTextError(frame, "Falha detectada no rastreamento", (20, 80), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
         else:    
@@ -107,8 +107,8 @@ def loop():
             filteredDirection = directionFilter.calculate(systemInfo.trackedDirection)
             filteredDistance = distanceFilter.calculate(distance)
             # Mapeia a posição em pixels na tela para uma direção entre -1 e 1
-            arduinoMessagingThread.send(MessageCodes.TARGET_FOUND, filteredDirection, filteredDistance)
-            window.putTextInfo(frame, tracker.methodName + ": " + str(systemInfo.trackedRect), (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
+            arduinoMessagingThread.send(MessageCodes.TARGET_FOUND, systemInfo.trackedDirection, filteredDistance)
+            window.putTextInfo(frame, tracker.methodName + ": " + str(filteredDistance), (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
 
     window.putTextInfo(frame, "FPS : " + str(int(fps.update())) + " - Temp: " + str(temp.update()) + " 'C", (20, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
 
@@ -118,7 +118,7 @@ def loop():
 def stop():
     arduinoMessagingThread.clearSendQueue()
     arduinoMessagingThread.send(MessageCodes.STOP_EVENT)
-    cv2.waitKey(2000);
+    cv2.waitKey(500);
     
     fps.stop(True)
     arduinoMessagingThread.close()

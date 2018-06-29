@@ -24,6 +24,8 @@ class VideoStream:
     
     def calculateDistance(self, dimensionInPixels, dimensionInMeters):
         "Retorna a distancia do objeto em metros"
+        if(dimensionInPixels == 0):
+            return 0
         distance = (((dimensionInMeters * 1000) * self.focalLenght) / dimensionInPixels)
         return distance
     

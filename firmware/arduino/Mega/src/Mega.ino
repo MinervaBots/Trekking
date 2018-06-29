@@ -128,7 +128,7 @@ void writeInActuators()
     int value;
     if (actuatorsWrite & ExecutionFlags::kSpeed)
     {
-        value = round(mapf(linearSpeed, 0, 1, ESC_ZERO, ESC_MAX_FORWARD));
+        value = round(mapf(linearSpeed * linearSpeedLock, 0, 1, ESC_ZERO, ESC_MAX_FORWARD));
         esc.write(value);
     }
     if (actuatorsWrite & ExecutionFlags::kCamera)

@@ -71,7 +71,9 @@ void search(unsigned long deltaTime)
 void refinedSearch(unsigned long deltaTime)
 {
     rPiCmdMessenger.sendCmdStart(MessageCodesRPi::kRPiLog);
-    rPiCmdMessenger.sendCmdArg("refinedSearch");
+    //rPiCmdMessenger.sendCmdArg("refinedSearch");
+    rPiCmdMessenger.sendCmdArg(targetDistance);
+    rPiCmdMessenger.sendCmdArg(targetDirection);
     rPiCmdMessenger.sendCmdEnd();
     /*
         //Serial.println("refinedSearch");
@@ -130,9 +132,11 @@ void targetFound(unsigned long deltaTime)
 
 void rotateCamera(unsigned long deltaTime)
 {
+    /*
     rPiCmdMessenger.sendCmdStart(MessageCodesRPi::kRPiLog);
     rPiCmdMessenger.sendCmdArg("rotateCamera");
     rPiCmdMessenger.sendCmdEnd();
+    */
     linearSpeed = 0;
     cameraServoPosition += rotateCameraIncrement;
     if (abs(cameraServoPosition) >= 1)

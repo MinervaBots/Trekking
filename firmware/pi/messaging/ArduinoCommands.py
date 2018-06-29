@@ -11,7 +11,7 @@ from .MessagingThread import MessagingThread
 class ArduinoCommands(ABC):
   def __init__(self):
     self.list = []
-    self.list.append([MessageCodes.TARGET_FOUND, "fi"])
+    self.list.append([MessageCodes.TARGET_FOUND, "ff"])
     self.list.append([MessageCodes.TARGET_LOST, ""])
     self.list.append([MessageCodes.STOP_EVENT, ""])
     

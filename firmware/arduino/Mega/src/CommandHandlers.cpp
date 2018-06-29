@@ -27,18 +27,18 @@ void onStopEvent(CmdMessenger *cmdMesseger)
 
 void onRecvTargetFound(CmdMessenger *cmdMesseger)
 {
-    if (targetLostStartTime != 0 && state != refinedSearch)
+    if (targetLostStartTime != 0 || state != refinedSearch)
     {
         targetLostStartTime = 0;
         changeState(refinedSearch);
     }
 
     linearSpeedLock = 1;
-    float newDirection = cmdMesseger->readFloatArg();
-    targetDirection = lerp(targetDirection, newDirection, 0.8);
+    float newDirection = cmdMesseger->readBinArg<float>();
+    targetDirection = newDirection; //lerp(targetDirection, newDirection, 0.8);
 
-    float newDistance = cmdMesseger->readFloatArg();
-    targetDistance = lerp(targetDistance, newDistance, 0.1);
+    float newDistance = cmdMesseger->readBinArg<float>();
+    targetDistance = newDistance; //lerp(targetDistance, newDistance, 0.1);
 }
 
 void onRecvTargetLost(CmdMessenger *cmdMesseger)
@@ -47,13 +47,29 @@ void onRecvTargetLost(CmdMessenger *cmdMesseger)
     {
         targetLostStartTime = millis();
     }
-    else if (millis() - targetLostStartTime > TARGET_LOST_THRESHOLD && state != rotateCamera)
+    else
     {
-        changeState(rotateCamera);
-        rPiCmdMessenger.sendCmdStart(MessageCodesRPi::kRPiLog);
-        rPiCmdMessenger.sendCmdArg("changeState(rotateCamera)");
-        rPiCmdMessenger.sendCmdEnd();
+        unsigned long delta = millis() - targetLostStartTime;
+        if (delta > TARGET_LOST_THRESHOLD && state != rotateCamera)
+        {
+            changeState(rotateCamera);
+            /*
+            rPiCmdMessenger.sendCmdStart(MessageCodesRPi::kRPiLog);
+            rPiCmdMessenger.sendCmdArg("changeState(rotateCamera)");
+            rPiCmdMessenger.sendCmdArg(delta);
+            rPiCmdMessenger.sendCmdEnd();
+            */
+        }
     }
+    linearSpeedLock *= 0.9;
+    /*
+    rPiCmdMessenger.sendCmdStart(MessageCodesRPi::kRPiLog);
+    rPiCmdMessenger.sendCmdArg("onRecvTargetLost");
+    rPiCmdMessenger.sendCmdArg(targetDistance);
+    rPiCmdMessenger.sendCmdArg(targetDirection);
+    rPiCmdMessenger.sendCmdArg(linearSpeed);
+    rPiCmdMessenger.sendCmdEnd();
+    */
 }
 
 void onRecvUnknownCommand(CmdMessenger *cmdMesseger)

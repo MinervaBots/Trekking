@@ -1,8 +1,9 @@
 class SimpleLowPassFilter:
-    def __init__(self, alpha):
+    def __init__(self, alpha = 0.5):
         self.alpha = alpha
+        self.output = 0
         
-    def calculate(input : float):
+    def calculate(self, input : float):
         self.output = input + (self.alpha * self.output)
         return self.output
         
@@ -12,26 +13,26 @@ class RunningAverageFilter:
         self.__nextSampleId = 0
         self.samplesList = 16 * [0]
     
-    def calculate(input : float):
+    def calculate(self, input : float):
         self.samplesList[self.__nextSampleId] = input
         self.__nextSampleId += 1
         
-        if(self.__nextSampleId >= samplesCount):
+        if(self.__nextSampleId >= self.samplesCount):
             self.__nextSampleId = 0
         
         output = 0
         for sample in self.samplesList:
             output += sample
         
-        output /= samplesCount
+        output /= self.samplesCount
         return output
         
 class ExponentialFilter:
-    def __init__(self, alpha : input):
+    def __init__(self, alpha : input = 0.5):
         self.alpha = alpha
         self.output = 0
     
-    def calculate(input : float):
+    def calculate(self, input : float):
         self.output += (input - self.output) * self.alpha
         return self.output
 
@@ -72,22 +73,22 @@ class ResponsiveExponentialFilter:
     def disableEdgeSnap(self):
         self.edgeSnapEnable = False
         
-    def calculate(input : float):
+    def calculate(self, input : float):
         self.prevOutput = self.output
         
         # if sleep and edge snap are enabled and the new value is very close to an edge, drag it a little closer to the edges
         # This'll make it easier to pull the output values right to the extremes without sleeping,
         # and it'll make movements right near the edge appear larger, making it easier to wake up
         if (self.sleepEnable and self.edgeSnapEnable):
-            if(newValue < self.activityThreshold):
-                newValue = (newValue * 2) - self.activityThreshold
-            elif(newValue > self.edgeMaximum - self.activityThreshold):
-                newValue = (newValue * 2) - self.edgeMaximum + self.activityThreshold
+            if(input < self.activityThreshold):
+                input = (input * 2) - self.activityThreshold
+            elif(input > self.edgeMaximum - self.activityThreshold):
+                input = (input * 2) - self.edgeMaximum + self.activityThreshold
     
         # get difference between new input value and current smooth value
-        diff = abs(newValue - self.output)
+        diff = abs(input - self.output)
 
-        self.errorEMA += ((newValue - self.output) - self.errorEMA) * 0.4
+        self.errorEMA += ((input - self.output) - self.errorEMA) * 0.4
 
         # if sleep has been enabled, sleep when the amount of error is below the activity threshold
         if(self.sleepEnable):
@@ -119,7 +120,7 @@ class ResponsiveExponentialFilter:
             snap *= 0.5 + 0.5
         
         # calculate the exponential moving average based on the snap
-        self.output += (newValue - self.output) * snap
+        self.output += (input - self.output) * snap
 
         # ensure output is in bounds
         if(self.output < self.edgeMinimum):
@@ -127,7 +128,7 @@ class ResponsiveExponentialFilter:
         elif(self.output > self.edgeMaximum):
             self.output = self.edgeMaximum
         
-        self.outputHasChanged = prevOutput != self.output
+        self.outputHasChanged = self.prevOutput != self.output
         return self.output
     
     def snapCurve(self, x : float):
