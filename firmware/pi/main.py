@@ -25,11 +25,11 @@ distanceFilter = RunningAverageFilter(10)
 systemInfo = SystemInfo()
 
 #Captura de video
-video = VideoStream(usePiCamera = systemInfo.isRaspberryPi, framerate = 30, resolution = (640, 360))
+video = VideoStream(usePiCamera = systemInfo.isRaspberryPi, framerate = 30, resolution = (640, 368))
 video.start() # Inicializa a câmera aqui pra ter tempo de esquentar se for no Raspberry Pi
 
 tracker = Tracker("cascades/face.xml", video.resolution, "MEDIANFLOW")
-window = DebugWindow(systemInfo.enableWindow, "debug", tracker.resolution, 40, True)
+window = DebugWindow(systemInfo.enableWindow, "debug", tracker.resolution, 1, False)
 
 #Medida de performance
 fps = FPS(False)
@@ -60,16 +60,17 @@ builder.register_instance(TemperatureControl, temp)
 container = builder.build()
 
 # Extrai as instancias com as dependencias já resolvidas
-arduinoMessagingThread = container.resolve(ArduinoMessagingThread)
+#arduinoMessagingThread = container.resolve(ArduinoMessagingThread)
 bluetoothMessagingThread = container.resolve(BluetoothMessagingThread)
 
+lastUpdateTime = 0
 
 def setup():
     video.setCameraFocalLenght(3.04) # Padrão do raspberry pi
-    arduinoMessagingThread.setPort(systemInfo.arduinoPort)
+    #arduinoMessagingThread.setPort(systemInfo.arduinoPort)
     #bluetoothMessagingThread.setPort(systemInfo.bluetoothPort)
 
-    arduinoMessagingThread.start()
+    #arduinoMessagingThread.start()
     #bluetoothMessagingThread.start()
     systemInfo.isRunning = True
     tracker.isRunning = True
@@ -81,21 +82,24 @@ def setup():
     
 
 def loop():
+    global lastUpdateTime
+    
     frame = video.read()
     if frame is None:
         return
-
+    
+    #return window.update(frame) == 27
     if not tracker.isRunning:
         pass
     elif not systemInfo.isTracking:
         (systemInfo.isTracking, systemInfo.trackedRect, systemInfo.trackedDirection) = tracker.init(frame)
         window.putTextWarning(frame, "Tentando detectar...", (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
-        arduinoMessagingThread.send(MessageCodes.TARGET_LOST)
+        #arduinoMessagingThread.send(MessageCodes.TARGET_LOST)
     else:   
         (systemInfo.isTracking, systemInfo.trackedRect, systemInfo.trackedDirection) = tracker.update(frame)
 
         if systemInfo.trackedRect is None or systemInfo.trackedDirection == -1:
-            arduinoMessagingThread.send(MessageCodes.TARGET_LOST)
+            #arduinoMessagingThread.send(MessageCodes.TARGET_LOST)
             window.putTextError(frame, "Falha detectada no rastreamento", (20, 80), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
         else:    
             systemInfo.trackedRect = [int(i) for i in systemInfo.trackedRect]
@@ -107,22 +111,25 @@ def loop():
             filteredDirection = directionFilter.calculate(systemInfo.trackedDirection)
             filteredDistance = distanceFilter.calculate(distance)
             # Mapeia a posição em pixels na tela para uma direção entre -1 e 1
-            arduinoMessagingThread.send(MessageCodes.TARGET_FOUND, systemInfo.trackedDirection, filteredDistance)
+            #arduinoMessagingThread.send(MessageCodes.TARGET_FOUND, systemInfo.trackedDirection, filteredDistance)
             window.putTextInfo(frame, tracker.methodName + ": " + str(filteredDistance), (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
 
     window.putTextInfo(frame, "FPS : " + str(int(fps.update())) + " - Temp: " + str(temp.update()) + " 'C", (20, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
 
+    if(lastUpdateTime - time.time() > 2):
+        arduinoMessagingThread.send(MessageCodes.TEMPERATURE, temp.update())
+        lastUpdateTime = time.time() 
     # ESC pressionado
     return window.update(frame) == 27
 
 def stop():
-    arduinoMessagingThread.clearSendQueue()
-    arduinoMessagingThread.send(MessageCodes.STOP_EVENT)
+    #arduinoMessagingThread.clearSendQueue()
+    #arduinoMessagingThread.send(MessageCodes.STOP_EVENT)
     cv2.waitKey(500);
     
     fps.stop(True)
-    arduinoMessagingThread.close()
-    #bluetoothMessagingThread.close()
+    #arduinoMessagingThread.close()
+    bluetoothMessagingThread.close()
     window.close()
     video.stop()
     systemInfo.isRunning = False

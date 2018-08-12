@@ -5,7 +5,7 @@ PID steeringPid(&targetDirection, &steeringServoPosition, &setPointZero, steerin
 PID speedPid(&targetDistance, &linearSpeed, &setPointZero, speedKp, speedKi, speedKd, P_ON_M, REVERSE);
 
 double speedKp = 0.5, speedKi = 0, speedKd = 0.1;
-double cameraServoKp = 0.5, cameraServoKi = 0, cameraServoKd = 0.5;
+double cameraServoKp = 0, cameraServoKi = 1, cameraServoKd = 0.9;
 double steeringServoKp = 0.75, steeringServoKi = 0, steeringServoKd = 0.9;
 
 void setupPID()

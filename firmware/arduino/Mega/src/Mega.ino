@@ -19,6 +19,12 @@ SonicArray sonicArray(PIN_ULTRASSONIC_TRIGGER);
 
 void setup()
 {
+    pinMode(BUTTON_PIN, INPUT_PULLUP);
+    pinMode(BATTERY_FEEDBACK_PIN, INPUT);
+    pinMode(RPI_COOLER_PWM_PIN, OUTPUT);
+    pinMode(LED_DEBUG_PIN, OUTPUT);
+    pinMode(LED_SIGNAL_PIN, OUTPUT);
+    
     attachHandlers();
     attachRCInterrupts();
     setupPID();
@@ -26,7 +32,6 @@ void setup()
     Serial.begin(RPI_BAUD_RATE);
     Serial3.begin(MPU_BAUD_RATE);
     sonicArray.setupInterrupts();
-    pinMode(BUTTON_PIN, INPUT_PULLUP);
 
     cameraServo.attach(CAMERA_SERVO_PIN);
     steeringServo.attach(STEERING_SERVO_PIN);
@@ -47,6 +52,19 @@ void setup()
 
 void loop()
 {
+    int batteryFeedback = analogRead(BATTERY_FEEDBACK_PIN);
+    float batteryVolts = mapf(batteryFeedback, 0, 920.7, 0, 21);
+    
+    Serial.print(batteryFeedback);
+    Serial.print("\t");
+    Serial.println(batteryVolts);
+    
+    // digitalWrite(LED_SIGNAL_PIN, LOW);
+    // if(batteryVolts <= 18)
+    // {
+    //     digitalWrite(LED_DEBUG_PIN, HIGH);
+    // }
+    
     if (millis() - lastSignalTime >= 1000)
     {
         esc.write(ESC_ZERO);
@@ -55,7 +73,9 @@ void loop()
 
     if (gearPulseWidth > 1500)
     {
-        //Serial.println(gearPulseWidth);
+        digitalWrite(LED_DEBUG_PIN, HIGH);
+        digitalWrite(LED_SIGNAL_PIN, HIGH);
+        
         // Manual
         cameraPid.SetMode(MANUAL);
         steeringPid.SetMode(MANUAL);
@@ -63,10 +83,15 @@ void loop()
 
         esc.writeMicroseconds(elevPulseWidth);
         steeringServo.writeMicroseconds(ruddPulseWidth);
+        cameraServo.write(90);
+
         return;
     }
     else
     {
+        digitalWrite(LED_DEBUG_PIN, LOW);
+        digitalWrite(LED_SIGNAL_PIN, LOW);
+
         // Automático
         cameraPid.SetMode(AUTOMATIC);
         steeringPid.SetMode(AUTOMATIC);
@@ -133,8 +158,10 @@ void writeInActuators()
     }
     if (actuatorsWrite & ExecutionFlags::kCamera)
     {
-        value = round(mapf(cameraServoPosition, -1, 1, 0, CAMERA_SERVO_LIMIT));
+        /*
+        value = round(mapf(cameraServoPosition, -1, 1, CAMERA_SERVO_LIMIT_MIN, CAMERA_SERVO_LIMIT_MAX));
         cameraServo.write(value);
+        */
     }
     if (actuatorsWrite & ExecutionFlags::kSteering)
     {

@@ -1,7 +1,7 @@
 import dic
 from abc import *
 from typing import List
-from enum import IntEnum, auto
+from enum import IntEnum
 from .MessageHandler import *
 from .MessageCodes import MessageCodes
 from .BluetoothMessagingThread import BluetoothMessagingThread
@@ -14,4 +14,5 @@ class ArduinoCommands(ABC):
     self.list.append([MessageCodes.TARGET_FOUND, "ff"])
     self.list.append([MessageCodes.TARGET_LOST, ""])
     self.list.append([MessageCodes.STOP_EVENT, ""])
+    self.list.append([MessageCodes.TEMPERATURE, "f"])
     

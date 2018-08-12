@@ -28,10 +28,11 @@ void reset(unsigned long deltaTime)
 
 void idle(unsigned long deltaTime)
 {
+    /*
     rPiCmdMessenger.sendCmdStart(MessageCodesRPi::kRPiLog);
     rPiCmdMessenger.sendCmdArg("idle");
     rPiCmdMessenger.sendCmdEnd();
-
+*/
     linearSpeed = 0;
 
     setManual();

@@ -8,7 +8,8 @@
 #define RPI_BAUD_RATE           9600
 #define MPU_BAUD_RATE           9600
 
-#define CAMERA_SERVO_LIMIT      180
+#define CAMERA_SERVO_LIMIT_MIN      30
+#define CAMERA_SERVO_LIMIT_MAX      180
 #define STEERING_SERVO_MIN_LIMIT    30
 #define STEERING_SERVO_MAX_LIMIT    150
 #define ESC_MAX_FORWARD         110             // Apesar do ESC ser controlado como um servo, é mais fácil 
@@ -26,8 +27,6 @@
 #define OBSTACLE_AVOIDANCE_CONSTANT 100.0
 
 #define TARGET_LOST_THRESHOLD 10000
-
-
 
 #define GEAR_MEDIUMM_VALUE 15000
 

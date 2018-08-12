@@ -1,7 +1,7 @@
 import dic
 from abc import *
 from typing import List
-from enum import IntEnum, auto
+from enum import IntEnum
 from .MessageHandler import *
 from .MessageCodes import MessageCodes
 from tracking.Tracker import Tracker

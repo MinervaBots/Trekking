@@ -74,7 +74,7 @@ class MessagingThread(Thread):
                         break;
 
             hasFullMessage = False
-            decodedBuffer : str = ""
+            decodedBuffer = ""
         
             # Espera receber o byte indicador de fim de mensagem para processar
             # a mensagem completa

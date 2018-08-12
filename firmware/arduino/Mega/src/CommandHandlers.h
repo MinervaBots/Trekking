@@ -18,6 +18,7 @@ enum MessageCodesRPi
     kTargetFound,
     kTargetLost,
     kStopEvent,
+    kTemperature,
 };
 
 enum MessageCodesMPU
@@ -32,6 +33,7 @@ void onRecvTargetFound(CmdMessenger *cmdMesseger);
 void onRecvTargetLost(CmdMessenger *cmdMesseger);
 void onRecvUnknownCommand(CmdMessenger *cmdMesseger);
 void onStopEvent(CmdMessenger *cmdMesseger);
+void onTemperatureUpdateEvent(CmdMessenger *cmdMesseger);
 
 
 void onUpdateTransform(CmdMessenger *cmdMesseger);

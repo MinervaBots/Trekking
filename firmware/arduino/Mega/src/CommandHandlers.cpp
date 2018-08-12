@@ -3,6 +3,7 @@
 #include "Constants.h"
 #include "States.h"
 #include "Utils.h"
+#include "Pins.h"
 
 unsigned long targetLostStartTime;
 
@@ -72,6 +73,13 @@ void onRecvTargetLost(CmdMessenger *cmdMesseger)
     */
 }
 
+void onTemperatureUpdateEvent(CmdMessenger *cmdMesseger)
+{
+    //float temperature = cmdMesseger->readBinArg<float>();   
+    //int pwm = mapf(temperature, 40, 70, 0, 255);
+    //analogWrite(RPI_COOLER_PWM_PIN, pwm);
+}
+
 void onRecvUnknownCommand(CmdMessenger *cmdMesseger)
 {
     rPiCmdMessenger.sendCmdStart(MessageCodesRPi::kRPiLog);
@@ -84,6 +92,14 @@ void onUpdateTransform(CmdMessenger *cmdMesseger)
     currentTransform.position.x = cmdMesseger->readBinArg<float>();
     currentTransform.position.y = cmdMesseger->readBinArg<float>();
     currentTransform.heading = cmdMesseger->readBinArg<float>();
+
+    
+    rPiCmdMessenger.sendCmdStart(MessageCodesRPi::kRPiLog);
+    rPiCmdMessenger.sendCmdArg("Posição atual");
+    rPiCmdMessenger.sendCmdArg(currentTransform.position.x);
+    rPiCmdMessenger.sendCmdArg(currentTransform.position.y);
+    rPiCmdMessenger.sendCmdArg(currentTransform.heading);
+    rPiCmdMessenger.sendCmdEnd();
 }
 
 void onRecvMpuLog(CmdMessenger *cmdMesseger)

@@ -40,7 +40,7 @@ class Tracker:
             
         if self.usingTracker:
             delta = datetime.datetime.now() - self.lastDetectRunTime
-            if delta.seconds > 0.5:
+            if delta.seconds > 2:
                 return self.init(frame, *self.lastDetectionParameters)
 
             found, boundingBox = self.__tracker.update(frame)
@@ -91,6 +91,8 @@ class Tracker:
             self.__tracker = cv2.TrackerMedianFlow_create()
         elif self.methodName == 'GOTURN':
             self.__tracker = cv2.TrackerGOTURN_create()
+        elif self.methodName == 'MOSSE':
+            self.__tracker = cv2.TrackerMOSSE_create()
         else:
             print("Algortimo '" + self.methodName + "' não reconhecido")
             self.methodName = ""

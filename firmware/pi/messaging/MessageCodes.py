@@ -1,20 +1,18 @@
-from enum import IntEnum, auto
+from enum import IntEnum
 
 class MessageCodes(IntEnum):
     LOG = 0
-    ERROR = auto()
-    START_TRACKING = auto()
-    PAUSE_TRACKING = auto()
+    ERROR = 1
+    START_TRACKING = 2
+    PAUSE_TRACKING = 3
 
-    TARGET_FOUND = auto()
-    TARGET_LOST = auto()
-    STOP_EVENT = auto()
-
+    TARGET_FOUND = 4
+    TARGET_LOST = 5
+    STOP_EVENT = 6
+    TEMPERATURE = 7
 
     START_SYSTEM = 100
-    STOP_SYSTEM = auto()
-    SET_TRACKING_METHOD = auto()
-    GET_FPS = auto()
-    GET_TEMPERATURE = auto()
-
-    _LAST = auto()
+    STOP_SYSTEM = 101
+    SET_TRACKING_METHOD = 102
+    GET_FPS = 103
+    GET_TEMPERATURE = 104

@@ -16,4 +16,7 @@
 #define RUDD_PIN 2
 #define ELEV_PIN 3
 
+#define BATTERY_FEEDBACK_PIN A7
+#define RPI_COOLER_PWM_PIN 9
+
 #endif
