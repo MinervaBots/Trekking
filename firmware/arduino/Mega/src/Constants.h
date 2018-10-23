@@ -10,11 +10,15 @@
 
 #define CAMERA_SERVO_LIMIT_MIN      30
 #define CAMERA_SERVO_LIMIT_MAX      180
+#define CAMERA_SERVO_ZERO                (ESC_MAX_FORWARD + ESC_MAX_BACKWARD) / 2
+
 #define STEERING_SERVO_MIN_LIMIT    30
 #define STEERING_SERVO_MAX_LIMIT    150
+#define STEERING_SERVO_ZERO                (ESC_MAX_FORWARD + ESC_MAX_BACKWARD) / 2
+
 #define ESC_MAX_FORWARD         110             // Apesar do ESC ser controlado como um servo, é mais fácil 
 #define ESC_MAX_BACKWARD        80               // pensar as velocidades como valores entre [-1; 1]
-#define ESC_ZERO                90
+#define ESC_ZERO                (ESC_MAX_FORWARD + ESC_MAX_BACKWARD) / 2
 
 #define ULTRASSONIC_MAX_DIST    300               
 #define ULTRASSONIC_TIMEOUT     CM_TO_MS(ULTRASSONIC_MAX_DIST)
