@@ -8,7 +8,10 @@ from utils.DebugWindow import DebugWindow
 from utils.TemperatureControl import TemperatureControl
 from utils.Filters import *
 from videoStream.VideoStream import VideoStream
+from tracking.Detector import Detector
+from tracking.CascadeDetector import CascadeDetector
 from tracking.Tracker import Tracker
+from tracking.OpenCVTracker import OpenCVTracker
 import time
 
 from messaging.ArduinoMessagingThread import ArduinoMessagingThread
@@ -18,9 +21,8 @@ from messaging.ArduinoMessageHandlers import *
 from messaging.ArduinoCommands import *
 from messaging.BluetoothMessageHandlers import *
 
-
 directionFilter = RunningAverageFilter()
-distanceFilter = RunningAverageFilter(10)
+distanceFilter = RunningAverageFilter(100)
 
 systemInfo = SystemInfo()
 
@@ -28,8 +30,9 @@ systemInfo = SystemInfo()
 video = VideoStream(usePiCamera = systemInfo.isRaspberryPi, framerate = 30, resolution = (640, 368))
 video.start() # Inicializa a câmera aqui pra ter tempo de esquentar se for no Raspberry Pi
 
-tracker = Tracker("cascades/face.xml", video.resolution, "MEDIANFLOW")
-window = DebugWindow(systemInfo.enableWindow, "debug", tracker.resolution, 1, False)
+detector = CascadeDetector(video.resolution, "cascades/face.xml")
+tracker = OpenCVTracker(detector, "MEDIANFLOW")
+window = DebugWindow(systemInfo.enableWindow, "debug", video.resolution, 1, False)
 
 #Medida de performance
 fps = FPS(False)
@@ -51,6 +54,7 @@ builder.register_class(PauseTrackerHandler, register_as = [ArduinoMessageHandler
 #Registra instancias para serem acessiveis dentro dos handlers
 builder.register_instance(SystemInfo, systemInfo)
 builder.register_instance(DebugWindow, window)
+builder.register_instance(Detector, detector)
 builder.register_instance(Tracker, tracker)
 builder.register_instance(VideoStream, video)
 builder.register_instance(FPS, fps)
@@ -88,7 +92,6 @@ def loop():
     if frame is None:
         return
     
-    #return window.update(frame) == 27
     if not tracker.isRunning:
         pass
     elif not systemInfo.isTracking:
@@ -103,7 +106,7 @@ def loop():
             window.putTextError(frame, "Falha detectada no rastreamento", (20, 80), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
         else:    
             systemInfo.trackedRect = [int(i) for i in systemInfo.trackedRect]
-            p1, p2 = Tracker.rectToPoints(systemInfo.trackedRect)
+            p1, p2 = Detector.rectToPoints(systemInfo.trackedRect)
             window.rectangle(frame, p1, p2, (255, 255, 0), 2, 1)
 
             distance = video.calculateDistance(systemInfo.trackedRect[2], 0.5)
