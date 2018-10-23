@@ -3,7 +3,7 @@ import cv2
 import dic
 
 from SystemInfo import SystemInfo
-from utils.FPS import FPS
+from utils.PerfCounter import PerfCounter
 from utils.DebugWindow import DebugWindow
 from utils.TemperatureControl import TemperatureControl
 from utils.Filters import *
@@ -35,7 +35,7 @@ tracker = OpenCVTracker(detector, 2000, "MEDIANFLOW")
 window = DebugWindow(systemInfo.enableWindow, "debug", video.resolution, 1, False)
 
 #Medida de performance
-fps = FPS(False)
+fps = PerfCounter(False)
 temp = TemperatureControl(1)
 
 builder = dic.container.ContainerBuilder()
@@ -117,7 +117,7 @@ def loop():
             #arduinoMessagingThread.send(MessageCodes.TARGET_FOUND, systemInfo.trackedDirection, filteredDistance)
             window.putTextInfo(frame, tracker.methodName + ": " + str(filteredDistance), (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
 
-    window.putTextInfo(frame, "FPS : " + str(int(fps.update())) + " - Temp: " + str(temp.update()) + " 'C", (20, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
+    window.putTextInfo(frame, "({:.0f}, {:.2f})".format(*fps.update()) + " - Temp: " + str(temp.update()) + " 'C", (20, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
 
     if(lastUpdateTime - time.time() > 2):
         arduinoMessagingThread.send(MessageCodes.TEMPERATURE, temp.update())
