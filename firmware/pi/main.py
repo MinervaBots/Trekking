@@ -31,7 +31,7 @@ video = VideoStream(usePiCamera = systemInfo.isRaspberryPi, framerate = 30, reso
 video.start() # Inicializa a câmera aqui pra ter tempo de esquentar se for no Raspberry Pi
 
 detector = CascadeDetector(video.resolution, "cascades/face.xml")
-tracker = OpenCVTracker(detector, "MEDIANFLOW")
+tracker = OpenCVTracker(detector, 2000, "MEDIANFLOW")
 window = DebugWindow(systemInfo.enableWindow, "debug", video.resolution, 1, False)
 
 #Medida de performance
