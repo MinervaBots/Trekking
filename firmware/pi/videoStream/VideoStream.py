@@ -11,6 +11,7 @@ class VideoStream:
             # initialize the picamera stream and allow the camera
             # sensor to warmup
             self.stream = PiVideoStream(resolution=resolution, framerate=framerate)
+            
             #Usando a Câmera do Raspberry Pi precisamos dar um tempinho pra ela "esquentar"
             
         # otherwise, we are using OpenCV so initialize the webcam
@@ -19,6 +20,8 @@ class VideoStream:
             from .WebcamVideoStream import WebcamVideoStream
             self.stream = WebcamVideoStream(src=src,resolution=resolution,framerate=framerate)
       
+        self.__resolution = self.stream.resolution
+        
     def setCameraFocalLenght(self, focalLenght):
         self.focalLenght = focalLenght
     
@@ -31,7 +34,7 @@ class VideoStream:
     
     @property
     def resolution(self):
-        return self.stream.resolution
+        return self.__resolution
         
     def start(self):
         # start the threaded video stream
