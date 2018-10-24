@@ -122,7 +122,8 @@ class _ComponentContext(object):
             return component_type.resolve(self._container)
 
         # Se for descrito como uma lista
-        if issubclass(component_type, List):
+        _GenericAlias = type(List)
+        if isinstance(component_type, _GenericAlias): #issubclass(component_type, List):
             for component in self._container.registry_map:
                 #print(List[component])
                 if component_type is List[component]:
