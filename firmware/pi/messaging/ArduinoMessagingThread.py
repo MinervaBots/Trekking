@@ -8,6 +8,7 @@ from .ArduinoMessageHandlers import ArduinoMessageHandler
 from .ArduinoCommands import ArduinoCommands
 from .PyCmdMessenger import CmdMessenger
 from .arduino import ArduinoBoard
+from serial import SerialException
 
 class ArduinoMessagingThread(MessagingThread):
     def __init__(self, handlers : List[ArduinoMessageHandler], commands : ArduinoCommands):
@@ -20,19 +21,28 @@ class ArduinoMessagingThread(MessagingThread):
     def start(self):
         if self.port == "":
             raise ValueError("A porta deve ser definida antes de iniciar a thread")
-      
+        
+        try:
+            self.__arduino = ArduinoBoard(self.port,baud_rate=self.baudRate, timeout=self.timeout)
+        except SerialException:
+            self.failed = True
+            print("Não foi possivel abrir a porta. Nenhuma funcionalidade dessa classe será executada")
+            return
+            
         commands = list()
         for opCode in self._handlers:
             commands.append([int(opCode), self._handlers[opCode].parametersTypes])
         for command in self.__commands:
             commands.append(command)
       
-        self.__arduino = ArduinoBoard(self.port,baud_rate=self.baudRate, timeout=self.timeout)
         self.__pyCmdMessenger = CmdMessenger(self.__arduino, commands)
         self.isRunning = True
         super(MessagingThread, self).start()
+        self.failed = False
     
     def send(self, opCode, *args):
+        if self.failed:
+            return
         message = [int(opCode)]
         message += args
         self._sendQueue.put(message)

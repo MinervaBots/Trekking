@@ -1,5 +1,5 @@
 from queue import Queue
-from serial import Serial
+from serial import Serial, SerialException
 from threading import Thread
 from typing import List, Dict, Any
 from .MessageHandler import MessageHandler
@@ -39,8 +39,15 @@ class MessagingThread(Thread):
     def start(self):
         if self.port == "":
             raise ValueError("A porta deve ser definida antes de iniciar a thread")
-
-        self.stream = Serial(self.port, baudrate=self.baudRate, timeout=self.timeout)
+        
+        
+        try:
+            self.stream = Serial(self.port, baudrate=self.baudRate, timeout=self.timeout)
+        except SerialException:
+            self.failed = True
+            print("Não foi possivel abrir a porta. Nenhuma funcionalidade dessa classe será executada")
+            return
+            
         self.isRunning = True
         super(MessagingThread, self).start()
         
@@ -51,6 +58,9 @@ class MessagingThread(Thread):
         self._sendQueue.queue.clear()
       
     def send(self, opCode, *args):
+        if (self.failed):
+            return
+            
         message = str(int(opCode)) + self.fieldSeparator + self.fieldSeparator.join(str(field) for field in args) + self.messageSeparator
         self._sendQueue.put(message.encode())
 

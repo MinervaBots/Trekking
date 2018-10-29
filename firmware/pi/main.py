@@ -65,7 +65,7 @@ builder.register_instance(TemperatureControl, temp)
 container = builder.build()
 
 # Extrai as instancias com as dependencias já resolvidas
-#arduinoMessagingThread = container.resolve(ArduinoMessagingThread)
+arduinoMessagingThread = container.resolve(ArduinoMessagingThread)
 bluetoothMessagingThread = container.resolve(BluetoothMessagingThread)
 
 lastUpdateTime = 0
@@ -73,11 +73,11 @@ targets = []
             
 def setup():
     video.setCameraFocalLenght(3.04) # Padrão do raspberry pi
-    #arduinoMessagingThread.setPort(systemInfo.arduinoPort)
-    #bluetoothMessagingThread.setPort(systemInfo.bluetoothPort)
+    arduinoMessagingThread.setPort(systemInfo.arduinoPort)
+    bluetoothMessagingThread.setPort(systemInfo.bluetoothPort)
 
-    #arduinoMessagingThread.start()
-    #bluetoothMessagingThread.start()
+    arduinoMessagingThread.start()
+    bluetoothMessagingThread.start()
     systemInfo.isRunning = True
     tracker.isRunning = True
     while not systemInfo.isRunning:
@@ -98,12 +98,12 @@ def loop():
     elif not systemInfo.isTracking:
         (systemInfo.isTracking, systemInfo.trackedRects, systemInfo.trackedDirections) = tracker.init(frame)
         window.putTextWarning(frame, "Tentando detectar...", (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
-        #arduinoMessagingThread.send(MessageCodes.TARGET_LOST)
+        arduinoMessagingThread.send(MessageCodes.TARGET_LOST)
     else:   
         (systemInfo.isTracking, systemInfo.trackedRects, systemInfo.trackedDirections) = tracker.update(frame)
 
         if len(systemInfo.trackedRects) == 0:
-            #arduinoMessagingThread.send(MessageCodes.TARGET_LOST)
+            arduinoMessagingThread.send(MessageCodes.TARGET_LOST)
             window.putTextError(frame, "Falha detectada no rastreamento", (20, 80), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
         else:
             for i, rect in enumerate(systemInfo.trackedRects):
@@ -121,7 +121,7 @@ def loop():
             filteredDirection = directionFilter.calculate(currentTarget.direction)
             filteredDistance = distanceFilter.calculate(currentTarget.distance)
             
-            #arduinoMessagingThread.send(MessageCodes.TARGET_FOUND, filteredDirection, filteredDistance)
+            arduinoMessagingThread.send(MessageCodes.TARGET_FOUND, filteredDirection, filteredDistance)
             window.putTextInfo(frame, tracker.methodName + ": " + str(filteredDistance), (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
 
     tempValue = temp.update()
@@ -135,12 +135,12 @@ def loop():
     return window.update(frame) == 27
 
 def stop():
-    #arduinoMessagingThread.clearSendQueue()
-    #arduinoMessagingThread.send(MessageCodes.STOP_EVENT)
+    arduinoMessagingThread.clearSendQueue()
+    arduinoMessagingThread.send(MessageCodes.STOP_EVENT)
     cv2.waitKey(500)
     
     fps.stop(True)
-    #arduinoMessagingThread.close()
+    arduinoMessagingThread.close()
     bluetoothMessagingThread.close()
     window.close()
     video.stop()
