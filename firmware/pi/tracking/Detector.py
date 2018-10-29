@@ -11,9 +11,3 @@ class Detector:
     def rectToDirection(self, rect):
         objCenterX = (((rect[0] + (rect[2] / 2.0)) / self.resolution[0]) - 0.5) * 2
         return objCenterX
-
-    @staticmethod
-    def rectToPoints(rect):
-        p1 = int(rect[0]), int(rect[1])
-        p2 = int(rect[0] + rect[2]), int(rect[1] + rect[3])
-        return p1, p2

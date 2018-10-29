@@ -65,3 +65,16 @@ class DebugWindow:
             cv2.putText(frame, text, org, fontFace, fontScale, color, thickness, lineType, bottomLeftOrigin)
         else:
             print(text)
+
+    def drawTargets(self, frame, targets, thickness = 1, lineType = cv2.LINE_8):
+        for i, target in enumerate(targets):
+            p1, p2 = DebugWindow.rectToPoints(target.rect)
+            org = ( int((p1[0] + p2[0]) / 2), int((p1[1] + p2[1]) / 2))
+            self.rectangle(frame, p1, p2, target.color, 2, 1)
+            self.putText(frame, str(i), org, cv2.FONT_HERSHEY_SIMPLEX, 0.75, target.color, 2)
+            
+    @staticmethod
+    def rectToPoints(rect):
+        p1 = int(rect[0]), int(rect[1])
+        p2 = int(rect[0] + rect[2]), int(rect[1] + rect[3])
+        return p1, p2

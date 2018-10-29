@@ -12,6 +12,7 @@ from tracking.Detector import Detector
 from tracking.CascadeDetector import CascadeDetector
 from tracking.Tracker import Tracker
 from tracking.OpenCVTracker import OpenCVTracker
+from targeting.Target import Target
 import time
 
 from messaging.ArduinoMessagingThread import ArduinoMessagingThread
@@ -68,7 +69,8 @@ container = builder.build()
 bluetoothMessagingThread = container.resolve(BluetoothMessagingThread)
 
 lastUpdateTime = 0
-
+targets = []
+            
 def setup():
     video.setCameraFocalLenght(3.04) # Padrão do raspberry pi
     #arduinoMessagingThread.setPort(systemInfo.arduinoPort)
@@ -84,7 +86,6 @@ def setup():
     fps.start()
     window.open()
     
-
 def loop():
     global lastUpdateTime
     
@@ -105,17 +106,22 @@ def loop():
             #arduinoMessagingThread.send(MessageCodes.TARGET_LOST)
             window.putTextError(frame, "Falha detectada no rastreamento", (20, 80), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
         else:
-            
-            for rect in systemInfo.trackedRects:
-                p1, p2 = Detector.rectToPoints(rect)
-                window.rectangle(frame, p1, p2, (255, 255, 0), 2, 1)
+            for i, rect in enumerate(systemInfo.trackedRects):
+                distance = video.calculateDistance(rect[2], 0.5)
+                direction = systemInfo.trackedDirections[i]
+                if len(targets) <= i:
+                    targets.append(Target(rect, distance, direction))
+                else:
+                    targets[i].update(rect, distance, direction)
 
-            distance = video.calculateDistance(systemInfo.trackedRects[0][2], 0.5)
+            sortedTargets = sorted(targets, key = lambda t : t.distance)
+            window.drawTargets(frame, sortedTargets, 2, 1)
+            currentTarget = sortedTargets[0]
             
-            filteredDirection = directionFilter.calculate(systemInfo.trackedDirections[0])
-            filteredDistance = distanceFilter.calculate(distance)
-            # Mapeia a posição em pixels na tela para uma direção entre -1 e 1
-            #arduinoMessagingThread.send(MessageCodes.TARGET_FOUND, systemInfo.trackedDirection, filteredDistance)
+            filteredDirection = directionFilter.calculate(currentTarget.direction)
+            filteredDistance = distanceFilter.calculate(currentTarget.distance)
+            
+            #arduinoMessagingThread.send(MessageCodes.TARGET_FOUND, filteredDirection, filteredDistance)
             window.putTextInfo(frame, tracker.methodName + ": " + str(filteredDistance), (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
 
     tempValue = temp.update()
