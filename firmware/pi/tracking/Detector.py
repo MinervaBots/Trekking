@@ -14,6 +14,6 @@ class Detector:
 
     @staticmethod
     def rectToPoints(rect):
-        p1 = rect[0], rect[1]
-        p2 = rect[0] + rect[2], rect[1] + rect[3]
+        p1 = int(rect[0]), int(rect[1])
+        p2 = int(rect[0] + rect[2]), int(rect[1] + rect[3])
         return p1, p2

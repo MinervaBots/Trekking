@@ -16,5 +16,5 @@ class SystemInfo:
             self.enableWindow = True
             
         self.isTracking = False
-        self.trackedRect = (0, 0, 0, 0)
-        self.trackedDirection = 0
+        self.trackedRects = [(0, 0, 0, 0)]
+        self.trackedDirections = [0]

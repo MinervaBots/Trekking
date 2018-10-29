@@ -21,10 +21,14 @@ class Tracker:
     
     def update(self, frame):
         if not self.isRunning:
-            return False, None, 0
+            return False, [], []
         
         delta = datetime.datetime.now() - self.lastDetectRunTime
-        tracked = self._track(frame)
-        if not tracked[0] or delta.seconds * 1000 > self.detectionIntervalMs:
-            return self._detect(frame)
-        return tracked
+        if (delta.seconds * 1000 > self.detectionIntervalMs):
+            return self.init(frame)
+        else:
+            tracked = self._track(frame)
+            
+            if not tracked[0]:
+                tracked = self.init(frame)
+            return tracked

@@ -14,6 +14,9 @@ class CascadeDetector(Detector):
         self.colorIntervals = colorIntervals
     
     def find(self, frame):
+        resultObjs = []
+        resultDirections = []
+        
         userColor = len(self.colorIntervals) > 0
         
         objects = self.__cascadeDetector.detectMultiScale(frame, self.scaleFactor, self.minNeighbors, self.flags, self.minSize, self.maxSize)
@@ -33,10 +36,9 @@ class CascadeDetector(Detector):
                     # Se não tiver essa porcentagem de cor, pula esse objeto
                     continue
             
-            # A forma como está implementado retorna após detectar o primeiro objeto.
-            # Pode ser interessante ser capaz de detectar todos e escolher qual seguir.
-            # Para isso é necessário modificar parte da API e implementar um algoritmo de decisão.
-            return True, obj, self.rectToDirection(obj)
+            #print(obj)
+            resultObjs.append(obj)
+            resultDirections.append(self.rectToDirection(obj))
             
-        return False, None, 0
+        return len(resultObjs) > 0, resultObjs, resultDirections
     

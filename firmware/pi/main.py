@@ -31,7 +31,7 @@ video = VideoStream(usePiCamera = systemInfo.isRaspberryPi, framerate = 30, reso
 video.start() # Inicializa a câmera aqui pra ter tempo de esquentar se for no Raspberry Pi
 
 detector = CascadeDetector(video.resolution, "cascades/face.xml")
-tracker = OpenCVTracker(detector, 2000, "MEDIANFLOW")
+tracker = OpenCVTracker(detector, 1000, "MEDIANFLOW")
 window = DebugWindow(systemInfo.enableWindow, "debug", video.resolution, 1, False)
 
 #Medida de performance
@@ -95,40 +95,43 @@ def loop():
     if not tracker.isRunning:
         pass
     elif not systemInfo.isTracking:
-        (systemInfo.isTracking, systemInfo.trackedRect, systemInfo.trackedDirection) = tracker.init(frame)
+        (systemInfo.isTracking, systemInfo.trackedRects, systemInfo.trackedDirections) = tracker.init(frame)
         window.putTextWarning(frame, "Tentando detectar...", (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
         #arduinoMessagingThread.send(MessageCodes.TARGET_LOST)
     else:   
-        (systemInfo.isTracking, systemInfo.trackedRect, systemInfo.trackedDirection) = tracker.update(frame)
+        (systemInfo.isTracking, systemInfo.trackedRects, systemInfo.trackedDirections) = tracker.update(frame)
 
-        if systemInfo.trackedRect is None or systemInfo.trackedDirection == -1:
+        if len(systemInfo.trackedRects) == 0:
             #arduinoMessagingThread.send(MessageCodes.TARGET_LOST)
             window.putTextError(frame, "Falha detectada no rastreamento", (20, 80), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
-        else:    
-            systemInfo.trackedRect = [int(i) for i in systemInfo.trackedRect]
-            p1, p2 = Detector.rectToPoints(systemInfo.trackedRect)
-            window.rectangle(frame, p1, p2, (255, 255, 0), 2, 1)
-
-            distance = video.calculateDistance(systemInfo.trackedRect[2], 0.5)
+        else:
             
-            filteredDirection = directionFilter.calculate(systemInfo.trackedDirection)
+            for rect in systemInfo.trackedRects:
+                p1, p2 = Detector.rectToPoints(rect)
+                window.rectangle(frame, p1, p2, (255, 255, 0), 2, 1)
+
+            distance = video.calculateDistance(systemInfo.trackedRects[0][2], 0.5)
+            
+            filteredDirection = directionFilter.calculate(systemInfo.trackedDirections[0])
             filteredDistance = distanceFilter.calculate(distance)
             # Mapeia a posição em pixels na tela para uma direção entre -1 e 1
             #arduinoMessagingThread.send(MessageCodes.TARGET_FOUND, systemInfo.trackedDirection, filteredDistance)
             window.putTextInfo(frame, tracker.methodName + ": " + str(filteredDistance), (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
 
-    window.putTextInfo(frame, "({:.0f}, {:.2f})".format(*fps.update()) + " - Temp: " + str(temp.update()) + " 'C", (20, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
+    tempValue = temp.update()
+    window.putTextInfo(frame, "({:.0f}, {:.2f})".format(*fps.update()) + " - Temp: " + str(tempValue) + " 'C", (20, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
 
     if(lastUpdateTime - time.time() > 2):
-        arduinoMessagingThread.send(MessageCodes.TEMPERATURE, temp.update())
-        lastUpdateTime = time.time() 
+        arduinoMessagingThread.send(MessageCodes.TEMPERATURE, tempValue)
+        lastUpdateTime = time.time()
+        
     # ESC pressionado
     return window.update(frame) == 27
 
 def stop():
     #arduinoMessagingThread.clearSendQueue()
     #arduinoMessagingThread.send(MessageCodes.STOP_EVENT)
-    cv2.waitKey(500);
+    cv2.waitKey(500)
     
     fps.stop(True)
     #arduinoMessagingThread.close()
