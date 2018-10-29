@@ -53,7 +53,7 @@ def setup():
 def loop():
     global lastUpdateTime
 
-    if not(video.more()):
+    if not(video.running()):
         return True
     
     frame = video.read()
