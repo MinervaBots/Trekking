@@ -24,23 +24,31 @@ class PiVideoStream:
     def start(self):
         self.stream = self.camera.capture_continuous(self.rawCapture, format="bgr", use_video_port=True)
         # start the thread to read frames from the video stream
-        Thread(target=self.update, args=()).start()
+        
+        self.__thread = Thread(target=self.update, args=())
+        self.__thread.daemon = True
+        self.__thread.start()
+        
         return self
  
     def update(self):
         # keep looping infinitely until the thread is stopped
         for f in self.stream:
+        
+            # if the thread indicator variable is set, stop the thread
+            # and resource camera resources
+            if self.stopped:
+                break
+                
             # grab the frame from the stream and clear the stream in
             # preparation for the next frame
             self.frame = f.array
             self.rawCapture.truncate(0)
      
-            # if the thread indicator variable is set, stop the thread
-            # and resource camera resources
-            if self.stopped:
-                self.stream.close()
-                self.rawCapture.close()
-                self.camera.close()
+                
+        self.stream.close()
+        self.rawCapture.close()
+        self.camera.close()
         
     def read(self):
         # return the frame most recently read
@@ -49,4 +57,4 @@ class PiVideoStream:
     def stop(self):
         # indicate that the thread should be stopped
         self.stopped = True
-        return
+        self.__thread.join()

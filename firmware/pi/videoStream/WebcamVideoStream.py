@@ -27,7 +27,10 @@ class WebcamVideoStream:
         
         (self.grabbed, self.frame) = self.stream.read()
         # start the thread to read frames from the video stream
-        Thread(target=self.update, args=()).start()
+        
+        self.__thread = Thread(target=self.update, args=())
+        self.__thread.daemon = True
+        self.__thread.start()
         return self
  
     def update(self):
@@ -35,12 +38,12 @@ class WebcamVideoStream:
         while True:
             # if the thread indicator variable is set, stop the thread
             if self.stopped:
-                self.stream.release();
-                return
+                break
  
             # otherwise, read the next frame from the stream
             (self.grabbed, self.frame) = self.stream.read()
-            
+        self.stream.release()
+        
     def read(self):
         # return the frame most recently read
         return self.frame
@@ -48,3 +51,4 @@ class WebcamVideoStream:
     def stop(self):
         # indicate that the thread should be stopped
         self.stopped = True
+        self.__thread.join()
