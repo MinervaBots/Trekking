@@ -22,7 +22,7 @@ from messaging.ArduinoMessageHandlers import *
 from messaging.ArduinoCommands import *
 from messaging.BluetoothMessageHandlers import *
 
-directionFilter = RunningAverageFilter()
+directionFilter = SimpleLowPassFilter(0.5)
 distanceFilter = RunningAverageFilter(100)
 
 systemInfo = SystemInfo()
@@ -122,7 +122,7 @@ def loop():
             filteredDistance = distanceFilter.calculate(currentTarget.distance)
             
             arduinoMessagingThread.send(MessageCodes.TARGET_FOUND, filteredDirection, filteredDistance)
-            window.putTextInfo(frame, tracker.methodName + ": " + str(filteredDistance), (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
+            window.putTextInfo(frame, tracker.methodName + ": {:.2f}".format(filteredDistance), (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
 
     tempValue = temp.update()
     window.putTextInfo(frame, "({:.0f}, {:.2f})".format(*fps.update()) + " - Temp: " + str(tempValue) + " 'C", (20, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)

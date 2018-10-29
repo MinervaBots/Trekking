@@ -4,14 +4,15 @@ class SimpleLowPassFilter:
         self.output = 0
         
     def calculate(self, input : float):
-        self.output = input + (self.alpha * self.output)
+        self.output += self.alpha * (input - self.output)
+        
         return self.output
         
 class RunningAverageFilter:
     def __init__(self, samplesCount = 16):
-        self.samplesCount = 16
+        self.samplesCount = samplesCount
         self.__nextSampleId = 0
-        self.samplesList = 16 * [0]
+        self.samplesList = samplesCount * [0]
     
     def calculate(self, input : float):
         self.samplesList[self.__nextSampleId] = input
