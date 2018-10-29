@@ -14,19 +14,17 @@ class Tracker:
     def start(self):
         self.isRunning = True
     
-    def _shouldRunDetection(self):
-        delta = datetime.datetime.now() - self.lastDetectRunTime
-        return delta.seconds * 1000 > self.detectionIntervalMs
-    
     def _detect(self, frame):
         self.lastDetectRunTime = datetime.datetime.now()
-        return self.detector.find(frame)
+        result = self.detector.find(frame)
+        return result
     
     def update(self, frame):
         if not self.isRunning:
             return False, None, 0
-            
-        if (self._shouldRunDetection()):
-            return self._detect(frame)
         
-        return self._track(frame)
+        delta = datetime.datetime.now() - self.lastDetectRunTime
+        tracked = self._track(frame)
+        if not tracked[0] or delta.seconds * 1000 > self.detectionIntervalMs:
+            return self._detect(frame)
+        return tracked
