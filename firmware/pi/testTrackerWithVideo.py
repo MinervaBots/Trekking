@@ -65,26 +65,23 @@ def loop():
     if not tracker.isRunning:
         pass
     elif not systemInfo.isTracking:
-        (systemInfo.isTracking, systemInfo.trackedRect, systemInfo.trackedDirection) = tracker.init(frame)
+        (systemInfo.isTracking, systemInfo.trackedRects, systemInfo.trackedDirections) = tracker.init(frame)
         window.putTextWarning(frame, "Tentando detectar...", (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
     else:   
-        (systemInfo.isTracking, systemInfo.trackedRect, systemInfo.trackedDirection) = tracker.update(frame)
+        (systemInfo.isTracking, systemInfo.trackedRects, systemInfo.trackedDirections) = tracker.update(frame)
 
-        if systemInfo.trackedRect is None or systemInfo.trackedDirection == -1:
+        if len(systemInfo.trackedRects) == 0:
             window.putTextError(frame, "Falha detectada no rastreamento", (20, 80), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
-        else:    
-            systemInfo.trackedRect = [int(i) for i in systemInfo.trackedRect]
-            p1, p2 = Detector.rectToPoints(systemInfo.trackedRect)
-            window.rectangle(frame, p1, p2, (255, 255, 0), 2, 1)
+        else:
+            for rect in systemInfo.trackedRects:
+                p1, p2 = Detector.rectToPoints(rect)
+                window.rectangle(frame, p1, p2, (255, 255, 0), 2, 1)
 
-            distance = video.calculateDistance(systemInfo.trackedRect[2], 0.5)
+            distance = video.calculateDistance(systemInfo.trackedRects[0][2], 0.5)
             window.putTextInfo(frame, tracker.methodName + ": " + str(distance), (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
 
     window.putTextInfo(frame, "({:.0f}, {:.2f})".format(*fps.update()) + " - Temp: " + str(temp.update()) + " 'C", (20, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
 
-    if(lastUpdateTime - time.time() > 2):
-        arduinoMessagingThread.send(MessageCodes.TEMPERATURE, temp.update())
-        lastUpdateTime = time.time() 
     # ESC pressionado
     return window.update(frame) == 27
 
