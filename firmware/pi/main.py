@@ -23,7 +23,7 @@ from messaging.ArduinoCommands import *
 from messaging.BluetoothMessageHandlers import *
 
 directionFilter = SimpleLowPassFilter(0.5)
-distanceFilter = RunningAverageFilter(100)
+distanceFilter = ResponsiveExponentialFilter(True, 0.1, 0.5, (0, 1000))
 
 systemInfo = SystemInfo()
 

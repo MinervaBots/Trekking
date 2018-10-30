@@ -38,14 +38,14 @@ class ExponentialFilter:
         return self.output
 
 class ResponsiveExponentialFilter:
-    def __init__(self, sleepEnable : bool, snapMultiplier : float = 0.01):
+    def __init__(self, sleepEnable, snapMultiplier = 0.01, activityThreshold = 0.2, edge = (-1, 1)):
         self.sleepEnable = sleepEnable
         self.output = 0
         
         self.enableEdgeSnap()
         self.setSnapMultiplier(snapMultiplier)
-        self.setActivityThreshold(0.2)
-        self.setEdge(-1, 1)
+        self.setActivityThreshold(activityThreshold)
+        self.setEdge(*edge)
         
         #    Variaveis usadas no calculo do filtro
         self.sleeping = False
