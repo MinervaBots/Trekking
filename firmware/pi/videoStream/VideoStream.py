@@ -30,7 +30,6 @@ class VideoStream:
         if(dimensionInPixels == 0):
             return 0
         
-        print (dimensionInPixels)
         distance = (dimensionInMeters * self.focalLenght) / dimensionInPixels
         return distance
     
