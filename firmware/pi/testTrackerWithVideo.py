@@ -7,11 +7,13 @@ from SystemInfo import SystemInfo
 from utils.PerfCounter import PerfCounter
 from utils.DebugWindow import DebugWindow
 from utils.TemperatureControl import TemperatureControl
+from utils.Filters import *
 from videoStream.FileVideoStream import FileVideoStream
 from tracking.Detector import Detector
 from tracking.CascadeDetector import CascadeDetector
 from tracking.Tracker import Tracker
 from tracking.OpenCVTracker import OpenCVTracker
+from targeting.Target import Target
 import time
 import tkinter as tk
 from tkinter import filedialog
@@ -22,6 +24,10 @@ root.withdraw()
 videoPath = filedialog.askopenfilename()
 cascadePath = filedialog.askopenfilename()
 
+
+directionFilter = SimpleLowPassFilter(0.5)
+distanceFilter = SimpleLowPassFilter(0.5)
+
 systemInfo = SystemInfo()
 
 #Captura de video
@@ -29,15 +35,14 @@ video = FileVideoStream(videoPath, resolution = (640, 368))
 video.start()
 
 detector = CascadeDetector(video.resolution, cascadePath)
-tracker = OpenCVTracker(detector, 4000, "MEDIANFLOW")
+tracker = OpenCVTracker(detector, 4000, "CSRT")
 window = DebugWindow(True, "debug", video.resolution, 1, False)
 
 #Medida de performance
 fps = PerfCounter(False)
 temp = TemperatureControl(1)
+targets = []
 
-
-lastUpdateTime = 0
 
 def setup():
     video.setCameraFocalLenght(3.04) # Padrão do raspberry pi
@@ -73,12 +78,22 @@ def loop():
         if len(systemInfo.trackedRects) == 0:
             window.putTextError(frame, "Falha detectada no rastreamento", (20, 80), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
         else:
-            for rect in systemInfo.trackedRects:
-                p1, p2 = Detector.rectToPoints(rect)
-                window.rectangle(frame, p1, p2, (255, 255, 0), 2, 1)
+            for i, rect in enumerate(systemInfo.trackedRects):
+                distance = video.calculateDistance(rect[2], 0.2)
+                direction = systemInfo.trackedDirections[i]
+                if len(targets) <= i:
+                    targets.append(Target(rect, distance, direction))
+                else:
+                    targets[i].update(rect, distance, direction)
+            
+            sortedTargets = sorted(targets[:len(systemInfo.trackedRects)], key = lambda t : t.distance)
+            window.drawTargets(frame, sortedTargets, 2, 1)
+            currentTarget = sortedTargets[0]
+            
+            filteredDirection = directionFilter.calculate(currentTarget.direction)
+            filteredDistance = distanceFilter.calculate(currentTarget.distance)
 
-            distance = video.calculateDistance(systemInfo.trackedRects[0][2], 0.5)
-            window.putTextInfo(frame, tracker.methodName + ": " + str(distance), (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
+            window.putTextInfo(frame, tracker.methodName + ": ({:.2f}, {:.2f})".format(filteredDistance, filteredDirection), (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
 
     window.putTextInfo(frame, "({:.0f}, {:.2f})".format(*fps.update()) + " - Temp: " + str(temp.update()) + " 'C", (20, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
 
