@@ -113,8 +113,8 @@ def loop():
                     targets.append(Target(rect, distance, direction))
                 else:
                     targets[i].update(rect, distance, direction)
-
-            sortedTargets = sorted(targets, key = lambda t : t.distance)
+            
+            sortedTargets = sorted(targets[:len(systemInfo.trackedRects)], key = lambda t : t.distance)
             window.drawTargets(frame, sortedTargets, 2, 1)
             currentTarget = sortedTargets[0]
             
