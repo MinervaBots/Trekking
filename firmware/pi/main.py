@@ -23,7 +23,7 @@ from messaging.ArduinoCommands import *
 from messaging.BluetoothMessageHandlers import *
 
 directionFilter = SimpleLowPassFilter(0.5)
-distanceFilter = ResponsiveExponentialFilter(True, 0.1, 0.5, (0, 1000))
+distanceFilter = SimpleLowPassFilter(0.5)
 
 systemInfo = SystemInfo()
 
@@ -32,7 +32,7 @@ video = VideoStream(usePiCamera = systemInfo.isRaspberryPi, framerate = 30, reso
 video.start() # Inicializa a câmera aqui pra ter tempo de esquentar se for no Raspberry Pi
 
 detector = CascadeDetector(video.resolution, "cascades/face.xml")
-tracker = OpenCVTracker(detector, 1000, "MEDIANFLOW")
+tracker = OpenCVTracker(detector, 500, "MEDIANFLOW")
 window = DebugWindow(systemInfo.enableWindow, "debug", video.resolution, 1, False)
 
 #Medida de performance
@@ -72,7 +72,7 @@ lastUpdateTime = 0
 targets = []
             
 def setup():
-    video.setCameraFocalLenght(3.04) # Padrão do raspberry pi
+    video.setCameraFocalLenght(459) # Valor calculado para a câmera do notebook do Paulo
     arduinoMessagingThread.setPort(systemInfo.arduinoPort)
     bluetoothMessagingThread.setPort(systemInfo.bluetoothPort)
 
@@ -107,7 +107,7 @@ def loop():
             window.putTextError(frame, "Falha detectada no rastreamento", (20, 80), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 2)
         else:
             for i, rect in enumerate(systemInfo.trackedRects):
-                distance = video.calculateDistance(rect[2], 0.5)
+                distance = video.calculateDistance(rect[2], 0.2)
                 direction = systemInfo.trackedDirections[i]
                 if len(targets) <= i:
                     targets.append(Target(rect, distance, direction))

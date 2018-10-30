@@ -29,7 +29,9 @@ class VideoStream:
         "Retorna a distancia do objeto em metros"
         if(dimensionInPixels == 0):
             return 0
-        distance = (((dimensionInMeters * 1000) * self.focalLenght) / dimensionInPixels)
+        
+        print (dimensionInPixels)
+        distance = (dimensionInMeters * self.focalLenght) / dimensionInPixels
         return distance
     
     @property
