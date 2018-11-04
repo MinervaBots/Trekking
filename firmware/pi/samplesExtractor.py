@@ -131,11 +131,6 @@ def saveSamples(frame, positives, negatives):
   global countPos, countNeg
   
   for rect in positives:
-        # 33% de chance de pular as amostras negativas dessa imagem
-        # A ideia é evitar também muitas imagens de positivo parecidas
-        if (random.randint(0, 2) == 0):
-          continue
-        
         x,y,w,h = map(int, rect)
         roi = frame[y:y+h, x:x+w]
 
@@ -148,12 +143,7 @@ def saveSamples(frame, positives, negatives):
         countPos += 1
 
 
-  for rect in negatives:  
-      # 66% de chance de pular as amostras negativas dessa imagem
-      # A ideia é evitar também muitos backgrounds parecidos
-      if (random.randint(0, 2) != 0):
-        continue
-  
+  for rect in negatives:
       x,y,w,h = map(int, rect)
       roi = frame[y:y+h, x:x+w]
       
@@ -229,8 +219,14 @@ while video.running():
     #_, positives, negatives = detector.detect(frame)
     cv2.imshow("Foreground", frame)
     saveSamples(originalFrame, positives, negatives)
+
+
+    i = 0
+    jump = random.randint(0, 10)
+    while i < jump:
+      frame = video.read()
+      i += 1
     
-    frame = video.read()
     frame = cv2.resize(frame, (640, 368))
 
     key = cv2.waitKey(1) & 0xFF
